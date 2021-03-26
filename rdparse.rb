@@ -234,6 +234,13 @@ end
 # This part defines the dice language
 #
 ##############################################################################
+class GameLanguage
+
+  def initialize
+    @gameParser = Parser.new("game language") do
+      token()
+
+  end
 
 class DiceRoller
 
