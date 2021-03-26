@@ -383,6 +383,7 @@ class GameLanguage
       match(:math_exp, "-", :term)
       match(:term)
     end
+    
     rule :term do
       match(:term, "*", :factor)
       match(:term, "/", :factor)
