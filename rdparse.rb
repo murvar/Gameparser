@@ -238,6 +238,7 @@ class GameLanguage
 
   def initialize
     @gameParser = Parser.new("game language") do
+      token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
       #token(/\d+/) {|m| m.to_i } #returns numbers as integers
       token(/\w+/) {|m| m } #returns chars
@@ -245,9 +246,13 @@ class GameLanguage
     end
   end
 
-  def roll
+  def done(str)
+    ["quit","exit","bye",""].include?(str.chomp)
+  end
+
+  def roll(file)
     print "[gameParser] "
-    str = gets
+    str = File.read(file)
     if done(str) then
       puts "Bye."
     else
@@ -265,7 +270,7 @@ class GameLanguage
   end
 end
 
-GameLanguage.new.roll
+GameLanguage.new.roll("example.rb")
 
 class LogicExpr
   def initialize
@@ -312,7 +317,7 @@ class LogicExpr
     ["quit","exit","bye",""].include?(str.chomp)
   end
 
-    def roll
+  def roll
       print "[logixexpr] "
       str = gets
       if done(str) then
@@ -321,24 +326,13 @@ class LogicExpr
         puts "=> #{@LogicParser.parse str}"
         roll
       end
-    end
+  end
 
-    def log(state = true)
+  def log(state = true)
       if state
         @diceParser.logger.level = Logger::DEBUG
       else
         @diceParser.logger.level = Logger::WARN
       end
-    end
+  end
 end
-# Examples of use
-
-# irb(main):1696:0> DiceRoller.new.roll
-# [diceroller] 1+3
-# => 4
-# [diceroller] 1+d4
-# => 2
-# [diceroller] 1+d4
-# => 3
-# [diceroller] (2+8*d20)*3d6
-# => 306
