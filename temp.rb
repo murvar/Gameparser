@@ -7,7 +7,7 @@ class GameLanguage
       @user_assignments = {}
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
-      token(/^[-+]?\d+$/) {|m| m.to_i} #returns integers
+      token(/^[-+]?\d+/) {|m| m.to_i} #returns integers
       token(/\w+/) {|m| m } #returns chars
       token(/./) {|m| m } #returns rest
 
@@ -21,43 +21,42 @@ class GameLanguage
       end
 
       rule :comp do
-        match(:type) {|m| m }
-        match(:block_comp) {|m| m }
+        match(:definition) {|m| m }
+        match(:statement) {|m| m }
       end
 
-      rule :block_comps do
-        match(:block_comps, :block_comp)
-        match(:block_comp)
-      end
-
-      rule :block_comp do
-        match(:function) {|m| m }
-        match(:cond_exp) {|m| m }
-        match(:loop) {|m| m }
-        match(:assignment) {|m| m }
-        match("") # hur matchar vi Empty?
-      end
-
-      rule :function do
-        match(:run)
-        match(:read?)
-        match(:write?)
-      end
-
-      rule :read do
-      end
-
-      rule :write do
-      end
-
-      rule :type do
+      rule :definition do
+        match(:type)
         match(:event)
-        match(:object)
+      end
+      
+      rule :statement do
+        # match(:function_call)
+        match(:condition)
+        match(:loop)
+        match(:assignment)
+        match(:exp)
       end
 
-      rule :event do
-        match("event", String, "{", :assignsments, :run,"}")
-      end
+      # rule :function_call do
+      #   match(:run)
+      #   match(:read?)
+      #   match(:write?)
+      # end
+
+      # rule :read do
+      # end
+
+      # rule :write do
+      # end
+
+      # rule :type do
+      #   match("type", String, "{", :assignsments, :run,"}")
+      # end
+
+      # rule :event do
+      #   match("event", String, "{", :assignsments, :run,"}")
+      # end
 
       rule :assignsments do
         match(:assignsments, :assignment)
@@ -67,13 +66,11 @@ class GameLanguage
       rule :assignment do
         match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
       end
-
-      rule :run do
-        match("run", "(""example.rb", :block_comps, ")")
-      end
-
-      rule :var do
-        match(String) {|s| s}
+      
+      rule :exp do
+        match(:math_exp)
+        match(:log_exp)
+        match(:bool_exp)
       end
 
       rule :values do
@@ -82,21 +79,22 @@ class GameLanguage
       end
 
       rule :value do
-        match(:bool_val){|b| b}
         match('"', String, '"') {|_, s, _| s}
-        match(Integer){|i| i}
         match(:array) {|a| a}
-        match(:function_call) {|f| f}
-        match(:var){|v| @user_assignments[v]}
+        match(:exp)
       end
-
+      
       rule :array do
         match("[", :values, "]") {|_, v, _| v}
         match("[", "]") {[]}
       end
+      
+      rule :run do
+        match("run", "(""example.rb", :block_comps, ")")
+      end
 
-      rule :object do
-        match(:assignsments)
+      rule :var do
+        match(String) {|s| s}
       end
 
       rule :loop do
@@ -104,7 +102,7 @@ class GameLanguage
         match(:for)
       end
 
-      rule :cond_exp do
+      rule :condition do
         match(:if)
         match(:switch)
       end
@@ -138,6 +136,7 @@ class GameLanguage
       rule :log_exp do
         match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
         match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
+        match("not", :log_exp) {|m| !m}
         match(:bool_exp) {|m| m}
       end
 
@@ -149,12 +148,12 @@ class GameLanguage
         match(:math_exp, ">=", :math_exp) {|m, _, n| m >= n}
         match(:math_exp, "!=", :math_exp) {|m, _, n| m != n}
         match(:bool_val) {|m| m}
-        match(:var) {|m| m}
-      end
+        match(:var) {|m| @user_assignments[m]}
+        end
 
       rule :bool_val do
-        match("True") {TRUE}
-        match("False") {FALSE}
+        match("True") {true}
+        match("False") {false}
       end
 
       rule :math_exp do
@@ -171,10 +170,15 @@ class GameLanguage
 
       rule :factor do
         match(Integer) {|m| m}
-        match(:var) {|m| @user_assignmentsm[m]}
+        match(:var) {|m| @user_assignments[m]}
       end
     end
+    
+# ============================================================
+# Parser end
+# ============================================================
 
+    
     def done(str)
       ["quit","exit","bye",""].include?(str.chomp)
     end
