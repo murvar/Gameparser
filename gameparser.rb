@@ -4,30 +4,34 @@ class GameLanguage
 
   def initialize
     @gameParser = Parser.new("game language") do
+      @user_assignments = {}
+
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
+      #warrior1 = 22
+      token(/^[-+]?\d+$/) {|m| m.to_i}
       token(/\w+/) {|m| m } #returns chars
       token(/./) {|m| m } #returns rest
 
       start :prog do
-        match(:comps)
+        match(:comps) {|m| m }
       end
 
       rule :comps do
-        match(:comp, :comps)
-        match(:comp)
+        match(:comp, :comps) {|m| m }
+        match(:comp) {|m| m }
       end
 
       rule :comp do
-        match(:type)
-        match(:block_comp)
+        match(:type) {|m| m }
+        match(:block_comp) {|m| m }
       end
 
       rule :block_comp do
-        match(:function)
-        match(:cond_exp)
-        match(:loop)
-        match(:assignment)
+        match(:function) {|m| m }
+        match(:cond_exp) {|m| m }
+        match(:loop) {|m| m }
+        match(:assignment) {|m| m }
         match("") # hur matchar vi Empty?
       end
 
@@ -58,7 +62,7 @@ class GameLanguage
       end
 
       rule :assignment do
-        match(:var, "=", :value)
+        match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
       end
 
       rule :run do
@@ -66,18 +70,27 @@ class GameLanguage
       end
 
       rule :var do
-        match(String)
+        match(String) {|s| s}
       end
 
       rule :values do
         match(:values, :value)
         match(:value)
       end
-
+      var = "Hadi"
+      var2 = "1234"
       rule :value do
-        match(String){|s| s}
-        match(Integer){|i| i}
-        #match(Bool){|b| b}
+        match(String){|s|
+          x = Integer(s) resque false
+          if x
+            x
+          else
+            s
+          end
+        end
+        }
+        #match(Integer){|i| i}
+        match(:bool_val){|b| b}
         match(:array)
         match(:function_call)
 
@@ -140,8 +153,8 @@ class GameLanguage
         match(:var)
       end
       rule :bool_val do
-        match("true") {True}
-        match("false")  {False}
+        match("True") {True}
+        match("False") {False}
       end
 
       rule :math_exp do
@@ -183,7 +196,7 @@ class GameLanguage
         @gameParser.logger.level = Logger::WARN
       end
     end
-    
+
   end
 end
 

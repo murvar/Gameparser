@@ -54,7 +54,7 @@
 
 type Kratos()
 {
-    attack = 8
+    attack = -8
     agility = 5
     health = 20
     inventory = []
