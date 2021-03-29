@@ -5,11 +5,9 @@ class GameLanguage
   def initialize
     @gameParser = Parser.new("game language") do
       @user_assignments = {}
-
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
-      #warrior1 = 22
-      token(/^[-+]?\d+$/) {|m| m.to_i}
+      token(/^[-+]?\d+$/) {|m| m.to_i} #returns integers
       token(/\w+/) {|m| m } #returns chars
       token(/./) {|m| m } #returns rest
 
@@ -18,13 +16,18 @@ class GameLanguage
       end
 
       rule :comps do
-        match(:comp, :comps) {|m| m }
+        match(:comps, :comp) {|m| m }
         match(:comp) {|m| m }
       end
 
       rule :comp do
         match(:type) {|m| m }
         match(:block_comp) {|m| m }
+      end
+
+      rule :block_comps do
+        match(:block_comps, :block_comp)
+        match(:block_comp)
       end
 
       rule :block_comp do
@@ -66,7 +69,7 @@ class GameLanguage
       end
 
       rule :run do
-        match("run", "(", :block_comps, ")")
+        match("run", "(""example.rb", :block_comps, ")")
       end
 
       rule :var do
@@ -74,31 +77,22 @@ class GameLanguage
       end
 
       rule :values do
-        match(:values, :value)
-        match(:value)
+        match(:values, ",", :value) {|m, _, n| m + Array(n)}
+        match(:value) {|m| Array(m)}
       end
-      var = "Hadi"
-      var2 = "1234"
-      rule :value do
-        match(String){|s|
-          x = Integer(s) resque false
-          if x
-            x
-          else
-            s
-          end
-        end
-        }
-        #match(Integer){|i| i}
-        match(:bool_val){|b| b}
-        match(:array)
-        match(:function_call)
 
+      rule :value do
+        match(:bool_val){|b| b}
+        match('"', String, '"') {|_, s, _| s}
+        match(Integer){|i| i}
+        match(:array) {|a| a}
+        match(:function_call) {|f| f}
+        match(:var){|v| @user_assignments[v]}
       end
 
       rule :array do
-        match("[", :values, "]")
-        match("[", "]")
+        match("[", :values, "]") {|_, v, _| v}
+        match("[", "]") {[]}
       end
 
       rule :object do
@@ -133,44 +127,51 @@ class GameLanguage
         match(:case)
       end
 
+      rule :case do
+        match()
+      end
+
       rule :for do
         match("for", :var, "in", :array, "{", :block_comps, "}")
       end
 
       rule :log_exp do
-        match(:bool_exp, "and", :log_exp)
-        match(:bool_exp, "or", :log_exp)
-        match(:bool_exp)
+        match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
+        match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
+        match(:bool_exp) {|m| m}
       end
+
       rule :bool_exp do
-        match(:math_exp, "<", :math_exp)
-        match(:math_exp, "<=", :math_exp)
-        match(:math_exp, "==", :math_exp)
-        match(:math_exp, ">", :math_exp)
-        match(:math_exp, ">=", :math_exp)
-        match(:math_exp, "!=", :math_exp)
-        match(:bool_val)
-        match(:var)
+        match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
+        match(:math_exp, "<=", :math_exp) {|m, _, n| m <= n}
+        match(:math_exp, "==", :math_exp) {|m, _, n| m == n}
+        match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
+        match(:math_exp, ">=", :math_exp) {|m, _, n| m >= n}
+        match(:math_exp, "!=", :math_exp) {|m, _, n| m != n}
+        match(:bool_val) {|m| m}
+        match(:var) {|m| m}
       end
+
       rule :bool_val do
-        match("True") {True}
-        match("False") {False}
+        match("True") {TRUE}
+        match("False") {FALSE}
       end
 
       rule :math_exp do
-        match(:math_exp, "+", :term)
-        match(:math_exp, "-", :term)
-        match(:term)
+        match(:math_exp, "+", :term) {|m, _, n| m + n}
+        match(:math_exp, "-", :term) {|m, _, n| m - n}
+        match(:term) {|m| m}
       end
 
       rule :term do
-        match(:term, "*", :factor)
-        match(:term, "/", :factor)
-        match(:factor)
+        match(:term, "*", :factor) {|m, _, n| m * n}
+        match(:term, "/", :factor) {|m, _, n| m / n}
+        match(:factor) {|m| m}
       end
 
       rule :factor do
-        match(Integer, :var)
+        match(Integer) {|m| m}
+        match(:var) {|m| m}
       end
     end
 
@@ -178,9 +179,10 @@ class GameLanguage
       ["quit","exit","bye",""].include?(str.chomp)
     end
 
-    def roll(file)
+    def roll()
       print "[gameParser]"
-      str = File.read(file)
+      #str = File.read(file)
+      str = gets
       if done(str) then
         puts "Bye."
       else
@@ -196,8 +198,7 @@ class GameLanguage
         @gameParser.logger.level = Logger::WARN
       end
     end
-
   end
 end
 
-GameLanguage.new.roll("example.rb")
+GameLanguage.new.roll()
