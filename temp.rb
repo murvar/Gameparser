@@ -1,3 +1,4 @@
+# coding: utf-8
 load "./rdparse.rb"
 
 class GameLanguage
@@ -93,10 +94,6 @@ class GameLanguage
         match("run", "(""example.rb", :block_comps, ")")
       end
 
-      rule :var do
-        match(String) {|s| s}
-      end
-
       rule :loop do
         match(:while)
         match(:for)
@@ -136,7 +133,7 @@ class GameLanguage
       rule :log_exp do
         match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
         match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
-        match("not", :log_exp) {|m| !m}
+        match("not", :log_exp) {|_, m, _| !m}
         match(:bool_exp) {|m| m}
       end
 
@@ -172,7 +169,12 @@ class GameLanguage
 
       rule :factor do
         match(Integer) {|m| m}
+        match("(", :math_exp , ")"){|_, m, _| m}
         match(:var) {|m| @user_assignments[m]}
+      end
+
+      rule :var do
+        match(String) {|s| s}
       end
     end
 
@@ -186,7 +188,7 @@ class GameLanguage
     end
 
     def roll()
-      print "[gameParser]"
+      print "[gameParser] "
       #str = File.read(file)
       str = gets
       if done(str) then
