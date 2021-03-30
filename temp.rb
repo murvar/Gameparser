@@ -139,20 +139,21 @@ class GameLanguage
 
       rule :bool_exp do
         match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
-        match(:math_exp, "<=", :math_exp) {|m, _, n| m <= n}
-        match(:bool_val, "==", :bool_val) {|m, _, n| m == n}
-        match(:math_exp, "==", :math_exp) {|m, _, n| m == n} #infinite stack
+        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| m <= n}
+        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| m == n}
+        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n} #infinite stack
         match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
-        match(:math_exp, ">=", :math_exp) {|m, _, n| m >= n}
-        match(:math_exp, "!=", :math_exp) {|m, _, n| m != n}
-        match(:bool_val, "!=", :bool_val) {|m, _, n| m != n} #infinite stack
+        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| m >= n}
+        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| m != n}
+        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n} #infinite stack
         match(:bool_val) {|m| m}
         match(:var) {|m| @user_assignments[m]}
         end
 
       rule :bool_val do
-        match("True") {true}
-        match("False") {false}
+        match("true") {true}
+        match("false") {false}
+        match("(", :log_exp, ")") {|_, m, _| m } 
       end
 
       rule :math_exp do
@@ -186,8 +187,11 @@ class GameLanguage
     def done(str)
       ["quit","exit","bye",""].include?(str.chomp)
     end
-
-    def roll()
+    def parse_string(str)
+      log(false)
+      @gameParser.parse(str)
+    end
+    def parse()
       print "[gameParser] "
       #str = File.read(file)
       str = gets
@@ -195,7 +199,7 @@ class GameLanguage
         puts "Bye."
       else
         puts "=> #{@gameParser.parse str}"
-        roll
+        parse
       end
     end
 
@@ -209,4 +213,4 @@ class GameLanguage
   end
 end
 
-GameLanguage.new.roll()
+#GameLanguage.new.parse()
