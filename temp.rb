@@ -29,7 +29,7 @@ class GameLanguage
         match(:type)
         match(:event)
       end
-      
+
       rule :statement do
         # match(:function_call)
         match(:condition)
@@ -66,11 +66,11 @@ class GameLanguage
       rule :assignment do
         match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
       end
-      
+
       rule :exp do
-        match(:math_exp)
-        match(:log_exp)
-        match(:bool_exp)
+        match(:log_exp) {|e| e}
+        #match(:bool_exp) {|e| e} #finns i :log_exp
+        match(:math_exp) {|e| e} #1+1 fungerar ej, måste skriva 1 + 1
       end
 
       rule :values do
@@ -81,14 +81,14 @@ class GameLanguage
       rule :value do
         match('"', String, '"') {|_, s, _| s}
         match(:array) {|a| a}
-        match(:exp)
+        match(:exp) {|e| e}
       end
-      
+
       rule :array do
         match("[", :values, "]") {|_, v, _| v}
         match("[", "]") {[]}
       end
-      
+
       rule :run do
         match("run", "(""example.rb", :block_comps, ")")
       end
@@ -143,10 +143,12 @@ class GameLanguage
       rule :bool_exp do
         match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
         match(:math_exp, "<=", :math_exp) {|m, _, n| m <= n}
-        match(:math_exp, "==", :math_exp) {|m, _, n| m == n}
+        match(:bool_val, "==", :bool_val) {|m, _, n| m == n}
+        match(:math_exp, "==", :math_exp) {|m, _, n| m == n} #infinite stack
         match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
         match(:math_exp, ">=", :math_exp) {|m, _, n| m >= n}
         match(:math_exp, "!=", :math_exp) {|m, _, n| m != n}
+        match(:bool_val, "!=", :bool_val) {|m, _, n| m != n} #infinite stack
         match(:bool_val) {|m| m}
         match(:var) {|m| @user_assignments[m]}
         end
@@ -173,12 +175,12 @@ class GameLanguage
         match(:var) {|m| @user_assignments[m]}
       end
     end
-    
+
 # ============================================================
 # Parser end
 # ============================================================
 
-    
+
     def done(str)
       ["quit","exit","bye",""].include?(str.chomp)
     end
