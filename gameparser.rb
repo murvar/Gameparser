@@ -1,3 +1,4 @@
+# coding: utf-8
 load "./rdparse.rb"
 
 class GameLanguage
@@ -7,7 +8,7 @@ class GameLanguage
       @user_assignments = {}
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
-      token(/^[-+]?\d+$/) {|m| m.to_i} #returns integers
+      token(/^[-+]?\d+/) {|m| m.to_i} #returns integers
       token(/\w+/) {|m| m } #returns chars
       token(/./) {|m| m } #returns rest
 
@@ -21,43 +22,42 @@ class GameLanguage
       end
 
       rule :comp do
-        match(:type) {|m| m }
-        match(:block_comp) {|m| m }
+        match(:definition) {|m| m }
+        match(:statement) {|m| m }
       end
 
-      rule :block_comps do
-        match(:block_comps, :block_comp)
-        match(:block_comp)
-      end
-
-      rule :block_comp do
-        match(:function) {|m| m }
-        match(:cond_exp) {|m| m }
-        match(:loop) {|m| m }
-        match(:assignment) {|m| m }
-        match("") # hur matchar vi Empty?
-      end
-
-      rule :function do
-        match(:run)
-        match(:read?)
-        match(:write?)
-      end
-
-      rule :read do
-      end
-
-      rule :write do
-      end
-
-      rule :type do
+      rule :definition do
+        match(:type)
         match(:event)
-        match(:object)
       end
 
-      rule :event do
-        match("event", String, "{", :assignsments, :run,"}")
+      rule :statement do
+        # match(:function_call)
+        match(:condition)
+        match(:loop)
+        match(:assignment)
+        match(:exp)
       end
+
+      # rule :function_call do
+      #   match(:run)
+      #   match(:read?)
+      #   match(:write?)
+      # end
+
+      # rule :read do
+      # end
+
+      # rule :write do
+      # end
+
+      # rule :type do
+      #   match("type", String, "{", :assignsments, :run,"}")
+      # end
+
+      # rule :event do
+      #   match("event", String, "{", :assignsments, :run,"}")
+      # end
 
       rule :assignsments do
         match(:assignsments, :assignment)
@@ -68,12 +68,10 @@ class GameLanguage
         match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
       end
 
-      rule :run do
-        match("run", "(""example.rb", :block_comps, ")")
-      end
-
-      rule :var do
-        match(String) {|s| s}
+      rule :exp do
+        match(:log_exp) {|e| e}
+        #match(:bool_exp) {|e| e} #finns i :log_exp
+        match(:math_exp) {|e| e} #1+1 fungerar ej, måste skriva 1 + 1
       end
 
       rule :values do
@@ -82,12 +80,9 @@ class GameLanguage
       end
 
       rule :value do
-        match(:bool_val){|b| b}
         match('"', String, '"') {|_, s, _| s}
-        match(Integer){|i| i}
         match(:array) {|a| a}
-        match(:function_call) {|f| f}
-        match(:var){|v| @user_assignments[v]}
+        match(:exp) {|e| e}
       end
 
       rule :array do
@@ -95,8 +90,8 @@ class GameLanguage
         match("[", "]") {[]}
       end
 
-      rule :object do
-        match(:assignsments)
+      rule :run do
+        match("run", "(""example.rb", :block_comps, ")")
       end
 
       rule :loop do
@@ -104,7 +99,7 @@ class GameLanguage
         match(:for)
       end
 
-      rule :cond_exp do
+      rule :condition do
         match(:if)
         match(:switch)
       end
@@ -138,23 +133,27 @@ class GameLanguage
       rule :log_exp do
         match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
         match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
+        match("not", :log_exp) {|_, m, _| !m}
         match(:bool_exp) {|m| m}
       end
 
       rule :bool_exp do
         match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
-        match(:math_exp, "<=", :math_exp) {|m, _, n| m <= n}
-        match(:math_exp, "==", :math_exp) {|m, _, n| m == n}
+        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| m <= n}
+        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| m == n}
+        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n} #infinite stack
         match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
-        match(:math_exp, ">=", :math_exp) {|m, _, n| m >= n}
-        match(:math_exp, "!=", :math_exp) {|m, _, n| m != n}
+        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| m >= n}
+        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| m != n}
+        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n} #infinite stack
         match(:bool_val) {|m| m}
-        match(:var) {|m| m}
-      end
+        match(:var) {|m| @user_assignments[m]}
+        end
 
       rule :bool_val do
-        match("True") {TRUE}
-        match("False") {FALSE}
+        match("true") {true}
+        match("false") {false}
+        match("(", :log_exp, ")") {|_, m, _| m } 
       end
 
       rule :math_exp do
@@ -171,23 +170,36 @@ class GameLanguage
 
       rule :factor do
         match(Integer) {|m| m}
-        match(:var) {|m| @user_assignmentsm[m]}
+        match("(", :math_exp , ")"){|_, m, _| m}
+        match(:var) {|m| @user_assignments[m]}
+      end
+
+      rule :var do
+        match(String) {|s| s}
       end
     end
+
+# ============================================================
+# Parser end
+# ============================================================
+
 
     def done(str)
       ["quit","exit","bye",""].include?(str.chomp)
     end
-
-    def roll()
-      print "[gameParser]"
+    def parse_string(str)
+      log(false)
+      @gameParser.parse(str)
+    end
+    def parse()
+      print "[gameParser] "
       #str = File.read(file)
       str = gets
       if done(str) then
         puts "Bye."
       else
         puts "=> #{@gameParser.parse str}"
-        roll
+        parse
       end
     end
 
@@ -201,4 +213,4 @@ class GameLanguage
   end
 end
 
-GameLanguage.new.roll()
+#GameLanguage.new.parse()
