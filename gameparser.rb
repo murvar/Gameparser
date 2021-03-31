@@ -8,10 +8,11 @@ class GameLanguage
       @user_assignments = {}
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
-      token(/^[-+]?\d+/) {|m| m.to_i} #returns integers
+      #token(/^[-+]?\d+/) {|m| m.to_i} #returns integers
+      token(/^\d+/) {|m| m.to_i} #returns integers
       token(/\w+/) {|m| m } #returns chars
       token(/./) {|m| m } #returns rest
-
+      
       start :prog do
         match(:comps) {|m| m }
       end
@@ -36,7 +37,9 @@ class GameLanguage
         match(:condition)
         match(:loop)
         match(:assignment)
-        match(:exp)
+        match(:value)
+        # match(:exp)
+        # match(:array)
       end
 
       # rule :function_call do
@@ -81,6 +84,7 @@ class GameLanguage
 
       rule :value do
         match('"', String, '"') {|_, s, _| s}
+        match("'", String, "'") {|_, s, _| s}
         match(:array) {|a| a}
         match(:exp) {|e| e}
       end
@@ -170,6 +174,8 @@ class GameLanguage
 
       rule :factor do
         match(Integer) {|m| m}
+        match("-", Integer) {|_, m| -m}
+        match("+", Integer) {|_, m| m}
         match("(", :math_exp , ")"){|_, m, _| m}
         match(:var) {|m| @user_assignments[m]}
       end

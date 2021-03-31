@@ -1,4 +1,4 @@
-require './temp'
+require './gameparser'
 require 'test/unit'
 
 class Variable_assignment < Test::Unit::TestCase
@@ -42,7 +42,7 @@ end
 class SimpleArithmetic < Test::Unit::TestCase
   def test_addition
     gp = GameLanguage.new
-    
+
     assert_equal(4, gp.parse_string("2 + 2"))
     assert_equal(6, gp.parse_string("2 + 2 + 2"))
     assert_equal(62, gp.parse_string("2 + 10 + 20 + 30"))
@@ -51,7 +51,8 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-18, gp.parse_string("-19 + 1"))
     assert_equal(10, gp.parse_string("-220 + 230"))
     assert_equal(0, gp.parse_string("-440 + 440"))
-   # assert_equal(105, gp.parse_string("100+5")) # Does't work.
+    assert_equal(105, gp.parse_string("100+5"))
+    assert_equal(400, gp.parse_string("100+100+ 100 +100"))
   end
   
   def test_subtraction
@@ -65,7 +66,8 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-30, gp.parse_string("-10 - 20"))
     assert_equal(0, gp.parse_string("-1 - (-1)"))
     assert_equal(-42, gp.parse_string("(-22) - 20"))
-   # assert_equal(-1, gp.parse_string("1 -2")) # Does't work
+    assert_equal(-1, gp.parse_string("1 -2"))
+    assert_equal(-4, gp.parse_string("1 -2-2 - 1"))
     
   end
 end
@@ -170,13 +172,36 @@ class BooleanExpression < Test::Unit::TestCase
   
   def test_not_equal
     gp = GameLanguage.new
-
+    
     assert_equal(true, gp.parse_string("146 != 44"))
     assert_equal(false, gp.parse_string("-100 != -100 "))
     assert_equal(true, gp.parse_string("0 != -12"))
     assert_equal(false, gp.parse_string("300 != 300"))
   end
   
+end
+
+class BoolLogic < Test::Unit::TestCase
+  def test_bool_logic
+    gp = GameLanguage.new
+
+    assert_equal(false, gp.parse_string("(12 > 100) and (100 < 2)" ))
+    assert_equal(false, gp.parse_string("not ((12 > 10) or (100 < 2))"))
+    assert_equal(true , gp.parse_string("(2 == 2) and (100 >= 2)"))
+  end
+end
+
+class Lista < Test::Unit::TestCase
+  def test_lista
+    gp = GameLanguage.new
+
+    assert_equal([], gp.parse_string("[]"))
+    assert_equal([1,2,3], gp.parse_string("[1,2,3]"))
+    assert_equal(["a", "b", "c"], gp.parse_string('["a","b","c"]'))
+    assert_equal(["a", "b", "c"], gp.parse_string("['a','b','c']"))
+    assert_equal([true, true, false], gp.parse_string("[true,true,false]"))
+    assert_equal([1,"a",1<5], gp.parse_string("[1,'a',true]"))
+  end
 end
 
 # ============================================================
