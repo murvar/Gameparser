@@ -8,10 +8,10 @@ class StrTest < Test::Unit::TestCase
 
     assert_equal("Hi" , gp.parse_string('"Hi"'))
     assert_equal("Hi123" , gp.parse_string('"Hi123"'))
-    #assert_equal("123Hi" , gp.parse_string('"123Hi"')) # does not work
-    #assert_equal("Hello World" , gp.parse_string('"Hello World"')) # does not work
-    #assert_equal("Hey!" , gp.parse_string('"Hey!"')) # does not work
-    #assert_equal("###Bye" , gp.parse_string('"###Bye"')) # does not work
+    assert_equal("123Hi" , gp.parse_string('"123Hi"')) # does not work
+    assert_equal("Hello World" , gp.parse_string('"Hello World"')) # does not work
+    assert_equal("Hey!" , gp.parse_string('"Hey!"')) # does not work
+    assert_equal("###Bye" , gp.parse_string('"###Bye"')) # does not work
 
   end
 end

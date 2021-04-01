@@ -1,17 +1,30 @@
 # coding: utf-8
 load "./rdparse.rb"
 
+class Obj
+  attr_accessor :str
+  def initialize(st)
+    @str = st
+  end
+end
+
 class GameLanguage
 
   def initialize
     @gameParser = Parser.new("game language") do
       @user_assignments = {}
+      
+      
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
-      #token(/^[-+]?\d+/) {|m| m.to_i} #returns integers
       token(/^\d+/) {|m| m.to_i} #returns integers
-      token(/\w+/) {|m| m } #returns chars
-      token(/./) {|m| m } #returns rest
+      token(/\w+/) {|m| m } #returns variable names as string
+      token(/^".*"$/) do |m|
+        m = m[1...-1]
+        obj = Obj.new(m)
+        obj
+      end #returns string
+      token(/./) {|m| m } #returns rest like (, {, =, < etc as string
       
       start :prog do
         match(:comps) {|m| m }
@@ -83,8 +96,12 @@ class GameLanguage
       end
 
       rule :value do
-        match('"', String, '"') {|_, s, _| s}
-        match("'", String, "'") {|_, s, _| s}
+        # match('"', String, '"') {|_, s, _| s}
+        # match("'", String, "'") {|_, s, _| s}
+        match(Obj) do |s|
+          puts s.str
+          s.str
+        end
         match(:array) {|a| a}
         match(:exp) {|e| e}
       end
