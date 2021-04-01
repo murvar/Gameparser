@@ -1,7 +1,7 @@
 # coding: utf-8
 load "./rdparse.rb"
 
-class Obj
+class LiteralString
   attr_accessor :str
   def initialize(st)
     @str = st
@@ -19,10 +19,13 @@ class GameLanguage
       token(/\s+/) #removes whitespaces
       token(/^\d+/) {|m| m.to_i} #returns integers
       token(/\w+/) {|m| m } #returns variable names as string
-      token(/^".*"$/) do |m|
+      token(/".*?"/) do |m|
         m = m[1...-1]
-        obj = Obj.new(m)
-        obj
+        LiteralString.new(m)
+      end #returns string
+       token(/'.*?'/) do |m|
+        m = m[1...-1]
+        obj = LiteralString.new(m)
       end #returns string
       token(/./) {|m| m } #returns rest like (, {, =, < etc as string
       
@@ -86,7 +89,6 @@ class GameLanguage
 
       rule :exp do
         match(:log_exp) {|e| e}
-        #match(:bool_exp) {|e| e} #finns i :log_exp
         match(:math_exp) {|e| e} #1+1 fungerar ej, måste skriva 1 + 1
       end
 
@@ -98,10 +100,7 @@ class GameLanguage
       rule :value do
         # match('"', String, '"') {|_, s, _| s}
         # match("'", String, "'") {|_, s, _| s}
-        match(Obj) do |s|
-          puts s.str
-          s.str
-        end
+        match(LiteralString) {|s| s.str }
         match(:array) {|a| a}
         match(:exp) {|e| e}
       end
