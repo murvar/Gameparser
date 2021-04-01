@@ -22,11 +22,11 @@ class GameLanguage
       token(/".*?"/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
-      end #returns string
+      end #returns a LiteralString object
        token(/'.*?'/) do |m|
         m = m[1...-1]
         obj = LiteralString.new(m)
-      end #returns string
+      end #returns string a LiteralString object
       token(/./) {|m| m } #returns rest like (, {, =, < etc as string
       
       start :prog do
@@ -54,8 +54,6 @@ class GameLanguage
         match(:loop)
         match(:assignment)
         match(:value)
-        # match(:exp)
-        # match(:array)
       end
 
       # rule :function_call do
@@ -89,7 +87,7 @@ class GameLanguage
 
       rule :exp do
         match(:log_exp) {|e| e}
-        match(:math_exp) {|e| e} #1+1 fungerar ej, måste skriva 1 + 1
+        match(:math_exp) {|e| e}
       end
 
       rule :values do
@@ -98,8 +96,6 @@ class GameLanguage
       end
 
       rule :value do
-        # match('"', String, '"') {|_, s, _| s}
-        # match("'", String, "'") {|_, s, _| s}
         match(LiteralString) {|s| s.str }
         match(:array) {|a| a}
         match(:exp) {|e| e}
@@ -161,11 +157,11 @@ class GameLanguage
         match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
         match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| m <= n}
         match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| m == n}
-        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n} #infinite stack
+        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n}
         match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
         match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| m >= n}
         match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| m != n}
-        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n} #infinite stack
+        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n}
         match(:bool_val) {|m| m}
         match(:var) {|m| @user_assignments[m]}
         end
