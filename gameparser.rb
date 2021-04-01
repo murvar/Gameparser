@@ -231,4 +231,6 @@ class GameLanguage
   end
 end
 
-#GameLanguage.new.parse()
+if __FILE__ == $0
+  GameLanguage.new.parse()  
+end
