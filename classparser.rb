@@ -55,21 +55,9 @@ class Statement
   end
 
   def evaluate()
-    return object.evaluate()
+    return @object.evaluate()
   end
 end
-
-# " a = 22 should return 22"
-# class Assignments
-#   def initialize(assignments, assignment)
-#     @assignments = assignments
-#     @assignment = assignment
-#   end
-
-#   def evaluate()
-#     return assignments.evaluate(), assignments.evaluate()
-#   end
-# end
 
 class Assignment
   def initialize(lhs, rhs)
@@ -87,19 +75,20 @@ class Value
     @object = object
   end
   
-  def evalulate()
+  def evaluate()
     return @object.evaluate()
   end
 end
 
 class Arry
-  def initialize(elements)
-    @elements = elements
+  def initialize(list)
+    @list = list
   end
   
-  def evalulate()
+  def evaluate()
     result_list = []
-    for element in @elements
+
+    for element in @list
       result_list << element.evaluate()
     end
     
@@ -113,7 +102,7 @@ class And
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return (@lhs.evaluate() and @rhs.evaluate())
   end
 end
@@ -124,8 +113,8 @@ class Or
     @rhs = rhs
   end
   
-  def evalulate()
-    return (@lhs.evaluate() or @rhs.evaluat())
+  def evaluate()
+    return (@lhs.evaluate() or @rhs.evaluate())
   end
 end
   
@@ -134,8 +123,8 @@ class Not
     @object = object
   end
 
-  def evalulate()
-    return @object.evaluate()
+  def evaluate()
+    return (not @object.evaluate())
   end
 end
 
@@ -145,7 +134,7 @@ class Less
     @rhs = rhs
   end
 
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() < @rhs.evaluate()
   end
 end
@@ -156,7 +145,7 @@ class LessEqual
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() <= @rhs.evaluate()
   end
 end
@@ -167,7 +156,7 @@ class Greater
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() > @rhs.evaluate()
   end
 end
@@ -178,7 +167,7 @@ class GreaterEqual
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() >= @rhs.evaluate()
   end
 
@@ -191,7 +180,7 @@ class Equal
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() == @rhs.evaluate()
   end
 
@@ -203,7 +192,7 @@ class NotEqual
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() != @rhs.evaluate()
   end
 
@@ -215,7 +204,7 @@ class Addition
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() + @rhs.evaluate()
   end
 
@@ -227,7 +216,7 @@ class Subtraction
     @rhs = rhs
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() - @rhs.evaluate()
   end
 
@@ -240,7 +229,7 @@ class Multiplication
     
   end
   
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() * @rhs.evaluate()
   end
 
@@ -253,7 +242,7 @@ class Division
     
   end
     
-  def evalulate()
+  def evaluate()
     return @lhs.evaluate() / @rhs.evaluate()
   end
 
@@ -262,14 +251,14 @@ end
 class LiteralBool
   def initialize(value)
     if value == "true"
-      @value = value
+      @value = true
     else
-      @value = value
+      @value = false
     end
     
   end
   
-  def evalulate()
+  def evaluate()
     return @value
   end
 
@@ -281,7 +270,7 @@ class LiteralInteger
     
   end
   
-  def evalulate()
+  def evaluate()
     return @value
   end
 

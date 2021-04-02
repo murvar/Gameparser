@@ -1,4 +1,4 @@
-require './gameparser'
+require './gameparser_new'
 require 'test/unit'
 
 

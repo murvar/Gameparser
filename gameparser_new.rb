@@ -8,7 +8,6 @@ class GameLanguage
     @gameParser = Parser.new("game language") do
       @user_assignments = {}
       
-      
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
       token(/^\d+/) {|m| m.to_i} #returns integers
@@ -24,17 +23,17 @@ class GameLanguage
       token(/./) {|m| m } #returns rest like (, {, =, < etc as string
       
       start :prog do
-        match(:comps) {|m| m }
+        match(:comps) {|m| m.evaluate() unless m.class == nil }
       end
 
       rule :comps do
         match(:comps, :comp) {|m| m }
-        match(:comp) {|m| m }
+        match(:comp) {|m| Comp.new(m) }
       end
 
       rule :comp do
         match(:definition) {|m| m }
-        match(:statement) {|m| m }
+        match(:statement) {|m| Statement.new(m) }
       end
 
       rule :definition do
@@ -46,8 +45,8 @@ class GameLanguage
         # match(:function_call)
         match(:condition)
         match(:loop)
-        match(:assignment)
-        match(:value)
+        match(:assignment) {|m| m }
+        match(:value)  {|m| m }
       end
 
       # rule :function_call do
@@ -90,14 +89,14 @@ class GameLanguage
       end
 
       rule :value do
-        match(LiteralString) {|s| s.str }
-        match(:array) {|a| a}
+        match(LiteralString) {|s| Value.new(s) }
+        match(:array) {|a| Value.new(a) }
         match(:exp) {|e| e}
       end
 
       rule :array do
-        match("[", :values, "]") {|_, v, _| v}
-        match("[", "]") {[]}
+        match("[", :values, "]") {|_, v, _|  Arry.new(v)}
+        match("[", "]") { Arry.new([]) }
       end
 
       rule :run do
@@ -141,53 +140,53 @@ class GameLanguage
       end
 
       rule :log_exp do
-        match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
-        match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
-        match("not", :log_exp) {|_, m, _| !m}
+        match(:bool_exp, "and", :log_exp) {|m, _, n| And.new(m, n) }
+        match(:bool_exp, "or", :log_exp) {|m, _, n| Or.new(m, n) }
+        match("not", :log_exp) {|_, m, _| Not.new(m) }
         match(:bool_exp) {|m| m}
       end
 
       rule :bool_exp do
-        match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
-        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| m <= n}
-        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| m == n}
-        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n}
-        match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
-        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| m >= n}
-        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| m != n}
-        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n}
-        match(:bool_val) {|m| m}
+        match(:math_exp, "<", :math_exp) {|m, _, n| Less.new(m, n) }
+        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| LessEqual.new(m, n) }
+        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| Equal.new(m, n) }
+        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| Equal.new(m, n) }
+        match(:math_exp, ">", :math_exp) {|m, _, n| Greater.new(m, n) }
+        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| GreaterEqual.new(m, n) }
+        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| NotEqual.new(m, n) }
+        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| NotEqual.new(m, n) }
+        match(:bool_val) {|m| m }
         match(:var) {|m| @user_assignments[m]}
         end
 
       rule :bool_val do
-        match("true") {true}
-        match("false") {false}
+        match("true") {|b| LiteralBool.new(b)}
+        match("false") {|b| LiteralBool.new(b)}
         match("(", :log_exp, ")") {|_, m, _| m } 
       end
 
       rule :math_exp do
-        match(:math_exp, "+", :term) {|m, _, n| m + n}
-        match(:math_exp, "-", :term) {|m, _, n| m - n}
+        match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) }
+        match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
         match(:term) {|m| m}
       end
 
       rule :term do
-        match(:term, "*", :factor) {|m, _, n| m * n}
-        match(:term, "/", :factor) {|m, _, n| m / n}
+        match(:term, "*", :factor) {|m, _, n| Multiplication.new(m, n) }
+        match(:term, "/", :factor) {|m, _, n| Division.new(m, n) }
         match(:factor) {|m| m}
       end
 
       rule :factor do
-        match(Integer) {|m| m}
-        match("-", Integer) {|_, m| -m}
-        match("+", Integer) {|_, m| m}
+        match(Integer) {|m| LiteralInteger.new(m) }
+        match("-", Integer) {|_, m| LiteralInteger.new(-m) }
+        match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m}
-        match(:var) {|m| @user_assignments[m]}
+        match(:var) {|m| @user_assignments[Variable.new(m)]}
       end
 
       rule :var do
-        match(String) {|s| s}
+        match(String) {|s| s }
       end
     end
 
