@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
+# coding: utf-8
 
-require "rdparse"
+#require "rdparse"
 
 class Prog
   def initialize(comps)
@@ -44,162 +45,266 @@ class Definition
   end
 
   def evaluate()
+    return 0
+  end
+end
 
-
-  rule :definition do
-    match(:type)
-    match(:event)
+class Statement
+  def initialize(object)
+    @object = object
   end
 
-  rule :statement do
-    # match(:function_call)
-    match(:condition)
-    match(:loop)
-    match(:assignment)
-    match(:value)
-    # match(:exp)
-    # match(:array)
+  def evaluate()
+    return object.evaluate()
+  end
+end
+
+# " a = 22 should return 22"
+# class Assignments
+#   def initialize(assignments, assignment)
+#     @assignments = assignments
+#     @assignment = assignment
+#   end
+
+#   def evaluate()
+#     return assignments.evaluate(), assignments.evaluate()
+#   end
+# end
+
+class Assignment
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
   end
 
-  # rule :function_call do
-  #   match(:run)
-  #   match(:read?)
-  #   match(:write?)
-  # end
-
-  # rule :read do
-  # end
-
-  # rule :write do
-  # end
-
-  # rule :type do
-  #   match("type", String, "{", :assignsments, :run,"}")
-  # end
-
-  # rule :event do
-  #   match("event", String, "{", :assignsments, :run,"}")
-  # end
-
-  rule :assignsments do
-    match(:assignsments, :assignment)
-    match(:assignment)
+  def evaluate()
+    return @lhs.evaluate()
   end
+end
 
-  rule :assignment do
-    match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
+class Value
+  def initialize(object)
+    @object = object
   end
-
-  rule :exp do
-    match(:log_exp) {|e| e}
-    match(:math_exp) {|e| e} #1+1 fungerar ej, måste skriva 1 + 1
+  
+  def evalulate()
+    return @object.evaluate()
   end
+end
 
-  rule :values do
-    match(:values, ",", :value) {|m, _, n| m + Array(n)}
-    match(:value) {|m| Array(m)}
+class Arry
+  def initialize(elements)
+    @elements = elements
   end
-
-  rule :value do
-    # match('"', String, '"') {|_, s, _| s}
-    # match("'", String, "'") {|_, s, _| s}
-    match(LiteralString) {|s| s.str }
-    match(:array) {|a| a}
-    match(:exp) {|e| e}
-  end
-
-  rule :array do
-    match("[", :values, "]") {|_, v, _| v}
-    match("[", "]") {[]}
-  end
-
-  rule :run do
-    match("run", "(""example.rb", :block_comps, ")")
-  end
-
-  rule :loop do
-    match(:while)
-    match(:for)
-  end
-
-  rule :condition do
-    match(:if)
-    match(:switch)
-  end
-
-  rule :while do
-    match("while", :log_exp, "{", :block_comps, "}")
-  end
-
-  rule :if do
-    match("if", :log_exp, "{", :block_comps, "}", "else", "{", :block_comps, "}")
-    match("if", :log_exp, "{", :block_comps, "}")
-  end
-
-  rule :switch do
-    match("case", :var, :cases)
-  end
-
-  rule :cases do
-    match(:cases, :case)
-    match(:case)
-  end
-
-  rule :case do
-    match()
-  end
-
-  rule :for do
-    match("for", :var, "in", :array, "{", :block_comps, "}")
-  end
-
-  rule :log_exp do
-    match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
-    match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
-    match("not", :log_exp) {|_, m, _| !m}
-    match(:bool_exp) {|m| m}
-  end
-
-  rule :bool_exp do
-    match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
-    match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| m <= n}
-    match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| m == n}
-    match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n} #infinite stack
-    match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
-    match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| m >= n}
-    match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| m != n}
-    match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n} #infinite stack
-    match(:bool_val) {|m| m}
-    match(:var) {|m| @user_assignments[m]}
+  
+  def evalulate()
+    result_list = []
+    for element in @elements
+      result_list << element.evaluate()
     end
+    
+    return result_list
+  end
+end
+      
+class And
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return (@lhs.evaluate() and @rhs.evaluate())
+  end
+end
 
-  rule :bool_val do
-    match("true") {true}
-    match("false") {false}
-    match("(", :log_exp, ")") {|_, m, _| m }
+class Or
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return (@lhs.evaluate() or @rhs.evaluat())
+  end
+end
+  
+class Not
+  def initialize(object)
+    @object = object
   end
 
-  rule :math_exp do
-    match(:math_exp, "+", :term) {|m, _, n| m + n}
-    match(:math_exp, "-", :term) {|m, _, n| m - n}
-    match(:term) {|m| m}
+  def evalulate()
+    return @object.evaluate()
+  end
+end
+
+class Less
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
   end
 
-  rule :term do
-    match(:term, "*", :factor) {|m, _, n| m * n}
-    match(:term, "/", :factor) {|m, _, n| m / n}
-    match(:factor) {|m| m}
+  def evalulate()
+    return @lhs.evaluate() < @rhs.evaluate()
+  end
+end
+
+class LessEqual
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() <= @rhs.evaluate()
+  end
+end
+
+class Greater
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() > @rhs.evaluate()
+  end
+end
+
+class GreaterEqual
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() >= @rhs.evaluate()
   end
 
-  rule :factor do
-    match(Integer) {|m| m}
-    match("-", Integer) {|_, m| -m}
-    match("+", Integer) {|_, m| m}
-    match("(", :math_exp , ")"){|_, m, _| m}
-    match(:var) {|m| @user_assignments[m]}
+end
+
+
+class Equal
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() == @rhs.evaluate()
   end
 
-  rule :var do
-    match(String) {|s| s}
+end
+
+class NotEqual
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
   end
+  
+  def evalulate()
+    return @lhs.evaluate() != @rhs.evaluate()
   end
+
+end
+
+class Addition
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() + @rhs.evaluate()
+  end
+
+end
+
+class Subtraction
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() - @rhs.evaluate()
+  end
+
+end
+
+class Multiplication
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+    
+  end
+  
+  def evalulate()
+    return @lhs.evaluate() * @rhs.evaluate()
+  end
+
+end
+
+class Division
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+    
+  end
+    
+  def evalulate()
+    return @lhs.evaluate() / @rhs.evaluate()
+  end
+
+end
+
+class LiteralBool
+  def initialize(value)
+    if value == "true"
+      @value = value
+    else
+      @value = value
+    end
+    
+  end
+  
+  def evalulate()
+    return @value
+  end
+
+end
+
+class LiteralInteger
+  def initialize(value)
+    @value = value
+    
+  end
+  
+  def evalulate()
+    return @value
+  end
+
+end
+
+class LiteralString
+  attr_accessor :str
+  def initialize(st)
+    @str = st
+  end
+
+  def evaluate()
+    return @str
+  end
+end
+
+
+class Variable
+  def initialize(value)
+    @value = value
+  end
+
+  def evaluate()
+    return @value
+  end
+end
