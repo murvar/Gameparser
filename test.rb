@@ -31,7 +31,7 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(105, gp.parse_string("100+5"))
     assert_equal(400, gp.parse_string("100+100+ 100 +100"))
   end
-  
+
   def test_subtraction
     gp = GameLanguage.new
 
@@ -45,7 +45,7 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-42, gp.parse_string("(-22) - 20"))
     assert_equal(-1, gp.parse_string("1 -2"))
     assert_equal(-4, gp.parse_string("1 -2-2 - 1"))
-    
+
   end
 end
 
@@ -108,7 +108,7 @@ class BooleanExpression < Test::Unit::TestCase
     assert_equal(false, gp.parse_string("390 < 2"))
     assert_equal(false, gp.parse_string("0 < -1"))
   end
-  
+
   def test_greater
     gp = GameLanguage.new
 
@@ -128,7 +128,7 @@ class BooleanExpression < Test::Unit::TestCase
     assert_equal(true, gp.parse_string("222 <= 980"))
     assert_equal(true, gp.parse_string("-12 <= 1"))
   end
-  
+
   def test_greater_equal
     gp = GameLanguage.new
 
@@ -147,7 +147,7 @@ class BooleanExpression < Test::Unit::TestCase
     assert_equal(false, gp.parse_string("0 == -12"))
     assert_equal(true, gp.parse_string("210 == 210"))
   end
-  
+
   def test_not_equal
     gp = GameLanguage.new
 
@@ -156,7 +156,7 @@ class BooleanExpression < Test::Unit::TestCase
     assert_equal(true, gp.parse_string("0 != -12"))
     assert_equal(false, gp.parse_string("300 != 300"))
   end
-  
+
 end
 
 class BoolLogic < Test::Unit::TestCase
@@ -191,7 +191,7 @@ class Variable_assignment < Test::Unit::TestCase
 
     assert_equal(1, gp.parse_string(" i = 1"))
     assert_equal(1,gp.parse_string("i")) # doubble check if "i" keeps its value
-    
+
     assert_equal(250, gp.parse_string(" i = 250"))
     assert_equal(250, gp.parse_string("i"))
 
@@ -207,26 +207,26 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal(-225, gp.parse_string(" my_dog = -225"))
     assert_equal(-225, gp.parse_string("my_dog "))
   end
-  
+
   def test_string
     gp = GameLanguage.new
 
     assert_equal("Hej", gp.parse_string(' i = "Hej"'))
     assert_equal("Hej", gp.parse_string("i"))
-    
+
     assert_equal("nO", gp.parse_string(' i = "nO"'))
     assert_equal("nO", gp.parse_string("i"))
 
     #asser_equal("Hello Worlds!", gp.parse_string('"Hello" + "World!"'))
-    
+
   end
-  
+
   def test_bool
     gp = GameLanguage.new
 
     assert_equal(true, gp.parse_string(" i = true"))
     assert_equal(true, gp.parse_string(" i"))
-    
+
     assert_equal(false, gp.parse_string(" i = false"))
     assert_equal(false, gp.parse_string("i"))
 
@@ -236,8 +236,24 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal(false, gp.parse_string(" value = false or (not(true or false))"))
     assert_equal(false, gp.parse_string(" value"))
   end
-  
+
 end
+
+class FunctionTest < Test::Unit::TestCase
+   def test1
+     gp = GameLanguage.new
+     var1 = "def test(x)
+{
+  k = i + 5
+  k
+}
+test(1)
+"
+     assert_equal(6, gp.parse_string(var1))
+     #assert_equal( , gp.parse_string())
+     #assert_equal( , gp.parse_string())
+   end
+ end
 
 # ============================================================
 # Template

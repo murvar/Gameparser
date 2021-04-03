@@ -7,7 +7,8 @@ class GameLanguage
   def initialize
     @gameParser = Parser.new("game language") do
       @user_assignments = {}
-      
+      @functions = {}
+
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
       token(/^\d+/) {|m| m.to_i} #returns integers
@@ -21,7 +22,7 @@ class GameLanguage
         obj = LiteralString.new(m)
       end #returns string a LiteralString object
       token(/./) {|m| m } #returns rest like (, {, =, < etc as string
-      
+
       start :prog do
         match(:comps) {|m| m.evaluate() unless m.class == nil }
       end
@@ -39,22 +40,49 @@ class GameLanguage
       rule :definition do
         match(:type)
         match(:event)
+        match(:function_def)
+      end
+
+      rule :function_def do
+          match("def", :function, "(", :values, ")", :block) {|_, name, _, params, _, block| @functions[name] = Function.new(params, block) }
+      end
+
+      # rule :params do
+      #   match(:params, :param) {|m, n| m + Array(n) }
+      #   match(:param) {|m| Array(m)}
+      #   match("")  {|m| [] }# emty?
+      # end
+      #
+      # rule :param do
+      #   match(:value)
+      # end
+
+      rule :block do
+        match("{", :statements, "}")
+      end
+
+      rule :statements do
+        match(:statements, :statement) {|m, n| m + Array(n) }
+        match(:statement) {|m| Array(m)}
       end
 
       rule :statement do
-        # match(:function_call)
         match(:condition)
         match(:loop)
         match(:assignment) {|m| m }
         match(:value)  {|m| m }
+        match(:function_call)
       end
 
-      # rule :function_call do
-      #   match(:run)
-      #   match(:read?)
-      #   match(:write?)
-      # end
+      rule :function_call do
+        match(:function, "(", :values, ")") {|m, _, arguments, _| @functions[m].evaluate(arguments) }
+        #match(:read?)
+        #match(:write?)
+      end
 
+      rule :function do
+        match(String) {|m| m }
+      end
       # rule :read do
       # end
 
@@ -75,6 +103,9 @@ class GameLanguage
       end
 
       rule :assignment do
+        # i = 4
+        # j = 5
+        # i = j
         match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
       end
 
@@ -86,6 +117,7 @@ class GameLanguage
       rule :values do
         match(:values, ",", :value) {|m, _, n| m + Array(n)}
         match(:value) {|m| Array(m)}
+        match("")  {|m| [] }# emty?
       end
 
       rule :value do
@@ -160,9 +192,9 @@ class GameLanguage
         end
 
       rule :bool_val do
-        match("true") {|b| LiteralBool.new(b)}
-        match("false") {|b| LiteralBool.new(b)}
-        match("(", :log_exp, ")") {|_, m, _| m } 
+        match("true") {|b| LiteralBool.new(b) }
+        match("false") {|b| LiteralBool.new(b) }
+        match("(", :log_exp, ")") {|_, m, _| m }
       end
 
       rule :math_exp do
@@ -182,7 +214,7 @@ class GameLanguage
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m}
-        match(:var) {|m| @user_assignments[Variable.new(m)]}
+        match(:var) {|m| @user_assignments[Variable.new(m)]} # Är detta en ny variabel eller en gammal?
       end
 
       rule :var do
@@ -225,5 +257,5 @@ class GameLanguage
 end
 
 if __FILE__ == $0
-  GameLanguage.new.parse()  
+  GameLanguage.new.parse()
 end

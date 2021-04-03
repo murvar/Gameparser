@@ -74,7 +74,7 @@ class Value
   def initialize(object)
     @object = object
   end
-
+  
   def evaluate()
     return @object.evaluate()
   end
@@ -84,24 +84,24 @@ class Arry
   def initialize(list)
     @list = list
   end
-
+  
   def evaluate()
     result_list = []
 
     for element in @list
       result_list << element.evaluate()
     end
-
+    
     return result_list
   end
 end
-
+      
 class And
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return (@lhs.evaluate() and @rhs.evaluate())
   end
@@ -112,12 +112,12 @@ class Or
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return (@lhs.evaluate() or @rhs.evaluate())
   end
 end
-
+  
 class Not
   def initialize(object)
     @object = object
@@ -144,7 +144,7 @@ class LessEqual
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() <= @rhs.evaluate()
   end
@@ -155,7 +155,7 @@ class Greater
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() > @rhs.evaluate()
   end
@@ -166,7 +166,7 @@ class GreaterEqual
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() >= @rhs.evaluate()
   end
@@ -179,7 +179,7 @@ class Equal
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() == @rhs.evaluate()
   end
@@ -191,7 +191,7 @@ class NotEqual
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() != @rhs.evaluate()
   end
@@ -203,7 +203,7 @@ class Addition
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() + @rhs.evaluate()
   end
@@ -215,7 +215,7 @@ class Subtraction
     @lhs = lhs
     @rhs = rhs
   end
-
+  
   def evaluate()
     return @lhs.evaluate() - @rhs.evaluate()
   end
@@ -226,9 +226,9 @@ class Multiplication
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
-
+    
   end
-
+  
   def evaluate()
     return @lhs.evaluate() * @rhs.evaluate()
   end
@@ -239,9 +239,9 @@ class Division
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
-
+    
   end
-
+    
   def evaluate()
     return @lhs.evaluate() / @rhs.evaluate()
   end
@@ -255,9 +255,9 @@ class LiteralBool
     else
       @value = false
     end
-
+    
   end
-
+  
   def evaluate()
     return @value
   end
@@ -267,9 +267,9 @@ end
 class LiteralInteger
   def initialize(value)
     @value = value
-
+    
   end
-
+  
   def evaluate()
     return @value
   end
@@ -295,40 +295,5 @@ class Variable
 
   def evaluate()
     return @value
-  end
-end
-
-
-# def test(i)
-#   {
-#    k = 5 + i
-#    k
-#  }
-# [i] {"i": 0}
-class Functions
-  def initialize(params, block)
-    @params_hash = Hash.new
-    for i in params
-      @params_hash[i] = nil
-    end
-
-    @block = block
-  end
-#{"i": nil}
-#[1]
-  def evaluate(arguments)
-    counter = 0
-    @params_hash.each do |k, v|
-      @params_hash[k] = arguments[counter]
-      counter += 1
-    end
-    counter = 0
-    for object in @block
-      m = object.evaluate()
-      counter += 1
-      if counter == @block.length
-        return m
-      end
-    end
   end
 end
