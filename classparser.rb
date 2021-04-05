@@ -39,13 +39,12 @@ class Comp
 end
 
 class Definition
-  def initialize(type, event)
-    @type = type
-    @event = event
+  def initialize(object)
+    @object = object
   end
 
   def evaluate()
-    return 0
+    nil
   end
 end
 
@@ -330,6 +329,7 @@ class Function
       m = object.evaluate()
       counter += 1
       if counter == @block.length
+        puts m
         return m
       end
     end

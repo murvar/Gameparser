@@ -28,12 +28,12 @@ class GameLanguage
       end
 
       rule :comps do
-        match(:comps, :comp) {|m| m }
+        match(:comps, :comp) {|m, n| m } ### ???
         match(:comp) {|m| Comp.new(m) }
       end
 
       rule :comp do
-        match(:definition) {|m| m }
+        match(:definition) {|m| Definition.new(m) }
         match(:statement) {|m| Statement.new(m) }
       end
 
@@ -54,8 +54,10 @@ class GameLanguage
       end
 
       rule :param do
-        match(/\w+/){|m| @variables[m] = Variable.new(nil)
-        @variables[m] }
+        match(/\w+/) do |m|
+          @variables[m] = Variable.new(2)
+          m
+        end
       end
 
       rule :block do
@@ -76,7 +78,10 @@ class GameLanguage
       end
 
       rule :function_call do
-        match(:function, "(", :values, ")") {|m, _, arguments, _| @functions[m].evaluate(arguments) }
+        match(:function, "(", :values, ")") do |m, _, arguments, _|
+          puts @functions[m].evaluate(arguments)
+          @functions[m].evaluate(arguments)
+        end          
         #match(:read?)
         #match(:write?)
       end
