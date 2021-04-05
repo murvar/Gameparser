@@ -104,13 +104,9 @@ class GameLanguage
       end
 
       rule :assignment do
-        # i = 4
-        # j = 5
-        # i = j
         match(:var, "=", :value) do |m,  _, n|
-          @variables[m] = Variable.new(nil)
+          @variables[m] = Variable.new(n.evaluate())
           Assignment.new(@variables[m], n)
-          @variables[m].evaluate()
         end
       end
 
@@ -132,7 +128,7 @@ class GameLanguage
       end
 
       rule :array do
-        match("[", :values, "]") {|_, v, _|  Arry.new(v)}
+        match("[", :values, "]") {|_, v, _| Arry.new(v)}
         match("[", "]") { Arry.new([]) }
       end
 
@@ -193,7 +189,7 @@ class GameLanguage
         match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| NotEqual.new(m, n) }
         match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| NotEqual.new(m, n) }
         match(:bool_val) {|m| m }
-        match(:var) {|m| @variables[m]}
+        match(:var) {|m| @variables[m] }
         end
 
       rule :bool_val do
@@ -218,8 +214,8 @@ class GameLanguage
         match(Integer) {|m| LiteralInteger.new(m) }
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
-        match("(", :math_exp , ")"){|_, m, _| m}
-        match(:var) {|m| @variables[m]} # Är detta en ny variabel eller en gammal?
+        match("(", :math_exp , ")"){|_, m, _| m }
+        match(:var) {|m| @variables[m] } # Är detta en ny variabel eller en gammal?
       end
 
       rule :var do

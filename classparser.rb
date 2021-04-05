@@ -67,7 +67,7 @@ class Assignment
 
   def evaluate()
     @lhs = @rhs.evaluate()
-    return @lhs.evaluate()
+    return @lhs
   end
 end
 
