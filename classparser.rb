@@ -66,6 +66,7 @@ class Assignment
   end
 
   def evaluate()
+    @lhs = @rhs.evaluate()
     return @lhs.evaluate()
   end
 end
@@ -305,8 +306,10 @@ end
 #    k
 #  }
 # [i] {"i": 0}
-class Functions
+class Function
   def initialize(params, block)
+    puts params
+    puts block
     @params_hash = Hash.new
     for i in params
       @params_hash[i] = nil

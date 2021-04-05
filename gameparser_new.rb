@@ -6,7 +6,7 @@ class GameLanguage
 
   def initialize
     @gameParser = Parser.new("game language") do
-      @user_assignments = {}
+      @variables = {}
       @functions = {}
 
       token(/#.*/) #removes comment
@@ -44,21 +44,22 @@ class GameLanguage
       end
 
       rule :function_def do
-          match("def", :function, "(", :values, ")", :block) {|_, name, _, params, _, block| @functions[name] = Function.new(params, block) }
+          match("def", :function, "(", :params, ")", :block) {|_, name, _, params, _, block| @functions[name] = Function.new(params, block) }
       end
 
-      # rule :params do
-      #   match(:params, :param) {|m, n| m + Array(n) }
-      #   match(:param) {|m| Array(m)}
-      #   match("")  {|m| [] }# emty?
-      # end
-      #
-      # rule :param do
-      #   match(:value)
-      # end
+      rule :params do
+        match(:params, :param) {|m, n| m + Array(n) }
+        match(:param) {|m| Array(m)}
+        match("")  {|m| [] } # emty?
+      end
+
+      rule :param do
+        match(/\w+/){|m| @variables[m] = Variable.new(nil)
+        @variables[m] }
+      end
 
       rule :block do
-        match("{", :statements, "}")
+        match("{", :statements, "}") {|_, m, _| m}
       end
 
       rule :statements do
@@ -106,7 +107,11 @@ class GameLanguage
         # i = 4
         # j = 5
         # i = j
-        match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
+        match(:var, "=", :value) do |m,  _, n|
+          @variables[m] = Variable.new(nil)
+          Assignment.new(@variables[m], n)
+          @variables[m].evaluate()
+        end
       end
 
       rule :exp do
@@ -188,7 +193,7 @@ class GameLanguage
         match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| NotEqual.new(m, n) }
         match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| NotEqual.new(m, n) }
         match(:bool_val) {|m| m }
-        match(:var) {|m| @user_assignments[m]}
+        match(:var) {|m| @variables[m]}
         end
 
       rule :bool_val do
@@ -214,7 +219,7 @@ class GameLanguage
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m}
-        match(:var) {|m| @user_assignments[Variable.new(m)]} # Är detta en ny variabel eller en gammal?
+        match(:var) {|m| @variables[m]} # Är detta en ny variabel eller en gammal?
       end
 
       rule :var do
