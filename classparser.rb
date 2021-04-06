@@ -206,7 +206,7 @@ class Addition
   end
 
   def evaluate()
-    return @lhs.evaluate() + @rhs.evaluate()
+    return (@lhs.evaluate() + @rhs.evaluate())
   end
 
 end

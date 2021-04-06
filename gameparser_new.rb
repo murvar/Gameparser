@@ -3,12 +3,10 @@ require './rdparse.rb'
 require './classparser'
 
 class GameLanguage
-attr_accessor :test, :gameParser
   def initialize
     @gameParser = Parser.new("game language") do
       @variables = {}
       @functions = {}
-      @test = 22
 
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
@@ -56,8 +54,7 @@ attr_accessor :test, :gameParser
 
       rule :param do
         match(/\w+/) do |m|
-          # @variables = {"i" = 0, "k" = 5}
-          #
+          # @variables = {"i" = var (value is 0), "k" = var(value is 5)}
           @variables[m] = Variable.new(0)
           m
         end
@@ -82,9 +79,6 @@ attr_accessor :test, :gameParser
 
       rule :function_call do
         match(:function, "(", :values, ")") do |m, _, arguments, _|
-          #puts @functions
-          puts "hello"
-          puts arguments[0].evaluate()
           @functions[m].evaluate(arguments)
         end
         #match(:read?)
@@ -120,11 +114,6 @@ attr_accessor :test, :gameParser
         end
       end
 
-      rule :exp do
-        match(:log_exp) {|e| e}
-        match(:math_exp) {|e| e}
-      end
-
       rule :values do
         match(:values, ",", :value) {|m, _, n| m + Array(n)}
         match(:value) {|m| Array(m)}
@@ -142,45 +131,50 @@ attr_accessor :test, :gameParser
         match("[", "]") { Arry.new([]) }
       end
 
-      rule :run do
-        match("run", "(""example.rb", :block_comps, ")")
+      rule :exp do
+        match(:log_exp) {|e| e}
+        match(:math_exp) {|e| e}
       end
 
-      rule :loop do
-        match(:while)
-        match(:for)
-      end
+      # rule :run do
+      #   match("run", "(""example.rb", :block_comps, ")")
+      # end
 
-      rule :condition do
-        match(:if)
-        match(:switch)
-      end
+      # rule :loop do
+      #   match(:while)
+      #   match(:for)
+      # end
 
-      rule :while do
-        match("while", :log_exp, "{", :block_comps, "}")
-      end
+      # rule :condition do
+      #   match(:if)
+      #   match(:switch)
+      # end
 
-      rule :if do
-        match("if", :log_exp, "{", :block_comps, "}", "else", "{", :block_comps, "}")
-        match("if", :log_exp, "{", :block_comps, "}")
-      end
+      # rule :while do
+      #   match("while", :log_exp, "{", :block_comps, "}")
+      # end
 
-      rule :switch do
-        match("case", :var, :cases)
-      end
+      # rule :if do
+      #   match("if", :log_exp, "{", :block_comps, "}", "else", "{", :block_comps, "}")
+      #   match("if", :log_exp, "{", :block_comps, "}")
+      # end
 
-      rule :cases do
-        match(:cases, :case)
-        match(:case)
-      end
+      # rule :switch do
+      #   match("case", :var, :cases)
+      # end
 
-      rule :case do
-        match()
-      end
+      # rule :cases do
+      #   match(:cases, :case)
+      #   match(:case)
+      # end
 
-      rule :for do
-        match("for", :var, "in", :array, "{", :block_comps, "}")
-      end
+      # rule :case do
+      #   match()
+      # end
+
+      # rule :for do
+      #   match("for", :var, "in", :array, "{", :block_comps, "}")
+      # end
 
       rule :log_exp do
         match(:bool_exp, "and", :log_exp) {|m, _, n| And.new(m, n) }
@@ -199,8 +193,12 @@ attr_accessor :test, :gameParser
         match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| NotEqual.new(m, n) }
         match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| NotEqual.new(m, n) }
         match(:bool_val) {|m| m }
-        match(:var) {|m| @variables[m] }
+        match(:var) do |m|
+          if @variables[m].class == LiteralBool
+            @variables[m]
+          end
         end
+      end
 
       rule :bool_val do
         match("true") {|b| LiteralBool.new(b) }
@@ -209,7 +207,7 @@ attr_accessor :test, :gameParser
       end
 
       rule :math_exp do
-        match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) } # varför får vi inte match med k = i + 5
+        match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) }
         match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
         match(:term) {|m| m}
       end
