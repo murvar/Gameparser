@@ -66,6 +66,7 @@ class Assignment
 
   def evaluate()
     @lhs = @rhs.evaluate()
+    #puts @lhs
     return @lhs
   end
 end
@@ -307,7 +308,7 @@ end
 # [i] {"i": 0}
 class Function
   def initialize(params, block)
-    puts params
+    #puts params
     puts block
     @params_hash = Hash.new
     for i in params
@@ -324,9 +325,11 @@ class Function
       @params_hash[k] = arguments[counter]
       counter += 1
     end
+    puts @params_hash
     counter = 0
     for object in @block
       m = object.evaluate()
+      puts object
       counter += 1
       if counter == @block.length
         puts m

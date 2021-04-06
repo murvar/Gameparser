@@ -3,11 +3,12 @@ require './rdparse.rb'
 require './classparser'
 
 class GameLanguage
-
+attr_accessor :test, :gameParser
   def initialize
     @gameParser = Parser.new("game language") do
       @variables = {}
       @functions = {}
+      @test = 22
 
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
@@ -55,7 +56,9 @@ class GameLanguage
 
       rule :param do
         match(/\w+/) do |m|
-          @variables[m] = Variable.new(2)
+          # @variables = {"i" = 0, "k" = 5}
+          #
+          @variables[m] = Variable.new(0)
           m
         end
       end
@@ -79,9 +82,11 @@ class GameLanguage
 
       rule :function_call do
         match(:function, "(", :values, ")") do |m, _, arguments, _|
-          puts @functions[m].evaluate(arguments)
+          #puts @functions
+          puts "hello"
+          puts arguments[0].evaluate()
           @functions[m].evaluate(arguments)
-        end          
+        end
         #match(:read?)
         #match(:write?)
       end
@@ -204,7 +209,7 @@ class GameLanguage
       end
 
       rule :math_exp do
-        match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) }
+        match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) } # varför får vi inte match med k = i + 5
         match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
         match(:term) {|m| m}
       end
@@ -220,7 +225,7 @@ class GameLanguage
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(:var) {|m| @variables[m] } # Är detta en ny variabel eller en gammal?
+        match(:var) {|m| @variables[m] }
       end
 
       rule :var do
