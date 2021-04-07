@@ -1,5 +1,5 @@
 # coding: utf-8
-require './gameparser_new'
+require './gameparser'
 require 'test/unit'
 
 
@@ -259,26 +259,26 @@ class Variable_assignment < Test::Unit::TestCase
 
 end
 
-# class FunctionTest < Test::Unit::TestCase
-#    def test32212
-#      gp = GameLanguage.new
-#      #puts "Helloooooooooooooooooo"
-#      # Hur ska vi spara kod till senare och inte köra den direkt?
-#      # Vi får ett error för "k = i + 5" eftersom den vill köra
-#      # koden direkt
-#      var1 = "def test(i)
-# {
-#   k = i + 5
-#   k
-# }
-# test(1)
-# "
-#      assert_equal(nil, gp.parse_string(var1))
-#      #puts gp.gameParser.test
-#      #assert_equal( , gp.parse_string())
-#      #assert_equal( , gp.parse_string())
-#    end
-#  end
+class FunctionTest < Test::Unit::TestCase
+   def test222222()
+     gp = GameLanguage.new
+     #puts "Helloooooooooooooooooo"
+     # Hur ska vi spara kod till senare och inte köra den direkt?
+     # Vi får ett error för "k = i + 5" eftersom den vill köra
+     # koden direkt
+     var1 = "def test(i)
+{
+  k = i + 5
+  k
+}
+test(1)
+"
+     assert_equal(5, gp.parse_string(var1))
+     #puts gp.gameParser.test
+     #assert_equal( , gp.parse_string())
+     #assert_equal( , gp.parse_string())
+   end
+ end
 
 # ============================================================
 # Template

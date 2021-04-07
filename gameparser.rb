@@ -1,20 +1,16 @@
 # coding: utf-8
-load "./rdparse.rb"
-
-class LiteralString
-  attr_accessor :str
-  def initialize(st)
-    @str = st
-  end
-end
-
+require './rdparse.rb'
+require './classparser'
+$variables = {}
+$functions = {}
 class GameLanguage
 
   def initialize
+
     @gameParser = Parser.new("game language") do
-      @user_assignments = {}
-      
-      
+
+
+
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
       token(/^\d+/) {|m| m.to_i} #returns integers
@@ -28,40 +24,77 @@ class GameLanguage
         obj = LiteralString.new(m)
       end #returns string a LiteralString object
       token(/./) {|m| m } #returns rest like (, {, =, < etc as string
-      
+
       start :prog do
-        match(:comps) {|m| m }
+        match(:comps) {|m| Comps.new(m).evaluate() unless m.class == nil }
       end
 
       rule :comps do
-        match(:comps, :comp) {|m| m }
-        match(:comp) {|m| m }
+        match(:comps, :comp) {|m, n| m + Array(Comp.new(n)) } ### ???
+        match(:comp) {|m| Array(Comp.new(m)) }
       end
 
       rule :comp do
-        match(:definition) {|m| m }
-        match(:statement) {|m| m }
+        match(:definition) {|m| Definition.new(m) }
+        match(:statement) {|m| Statement.new(m) }
       end
 
       rule :definition do
         match(:type)
         match(:event)
+        match(:function_def)
+      end
+
+      rule :function_def do
+          match("def", :function, "(", :params, ")", :block) do
+            |_, name, _, params, _, block|
+             $functions[name] = Function.new(params, block)
+           end
+      end
+
+      rule :params do
+        match(:params, :param) {|m, n| m + Array(n) }
+        match(:param) {|m| Array(m)}
+        match(:empty)  {|m| [] } # emty?
+      end
+
+      rule :param do
+        match(/\w+/) do |m|
+          # $variables = {"i" = var (value is 0), "k" = var(value is 5)}
+          #$variables[m] = Variable.new(0) # fel
+          m
+        end
+      end
+
+      rule :block do
+        match("{", :statements, "}") {|_, m, _| m}
+      end
+
+      rule :statements do
+        match(:statements, :statement) {|m, n| m + Array(n) }
+        match(:statement) {|m| Array(m)}
       end
 
       rule :statement do
-        # match(:function_call)
         match(:condition)
         match(:loop)
-        match(:assignment)
-        match(:value)
+        match(:assignment) {|m| m }
+        match(:value)  {|m| m }
+        match(:function_call)
       end
 
-      # rule :function_call do
-      #   match(:run)
-      #   match(:read?)
-      #   match(:write?)
-      # end
+      rule :function_call do
+        match(:function, "(", :values, ")") do |m, _, arguments, _|
+          #puts arguments.evaluate()
+          $functions[m].evaluate(arguments)
+        end
+        #match(:read?)
+        #match(:write?)
+      end
 
+      rule :function do
+        match(String) {|m| m }
+      end
       # rule :read do
       # end
 
@@ -82,7 +115,27 @@ class GameLanguage
       end
 
       rule :assignment do
-        match(:var, "=", :value) { |m,  _, n| @user_assignments[m] = n}
+        match(:var, "=", :value) do |m,  _, n|
+          Assignment.new(m, n)
+        end
+      end
+
+      rule :values do
+        match(:values, ",", :value) {|m, _, n| m + Array(n)}
+        match(:value) {|m| Array(m)}
+        match("")  {|m| [] }# emty?
+      end
+
+      rule :value do
+        match(LiteralString) {|s| Value.new(s) }
+        match(:array) {|a| Value.new(a) }
+        match(:exp) {|e| e}
+        match(:function_call)
+      end
+
+      rule :array do
+        match("[", :values, "]") {|_, v, _| Arry.new(v)}
+        match("[", "]") { Arry.new([]) }
       end
 
       rule :exp do
@@ -90,110 +143,98 @@ class GameLanguage
         match(:math_exp) {|e| e}
       end
 
-      rule :values do
-        match(:values, ",", :value) {|m, _, n| m + Array(n)}
-        match(:value) {|m| Array(m)}
-      end
+      # rule :run do
+      #   match("run", "(""example.rb", :block_comps, ")")
+      # end
 
-      rule :value do
-        match(LiteralString) {|s| s.str }
-        match(:array) {|a| a}
-        match(:exp) {|e| e}
-      end
+      # rule :loop do
+      #   match(:while)
+      #   match(:for)
+      # end
 
-      rule :array do
-        match("[", :values, "]") {|_, v, _| v}
-        match("[", "]") {[]}
-      end
+      # rule :condition do
+      #   match(:if)
+      #   match(:switch)
+      # end
 
-      rule :run do
-        match("run", "(""example.rb", :block_comps, ")")
-      end
+      # rule :while do
+      #   match("while", :log_exp, "{", :block_comps, "}")
+      # end
 
-      rule :loop do
-        match(:while)
-        match(:for)
-      end
+      # rule :if do
+      #   match("if", :log_exp, "{", :block_comps, "}", "else", "{", :block_comps, "}")
+      #   match("if", :log_exp, "{", :block_comps, "}")
+      # end
 
-      rule :condition do
-        match(:if)
-        match(:switch)
-      end
+      # rule :switch do
+      #   match("case", :var, :cases)
+      # end
 
-      rule :while do
-        match("while", :log_exp, "{", :block_comps, "}")
-      end
+      # rule :cases do
+      #   match(:cases, :case)
+      #   match(:case)
+      # end
 
-      rule :if do
-        match("if", :log_exp, "{", :block_comps, "}", "else", "{", :block_comps, "}")
-        match("if", :log_exp, "{", :block_comps, "}")
-      end
+      # rule :case do
+      #   match()
+      # end
 
-      rule :switch do
-        match("case", :var, :cases)
-      end
-
-      rule :cases do
-        match(:cases, :case)
-        match(:case)
-      end
-
-      rule :case do
-        match()
-      end
-
-      rule :for do
-        match("for", :var, "in", :array, "{", :block_comps, "}")
-      end
+      # rule :for do
+      #   match("for", :var, "in", :array, "{", :block_comps, "}")
+      # end
 
       rule :log_exp do
-        match(:bool_exp, "and", :log_exp) {|m, _, n| m and n}
-        match(:bool_exp, "or", :log_exp) {|m, _, n| m or n}
-        match("not", :log_exp) {|_, m, _| !m}
+        match(:bool_exp, "and", :log_exp) {|m, _, n| And.new(m, n) }
+        match(:bool_exp, "or", :log_exp) {|m, _, n| Or.new(m, n) }
+        match("not", :log_exp) {|_, m, _| Not.new(m) }
         match(:bool_exp) {|m| m}
       end
 
       rule :bool_exp do
-        match(:math_exp, "<", :math_exp) {|m, _, n| m < n}
-        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| m <= n}
-        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| m == n}
-        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| m == n}
-        match(:math_exp, ">", :math_exp) {|m, _, n| m > n}
-        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| m >= n}
-        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| m != n}
-        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| m != n}
-        match(:bool_val) {|m| m}
-        match(:var) {|m| @user_assignments[m]}
+        match(:math_exp, "<", :math_exp) {|m, _, n| Less.new(m, n) }
+        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| LessEqual.new(m, n) }
+        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| Equal.new(m, n) }
+        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| Equal.new(m, n) }
+        match(:math_exp, ">", :math_exp) {|m, _, n| Greater.new(m, n) }
+        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| GreaterEqual.new(m, n) }
+        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| NotEqual.new(m, n) }
+        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| NotEqual.new(m, n) }
+        match(:bool_val) {|m| m }
+        match(:var) do |m|
+          if $variables[m].class == LiteralBool
+            $variables[m]
+          end
         end
+      end
 
       rule :bool_val do
-        match("true") {true}
-        match("false") {false}
-        match("(", :log_exp, ")") {|_, m, _| m } 
+        match("true") {|b| LiteralBool.new(b) }
+        match("false") {|b| LiteralBool.new(b) }
+        match("(", :log_exp, ")") {|_, m, _| m }
       end
 
       rule :math_exp do
-        match(:math_exp, "+", :term) {|m, _, n| m + n}
-        match(:math_exp, "-", :term) {|m, _, n| m - n}
+        match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) }
+        match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
         match(:term) {|m| m}
       end
 
       rule :term do
-        match(:term, "*", :factor) {|m, _, n| m * n}
-        match(:term, "/", :factor) {|m, _, n| m / n}
+        match(:term, "*", :factor) {|m, _, n| Multiplication.new(m, n) }
+        match(:term, "/", :factor) {|m, _, n| Division.new(m, n) }
         match(:factor) {|m| m}
       end
 
       rule :factor do
-        match(Integer) {|m| m}
-        match("-", Integer) {|_, m| -m}
-        match("+", Integer) {|_, m| m}
-        match("(", :math_exp , ")"){|_, m, _| m}
-        match(:var) {|m| @user_assignments[m]}
+        match(Integer) {|m| LiteralInteger.new(m) }
+        match("-", Integer) {|_, m| LiteralInteger.new(-m) }
+        match("+", Integer) {|_, m| LiteralInteger.new(m) }
+        match("(", :math_exp , ")"){|_, m, _| m }
+        match(:var) {|m| $variables[m] }
       end
 
       rule :var do
-        match(String) {|s| s}
+        match(String) {|s| s }
       end
     end
 
@@ -232,5 +273,5 @@ class GameLanguage
 end
 
 if __FILE__ == $0
-  GameLanguage.new.parse()  
+  GameLanguage.new.parse()
 end

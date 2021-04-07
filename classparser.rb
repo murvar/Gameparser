@@ -2,6 +2,7 @@
 # coding: utf-8
 
 #require "rdparse"
+require './gameparser'
 
 class Prog
   def initialize(comps)
@@ -44,7 +45,8 @@ class Definition
   end
 
   def evaluate()
-    @object.evaluate()
+    #@object.evaluate()
+    nil
   end
 end
 
@@ -65,9 +67,7 @@ class Assignment
   end
 
   def evaluate()
-    @lhs = @rhs.evaluate()
-    #puts @lhs
-    return @lhs
+    $variables[@lhs] = @rhs.evaluate()
   end
 end
 
@@ -309,7 +309,7 @@ end
 class Function
   def initialize(params, block)
     #puts params
-    puts block
+    #puts block
     @params_hash = Hash.new
     for i in params
       @params_hash[i] = nil
@@ -317,24 +317,46 @@ class Function
 
     @block = block
   end
-#{"i": nil}
+#{"i": object}
 #[1]
   def evaluate(arguments)
     counter = 0
     @params_hash.each do |k, v|
-      @params_hash[k] = arguments[counter]
+      $variables[k] = arguments[counter]
+      #@params_hash[k] = arguments[counter]
       counter += 1
     end
-    puts @params_hash
+    puts "param_hash: "
+    print @params_hash
+    puts "counter:  " , counter
+    puts "Arguments: ", arguments
     counter = 0
     for object in @block
       m = object.evaluate()
-      puts object
-      counter += 1
-      if counter == @block.length
-        puts m
-        return m
-      end
     end
+    return m
+  end
+end
+
+class Integer
+  def evaluate()
+    self
+  end
+end
+class String
+  def evaluate()
+    self
+  end
+end
+
+class TrueClass
+  def evaluate()
+    self
+  end
+end
+
+class FalseClass
+  def evaluate()
+    self
   end
 end
