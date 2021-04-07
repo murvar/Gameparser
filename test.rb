@@ -213,7 +213,7 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal(200, gp.parse_string(" k = i - 50"))
     assert_equal(200, gp.parse_string("k"))
     assert_equal(250, gp.parse_string("i"))
-    
+
 
     assert_equal(-34, gp.parse_string(" temp = -34"))
     assert_equal(-34, gp.parse_string("temp"))
@@ -268,7 +268,7 @@ end
 #      # koden direkt
 #      var1 = "def test(i)
 # {
-#   k = 5 + i
+#   k = i + 5
 #   k
 # }
 # test(1)

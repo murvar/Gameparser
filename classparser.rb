@@ -14,17 +14,17 @@ class Prog
 end
 
 class Comps
-  def initialize(comps, comp)
+  def initialize(comps)
     @comps = comps
-    @comp = comp
   end
 
   def evaluate()
-    if @comps != nil
-      return @comps.evaluate(), @comp.evaluate()
-    else
-      return @comp.evaluate()
+
+    for object in @comps
+       temp = object.evaluate()
+
     end
+    return temp
   end
 end
 
@@ -44,7 +44,7 @@ class Definition
   end
 
   def evaluate()
-    nil
+    @object.evaluate()
   end
 end
 

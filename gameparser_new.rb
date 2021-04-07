@@ -23,12 +23,12 @@ class GameLanguage
       token(/./) {|m| m } #returns rest like (, {, =, < etc as string
 
       start :prog do
-        match(:comps) {|m| m.evaluate() unless m.class == nil }
+        match(:comps) {|m| Comps.new(m).evaluate() unless m.class == nil }
       end
 
       rule :comps do
-        match(:comps, :comp) {|m, n| m } ### ???
-        match(:comp) {|m| Comp.new(m) }
+        match(:comps, :comp) {|m, n| m + Array(Comp.new(n)) } ### ???
+        match(:comp) {|m| Array(Comp.new(m)) }
       end
 
       rule :comp do
@@ -124,6 +124,7 @@ class GameLanguage
         match(LiteralString) {|s| Value.new(s) }
         match(:array) {|a| Value.new(a) }
         match(:exp) {|e| e}
+        match(:function_call)
       end
 
       rule :array do
