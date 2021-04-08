@@ -54,13 +54,13 @@ class GameLanguage
       rule :params do
         match(:params, :param) {|m, n| m + Array(n) }
         match(:param) {|m| Array(m)}
-        match(:empty)  {|m| [] } # emty?
+        match(:empty)  {|m| [] }
       end
 
       rule :param do
         match(/\w+/) do |m|
           # $variables = {"i" = var (value is 0), "k" = var(value is 5)}
-          #$variables[m] = Variable.new(0) # fel
+          $variables[m] = Variable.new(0) # fel
           m
         end
       end
@@ -77,38 +77,20 @@ class GameLanguage
       rule :statement do
         match(:condition)
         match(:loop)
-        match(:assignment) {|m| m }
+        match(:assignment)
+        match(:value)
         match(:function_call)
-        match(:value)  {|m| m }
       end
 
       rule :function_call do
         match(:function, "(", :values, ")") do |m, _, arguments, _|
-          puts "Here"
-          if $functions[m]
-            $functions[m].evaluate(arguments)
-          end
+          $functions[m].evaluate(arguments)
         end
-        #match(:read?)
-        #match(:write?)
       end
 
       rule :function do
         match(String) {|m| m }
       end
-      # rule :read do
-      # end
-
-      # rule :write do
-      # end
-
-      # rule :type do
-      #   match("type", String, "{", :assignsments, :run,"}")
-      # end
-
-      # rule :event do
-      #   match("event", String, "{", :assignsments, :run,"}")
-      # end
 
       rule :assignsments do
         match(:assignsments, :assignment)
@@ -124,15 +106,15 @@ class GameLanguage
       rule :values do
         match(:values, ",", :value) {|m, _, n| m + Array(n)}
         match(:value) {|m| Array(m)}
-        match("")  {|m| [] }# emty?
+        match(:empty)  {|m| [] }
       end
 
       rule :value do
-        match(LiteralString) {|s| Value.new(s) }
-        match(:array) {|a| Value.new(a) }
-        match(:exp) {|e| Value.new(e) }
-        match(String) {|e| Value.new(e) }
-        match(:function_call) {|e| Value.new(e) }
+        match(LiteralString) #{|s| Value.new(s) }
+        match(:array) #{|a| Value.new(a) }
+        match(:exp) #{|e| Value.new(e) }
+        #match(:function_call) {|e| Value.new(e) }
+        #match(String) {|e| Value.new(e) }
 
       end
 
@@ -145,46 +127,6 @@ class GameLanguage
         match(:log_exp) {|e| e}
         match(:math_exp) {|e| e}
       end
-
-      # rule :run do
-      #   match("run", "(""example.rb", :block_comps, ")")
-      # end
-
-      # rule :loop do
-      #   match(:while)
-      #   match(:for)
-      # end
-
-      # rule :condition do
-      #   match(:if)
-      #   match(:switch)
-      # end
-
-      # rule :while do
-      #   match("while", :log_exp, "{", :block_comps, "}")
-      # end
-
-      # rule :if do
-      #   match("if", :log_exp, "{", :block_comps, "}", "else", "{", :block_comps, "}")
-      #   match("if", :log_exp, "{", :block_comps, "}")
-      # end
-
-      # rule :switch do
-      #   match("case", :var, :cases)
-      # end
-
-      # rule :cases do
-      #   match(:cases, :case)
-      #   match(:case)
-      # end
-
-      # rule :case do
-      #   match()
-      # end
-
-      # rule :for do
-      #   match("for", :var, "in", :array, "{", :block_comps, "}")
-      # end
 
       rule :log_exp do
         match(:bool_exp, "and", :log_exp) {|m, _, n| And.new(m, n) }
@@ -234,7 +176,7 @@ class GameLanguage
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m }
         match(:var) {|m| $variables[m] }
-        match(String)
+
       end
 
       rule :var do

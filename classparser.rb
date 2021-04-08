@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 
-#require "rdparse"
 require './gameparser'
 
 class Prog
@@ -57,17 +56,6 @@ class Statement
 
   def evaluate()
     return @object.evaluate()
-  end
-end
-
-class Assignment
-  def initialize(lhs, rhs)
-    @lhs = lhs
-    @rhs = rhs
-  end
-
-  def evaluate()
-    $variables[@lhs] = @rhs.evaluate()
   end
 end
 
@@ -207,7 +195,7 @@ class Addition
   end
 
   def evaluate()
-    return (@lhs.evaluate() + @rhs.evaluate())
+    return @lhs.evaluate() + @rhs.evaluate()
   end
 
 end
@@ -289,24 +277,17 @@ class LiteralString
   end
 end
 
-
 class Variable
+  attr_accessor :value
   def initialize(value)
     @value = value
   end
 
   def evaluate()
-    return @value
+    @value
   end
 end
 
-
-# def test(i)
-#   {
-#    k = 5 + i
-#    k
-#  }
-# [i] {"i": 0}
 class Function
   def initialize(params, block)
     #puts params
@@ -314,40 +295,66 @@ class Function
     @params = params
     @block = block
   end
-#{"i": object}
-#[1]
+
   def evaluate(arguments)
-    print "Block:", @block
+    print "$variables before: ", $variables
     puts ""
-    counter = 0
-    # print "$variables before: ", $variables
-    # puts ""
     # print "Arguments: ", arguments
     # puts ""
-    for i in 0..@params.lenght
-      $variables[@params[i]]  = arguments[i]
-    end
-    # @params.each do |p|
-    #   puts p
-    #   $variables[p] = arguments[counter]
-    #   #@params_hash[k] = arguments[counter]
-    #   counter += 1
+    # for i in 0...@params.length
+    #   $variables[@params[i]  = arguments[i]
     # end
-    # print "params_hash: ", @params_hash
-    # puts ""
-    # print "$variables after: ", $variables
-    # puts ""
-    # print "counter:  " , counter
+    counter = 0
+    @params.each do |p|
+      #puts p
+      $variables[p].value = arguments[counter].evaluate()
+      #@params_hash[k] = arguments[counter]
+      counter += 1
+    end
+    # print "params_list: ", @params
     # puts ""
 
+    print "$variables after: ", $variables
+    puts ""
+    puts ""
+    puts ""
+
     for object in @block
-      puts object
+      print "Object is: ", object , "\n"
       m = object.evaluate()
+      print "Result of evaluate is: ", m , "\n"
+      puts "Variables after this iteration"
+      puts $variables
+      puts ""
     end
-    puts m
+    print "Return from function is: ", m , "\n"
     return m
   end
 end
+
+class Assignment
+  def initialize(lhs, rhs)
+    # @lhs = Variable.new(0)
+    # $variables[lhs] = @lhs
+    @lhs = lhs
+    @rhs = rhs
+  end
+  def evaluate()
+    # $variables[@lhs] = @rhs
+    # puts $variables
+    $variables[@lhs] = @rhs.evaluate()
+  end
+end
+
+# class Param
+#   def initialize(name)
+#     @name = name
+#   end
+#
+#   def evaluate()
+#     @name
+#   end
+# end
 
 class Integer
   def evaluate()
