@@ -268,12 +268,12 @@ class FunctionTest < Test::Unit::TestCase
      # koden direkt
      var1 = "def test(i)
 {
-  k = i + 5
+  k = 100 + i
   k
 }
-test(1)
+test(22)
 "
-     assert_equal(5, gp.parse_string(var1))
+     assert_equal(23, gp.parse_string(var1))
      #puts gp.gameParser.test
      #assert_equal( , gp.parse_string())
      #assert_equal( , gp.parse_string())

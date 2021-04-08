@@ -76,6 +76,7 @@ class Value
     @object = object
   end
 
+
   def evaluate()
     return @object.evaluate()
   end
@@ -310,30 +311,40 @@ class Function
   def initialize(params, block)
     #puts params
     #puts block
-    @params_hash = Hash.new
-    for i in params
-      @params_hash[i] = nil
-    end
-
+    @params = params
     @block = block
   end
 #{"i": object}
 #[1]
   def evaluate(arguments)
+    print "Block:", @block
+    puts ""
     counter = 0
-    @params_hash.each do |k, v|
-      $variables[k] = arguments[counter]
-      #@params_hash[k] = arguments[counter]
-      counter += 1
+    # print "$variables before: ", $variables
+    # puts ""
+    # print "Arguments: ", arguments
+    # puts ""
+    for i in 0..@params.lenght
+      $variables[@params[i]]  = arguments[i]
     end
-    puts "param_hash: "
-    print @params_hash
-    puts "counter:  " , counter
-    puts "Arguments: ", arguments
-    counter = 0
+    # @params.each do |p|
+    #   puts p
+    #   $variables[p] = arguments[counter]
+    #   #@params_hash[k] = arguments[counter]
+    #   counter += 1
+    # end
+    # print "params_hash: ", @params_hash
+    # puts ""
+    # print "$variables after: ", $variables
+    # puts ""
+    # print "counter:  " , counter
+    # puts ""
+
     for object in @block
+      puts object
       m = object.evaluate()
     end
+    puts m
     return m
   end
 end

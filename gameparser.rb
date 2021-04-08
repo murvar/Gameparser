@@ -1,6 +1,7 @@
 # coding: utf-8
 require './rdparse.rb'
 require './classparser'
+
 $variables = {}
 $functions = {}
 class GameLanguage
@@ -8,8 +9,6 @@ class GameLanguage
   def initialize
 
     @gameParser = Parser.new("game language") do
-
-
 
       token(/#.*/) #removes comment
       token(/\s+/) #removes whitespaces
@@ -46,10 +45,10 @@ class GameLanguage
       end
 
       rule :function_def do
-          match("def", :function, "(", :params, ")", :block) do
-            |_, name, _, params, _, block|
-             $functions[name] = Function.new(params, block)
-           end
+        match("def", :function, "(", :params, ")", :block) do
+          |_, name, _, params, _, block|
+          $functions[name] = Function.new(params, block)
+        end
       end
 
       rule :params do
@@ -79,14 +78,16 @@ class GameLanguage
         match(:condition)
         match(:loop)
         match(:assignment) {|m| m }
-        match(:value)  {|m| m }
         match(:function_call)
+        match(:value)  {|m| m }
       end
 
       rule :function_call do
         match(:function, "(", :values, ")") do |m, _, arguments, _|
-          #puts arguments.evaluate()
-          $functions[m].evaluate(arguments)
+          puts "Here"
+          if $functions[m]
+            $functions[m].evaluate(arguments)
+          end
         end
         #match(:read?)
         #match(:write?)
@@ -129,8 +130,10 @@ class GameLanguage
       rule :value do
         match(LiteralString) {|s| Value.new(s) }
         match(:array) {|a| Value.new(a) }
-        match(:exp) {|e| e}
-        match(:function_call)
+        match(:exp) {|e| Value.new(e) }
+        match(String) {|e| Value.new(e) }
+        match(:function_call) {|e| Value.new(e) }
+
       end
 
       rule :array do
@@ -231,6 +234,7 @@ class GameLanguage
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m }
         match(:var) {|m| $variables[m] }
+        match(String)
       end
 
       rule :var do
