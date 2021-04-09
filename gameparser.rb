@@ -1,6 +1,6 @@
 # coding: utf-8
-require './rdparse.rb'
-require './classparser'
+require './rdparse'
+require './classes'
 
 $variables = {}
 $functions = {}
@@ -10,26 +10,26 @@ class GameLanguage
 
     @gameParser = Parser.new("game language") do
 
-      token(/#.*/) #removes comment
-      token(/\s+/) #removes whitespaces
-      token(/^\d+/) {|m| m.to_i} #returns integers
-      token(/\w+/) {|m| m } #returns variable names as string
+      token(/#.*/) # removes comment
+      token(/\s+/) # removes whitespaces
+      token(/^\d+/) {|m| m.to_i} # returns integers
+      token(/\w+/) {|m| m } # returns variable names as string
       token(/".*?"/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
-      end #returns a LiteralString object
+      end # returns a LiteralString object
        token(/'.*?'/) do |m|
         m = m[1...-1]
         obj = LiteralString.new(m)
-      end #returns string a LiteralString object
-      token(/./) {|m| m } #returns rest like (, {, =, < etc as string
+      end # returns string a LiteralString object
+      token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
       start :prog do
         match(:comps) {|m| Comps.new(m).evaluate() unless m.class == nil }
       end
 
       rule :comps do
-        match(:comps, :comp) {|m, n| m + Array(Comp.new(n)) } ### ???
+        match(:comps, :comp) {|m, n| m + Array(Comp.new(n)) }
         match(:comp) {|m| Array(Comp.new(m)) }
       end
 
@@ -45,10 +45,14 @@ class GameLanguage
       end
 
       rule :function_def do
-        match("def", :function, "(", :params, ")", :block) do
+        match("def", :function_name, "(", :params, ")", :block) do
           |_, name, _, params, _, block|
           $functions[name] = Function.new(params, block)
         end
+      end
+      
+      rule :function_name do
+        match(String) {|m| m }
       end
 
       rule :params do
@@ -59,8 +63,7 @@ class GameLanguage
 
       rule :param do
         match(/\w+/) do |m|
-          # $variables = {"i" = var (value is 0), "k" = var(value is 5)}
-          $variables[m] = Variable.new(0) # fel
+          $variables[m] = Variable.new(0) # fel?
           m
         end
       end
@@ -68,30 +71,26 @@ class GameLanguage
       rule :block do
         match("{", :statements, "}") {|_, m, _| m}
       end
-
+      
+      rule :function_call do
+        match(:function_name, "(", :values, ")") do |m, _, arguments, _|
+          $functions[m].evaluate(arguments)
+        end
+      end
       rule :statements do
         match(:statements, :statement) {|m, n| m + Array(n) }
         match(:statement) {|m| Array(m)}
       end
 
       rule :statement do
-        match(:condition)
-        match(:loop)
+       # match(:condition)
+       # match(:loop)
         match(:assignment)
         match(:value)
         match(:function_call)
       end
 
-      rule :function_call do
-        match(:function, "(", :values, ")") do |m, _, arguments, _|
-          $functions[m].evaluate(arguments)
-        end
-      end
-
-      rule :function do
-        match(String) {|m| m }
-      end
-
+     
       rule :assignsments do
         match(:assignsments, :assignment)
         match(:assignment)
@@ -110,13 +109,11 @@ class GameLanguage
       end
 
       rule :value do
-        match(LiteralString) #{|s| Value.new(s) }
-        match(:array) #{|a| Value.new(a) }
-        match(:exp) #{|e| Value.new(e) }
-        #match(:function_call) {|e| Value.new(e) }
-        #match(String) {|e| Value.new(e) }
-
-      end
+        match(LiteralString)
+        match(:array)
+        match(:exp)
+        #match(:function_call)
+       end
 
       rule :array do
         match("[", :values, "]") {|_, v, _| Arry.new(v)}
@@ -175,8 +172,7 @@ class GameLanguage
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(:var) {|m| $variables[m] }
-
+        match(:var) { |m| $variables[m] }
       end
 
       rule :var do

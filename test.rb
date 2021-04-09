@@ -263,17 +263,14 @@ class FunctionTest < Test::Unit::TestCase
    def test222222()
      gp = GameLanguage.new
      #puts "Helloooooooooooooooooo"
-     # Hur ska vi spara kod till senare och inte köra den direkt?
-     # Vi får ett error för "k = i + 5" eftersom den vill köra
-     # koden direkt
-     var1 = "def test(i)
-{
-  k = i + 12
-
-}
-test(2)
-"
-     assert_equal(14, gp.parse_string(var1))
+    
+     code = "def test(i)
+            {
+             k = i + 12
+             k
+            }
+            test(2)"           
+     assert_equal(14, gp.parse_string(code))
      #puts gp.gameParser.test
      #assert_equal( , gp.parse_string())
      #assert_equal( , gp.parse_string())
