@@ -259,6 +259,34 @@ class Variable_assignment < Test::Unit::TestCase
 
 end
 
+class MultipleLine < Test::Unit::TestCase
+  def test_mini()
+    gp = GameLanguage.new
+    
+    code = "bool = true and false
+            bool"
+    assert_equal(false, gp.parse_string(code))
+
+    
+    code = "bool = true and false or true
+            bool"
+    assert_equal(true , gp.parse_string(code))
+
+    code = "bool = true and false or true
+            bool = 32 + 21
+            bool"
+    assert_equal(53, gp.parse_string(code))
+
+
+    code = "bool1 = true and false or true
+            bool1 = 32 + 21
+            bool2 = bool1 * 10
+            bool2"
+    assert_equal(530, gp.parse_string(code))
+    
+  end
+end
+
 class FunctionTest < Test::Unit::TestCase
    def test222222()
      gp = GameLanguage.new
