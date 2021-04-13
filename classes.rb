@@ -278,7 +278,7 @@ end
 
 class Variable
   attr_accessor :value
-  def initialize(value)
+  def initialize(value = 0)
     @value = value
   end
 
@@ -296,7 +296,7 @@ class Function
   def evaluate(arguments)
     counter = 0
     @params.each do |p|
-      $variables[p].value = arguments[counter].evaluate()
+      $variables[$scope][p].value = arguments[counter].evaluate()
       counter += 1
     end
   
@@ -311,11 +311,11 @@ class Assignment
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
-    $variables[@lhs] = Variable.new(0)
+    $variables[$scope][@lhs] = Variable.new()
   end
   
   def evaluate()
-    $variables[@lhs].value = @rhs.evaluate()
+    $variables[$scope][@lhs].value = @rhs.evaluate()
   end
 end
 

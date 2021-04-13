@@ -2,8 +2,9 @@
 require './rdparse'
 require './classes'
 
-$variables = {}
+$variables = {"global" => {}}
 $functions = {}
+$scope = "global"
 class GameLanguage
 
   def initialize
@@ -77,7 +78,7 @@ class GameLanguage
 
       rule :param do
         match(Identifier) do |m|
-          $variables[m.name] = Variable.new(0) # fel?
+          $variables[$scope][m.name] = Variable.new() # fel?
           m.name
         end
       end
@@ -175,8 +176,8 @@ class GameLanguage
         
         match(:bool_val) {|m| m }
         match(Identifier) do |m|
-          if $variables[m.name].class == LiteralBool
-            $variables[m.name]
+          if $variables[$scope][m.name].class == LiteralBool
+            $variables[$scope][m.name]
           end
         end
       end
@@ -204,7 +205,7 @@ class GameLanguage
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(Identifier) {|m| $variables[m.name] }
+        match(Identifier) {|m| $variables[$scope][m.name] }
       end
     end
 
