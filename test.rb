@@ -262,6 +262,7 @@ end
 class MultipleLine < Test::Unit::TestCase
   def test_mini()
     gp = GameLanguage.new
+   
     
     code = "bool = true and false
             bool"
@@ -277,28 +278,53 @@ class MultipleLine < Test::Unit::TestCase
             bool"
     assert_equal(53, gp.parse_string(code))
 
-
     code = "bool1 = true and false or true
             bool1 = 32 + 21
             bool2 = bool1 * 10
             bool2"
+
     assert_equal(530, gp.parse_string(code))
+    
+    assert_equal(530, gp.parse_string("bool2"))
     
   end
 end
 
 class FunctionTest < Test::Unit::TestCase
    def test222222()
-     gp = GameLanguage.new
-     #puts "Helloooooooooooooooooo"
-    
+     gp1 = GameLanguage.new
+
      code = "def test(i)
             {
              k = i + 12
              k
             }
-            test(2)"           
-     assert_equal(14, gp.parse_string(code))
+            "           
+     assert_equal(nil, gp1.parse_string(code))          
+     assert_equal(14, gp1.parse_string("test(2)"))
+     assert_equal(32, gp1.parse_string("test(20)"))
+     assert_equal(13, gp1.parse_string("test(2 / 2)"))
+
+     
+     gp2 = GameLanguage.new
+     code = "def test1(i)
+            {
+             k = i + 12
+             k
+            }
+            def test2(j)
+            {
+             p = ( j * 2 ) - 2
+             p
+            }
+            "           
+     assert_equal(nil, gp2.parse_string(code))          
+     assert_equal(14, gp2.parse_string("test1(2)"))
+     assert_equal(2, gp2.parse_string("test2(2)"))
+     assert_equal(-4, gp2.parse_string("test2(-1)"))
+
+
+     
      #puts gp.gameParser.test
      #assert_equal( , gp.parse_string())
      #assert_equal( , gp.parse_string())

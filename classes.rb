@@ -341,3 +341,17 @@ class FalseClass
     self
   end
 end
+
+class Identifier
+  attr_accessor :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+class CompOp
+  attr_reader :op
+  def initialize(op)
+    @op = op
+  end
+end

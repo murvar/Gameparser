@@ -13,15 +13,33 @@ class GameLanguage
       token(/#.*/) # removes comment
       token(/\s+/) # removes whitespaces
       token(/^\d+/) {|m| m.to_i} # returns integers
-      token(/\w+/) {|m| m } # returns variable names as string
+      
+      token(/false/) {|m|m}
+      token(/true/) {|m| m }
+      token(/or/) {|m| m }
+      token(/and/) {|m| m }
+      token(/not/) {|m| m }
+      token(/def/) {|m| m }
+
+      token(/<=/){|m| CompOp.new(m) }
+      token(/==/){|m| CompOp.new(m) }
+      token(/!=/){|m| CompOp.new(m) }
+      token(/</){|m| CompOp.new(m)  }
+      token(/>=/){|m| CompOp.new(m) }
+      token(/>/){|m| CompOp.new(m)  }
+      
+      token(/\w+/) {|m| Identifier.new(m) } # returns variable names as an Identifier object
+      
       token(/".*?"/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
       end # returns a LiteralString object
-       token(/'.*?'/) do |m|
+      
+      token(/'.*?'/) do |m|
         m = m[1...-1]
         obj = LiteralString.new(m)
       end # returns string a LiteralString object
+      
       token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
       start :prog do
@@ -45,16 +63,12 @@ class GameLanguage
       end
 
       rule :function_def do
-        match("def", :function_name, "(", :params, ")", :block) do
-          |_, name, _, params, _, block|
-          $functions[name] = Function.new(params, block)
+        match("def", Identifier, "(", :params, ")", :block) do
+          |_, func, _, params, _, block|
+          $functions[func.name] = Function.new(params, block)
         end
       end
       
-      rule :function_name do
-        match(String) {|m| m }
-      end
-
       rule :params do
         match(:params, :param) {|m, n| m + Array(n) }
         match(:param) {|m| Array(m)}
@@ -62,9 +76,9 @@ class GameLanguage
       end
 
       rule :param do
-        match(/\w+/) do |m|
-          $variables[m] = Variable.new(0) # fel?
-          m
+        match(Identifier) do |m|
+          $variables[m.name] = Variable.new(0) # fel?
+          m.name
         end
       end
 
@@ -73,8 +87,8 @@ class GameLanguage
       end
       
       rule :function_call do
-        match(:function_name, "(", :values, ")") do |m, _, arguments, _|
-          $functions[m].evaluate(arguments)
+        match(Identifier, "(", :values, ")") do |m, _, arguments, _|
+          $functions[m.name].evaluate(arguments)
         end
       end
       rule :statements do
@@ -97,8 +111,8 @@ class GameLanguage
       end
 
       rule :assignment do
-        match(:var, "=", :value) do |m,  _, n|
-          Assignment.new(m, n)
+        match(Identifier, "=", :value) do |m,  _, n|
+          Assignment.new(m.name, n)
         end
       end
 
@@ -126,25 +140,43 @@ class GameLanguage
       end
 
       rule :log_exp do
-        match(:bool_exp, "and", :log_exp) {|m, _, n| And.new(m, n) }
-        match(:bool_exp, "or", :log_exp) {|m, _, n| Or.new(m, n) }
+        match(:bool_exp, "and", :log_exp) {|lhs, _, rhs| And.new(lhs, rhs) }
+        match(:bool_exp, "or", :log_exp) {|lhs, _, rhs| Or.new(lhs, rhs) }
         match("not", :log_exp) {|_, m, _| Not.new(m) }
         match(:bool_exp) {|m| m}
       end
 
       rule :bool_exp do
-        match(:math_exp, "<", :math_exp) {|m, _, n| Less.new(m, n) }
-        match(:math_exp, "<", "=", :math_exp) {|m, _, _, n| LessEqual.new(m, n) }
-        match(:bool_val, "=", "=", :bool_val) {|m, _, _, n| Equal.new(m, n) }
-        match(:math_exp, "=", "=", :math_exp) {|m, _, _, n| Equal.new(m, n) }
-        match(:math_exp, ">", :math_exp) {|m, _, n| Greater.new(m, n) }
-        match(:math_exp, ">", "=", :math_exp) {|m, _, _, n| GreaterEqual.new(m, n) }
-        match(:math_exp, "!", "=", :math_exp) {|m, _, _, n| NotEqual.new(m, n) }
-        match(:bool_val, "!", "=", :bool_val) {|m, _, _, n| NotEqual.new(m, n) }
+         match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs|
+          case c.op
+          when "<=" then
+            LessEqual.new(lhs, rhs)
+          when "==" then
+            Equal.new(lhs, rhs)
+          when "!=" then
+            NotEqual.new(lhs, rhs)
+          when "<" then
+            Less.new(lhs, rhs)
+          when ">=" then
+            GreaterEqual.new(lhs, rhs)
+          when ">" then
+            Greater.new(lhs, rhs)
+          end
+         end
+         
+        match(:bool_val, CompOp, :bool_val) do |lhs, c, rhs|
+          case c.op
+          when "==" then
+            Equal.new(lhs, rhs)
+          when "!=" then
+            NotEqual.new(lhs, rhs)
+          end
+        end
+        
         match(:bool_val) {|m| m }
-        match(:var) do |m|
-          if $variables[m].class == LiteralBool
-            $variables[m]
+        match(Identifier) do |m|
+          if $variables[m.name].class == LiteralBool
+            $variables[m.name]
           end
         end
       end
@@ -172,11 +204,7 @@ class GameLanguage
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(:var) { |m| $variables[m] }
-      end
-
-      rule :var do
-        match(String) {|s| s }
+        match(Identifier) {|m| $variables[m.name] }
       end
     end
 
