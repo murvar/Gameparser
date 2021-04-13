@@ -329,7 +329,21 @@ class FunctionTest < Test::Unit::TestCase
      #assert_equal( , gp.parse_string())
      #assert_equal( , gp.parse_string())
    end
- end
+end
+
+class WriteTest < Test::Unit::TestCase
+  def test_print()
+    gp = GameLanguage.new
+
+    assert_equal(nil , gp.parse_string('write()'))
+    assert_equal(nil , gp.parse_string('write("Testing \"write\":")'))
+    assert_equal(nil , gp.parse_string('write("Hello World!")'))
+    assert_equal(nil , gp.parse_string('write("write()")'))
+    assert_equal(nil , gp.parse_string('write("My name is Hadi")'))
+    # assert_equal( , gp.parse_string())
+    # assert_equal( , gp.parse_string())
+  end
+end
 
 # ============================================================
 # Template

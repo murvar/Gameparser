@@ -21,6 +21,7 @@ class GameLanguage
       token(/and/) {|m| m }
       token(/not/) {|m| m }
       token(/def/) {|m| m }
+      token(/write/) {|m| m }
 
       token(/<=/){|m| CompOp.new(m) }
       token(/==/){|m| CompOp.new(m) }
@@ -31,10 +32,17 @@ class GameLanguage
       
       token(/\w+/) {|m| Identifier.new(m) } # returns variable names as an Identifier object
       
-      token(/".*?"/) do |m|
+      # token(/".*?"/) do |m|
+      #   m = m[1...-1]
+      #   LiteralString.new(m)
+      # end # returns a LiteralString object
+
+
+      token(/((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
       end # returns a LiteralString object
+      
       
       token(/'.*?'/) do |m|
         m = m[1...-1]
@@ -91,6 +99,9 @@ class GameLanguage
         match(Identifier, "(", :values, ")") do |m, _, arguments, _|
           $functions[m.name].evaluate(arguments)
         end
+
+        match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
+        match("write", "(", ")") { Write.new("")}
       end
       rule :statements do
         match(:statements, :statement) {|m, n| m + Array(n) }

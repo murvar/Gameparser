@@ -268,7 +268,8 @@ end
 class LiteralString
   attr_accessor :str
   def initialize(st)
-    @str = st
+    @str = st.gsub(/\\/, "")
+    
   end
 
   def evaluate()
@@ -353,5 +354,15 @@ class CompOp
   attr_reader :op
   def initialize(op)
     @op = op
+  end
+end
+
+class Write
+  def initialize(string)
+    @string = string
+  end
+  
+  def evaluate()
+    puts @string.evaluate()
   end
 end
