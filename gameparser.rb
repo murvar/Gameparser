@@ -44,10 +44,10 @@ class GameLanguage
       end # returns a LiteralString object
       
       
-      token(/'.*?'/) do |m|
-        m = m[1...-1]
-        obj = LiteralString.new(m)
-      end # returns string a LiteralString object
+      # token(/'.*?'/) do |m|
+      #   m = m[1...-1]
+      #   obj = LiteralString.new(m)
+      # end # returns string a LiteralString object
       
       token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
@@ -101,6 +101,9 @@ class GameLanguage
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
+        match("write", "(", Identifier, ")") do |_, _, i, _|
+          Write.new($variables[$scope][i.name])
+        end
         match("write", "(", ")") { Write.new("")}
       end
       rule :statements do

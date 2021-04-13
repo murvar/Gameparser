@@ -332,7 +332,7 @@ class FunctionTest < Test::Unit::TestCase
 end
 
 class WriteTest < Test::Unit::TestCase
-  def test_print()
+  def test1()
     gp = GameLanguage.new
 
     assert_equal(nil , gp.parse_string('write()'))
@@ -340,9 +340,32 @@ class WriteTest < Test::Unit::TestCase
     assert_equal(nil , gp.parse_string('write("Hello World!")'))
     assert_equal(nil , gp.parse_string('write("write()")'))
     assert_equal(nil , gp.parse_string('write("My name is Hadi")'))
-    # assert_equal( , gp.parse_string())
-    # assert_equal( , gp.parse_string())
   end
+
+  def test2()
+    gp = GameLanguage.new
+    
+    assert_equal(nil , gp.parse_string("write()"))
+
+    # Works in interactive mode
+    # assert_equal(nil , gp.parse_string("write('Testing \'write\':')"))
+    
+    assert_equal(nil , gp.parse_string("write('Hello World!')"))
+    assert_equal(nil , gp.parse_string("write('write()')"))
+    assert_equal(nil , gp.parse_string("write('My name is Hadi')"))
+  end
+   def test3()
+    gp = GameLanguage.new
+
+    code = 'a = 12
+            b = false
+            c = "hi"'
+    
+    assert_equal("hi" , gp.parse_string(code))
+    assert_equal(nil , gp.parse_string("write(a)"))
+    assert_equal(nil , gp.parse_string("write(b)"))
+    assert_equal(nil , gp.parse_string("write(c)"))
+   end
 end
 
 # ============================================================
