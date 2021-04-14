@@ -295,6 +295,8 @@ class Function
   end
 
   def evaluate(arguments)
+    # skapa frame
+    # skapa var
     counter = 0
     @params.each do |p|
       $variables[$scope][p].value = arguments[counter].evaluate()
@@ -304,10 +306,13 @@ class Function
     for object in @block
       m = object.evaluate()
     end
+    # ta bort frame
+    
     m
   end
 end
-
+#  k = 1
+#  k
 class Assignment
   def initialize(lhs, rhs)
     @lhs = lhs

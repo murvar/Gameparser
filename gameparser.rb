@@ -1,10 +1,18 @@
-3# coding: utf-8
+# coding: utf-8
+
 require './rdparse'
 require './classes'
 
-$variables = {"global" => {}}
-$functions = {}
+# $variables = [{}] # rekommenderas på det sättet för att kunna
+                    # hantera scope
+
 $scope = "global"
+$variables = {$scope => {}}
+$functions = {}
+
+# 1) $variables = {"global" => {}, "test" => {}}
+# 2) $variables = {"global" => {}, "test" => {"i" => Variable, "k" => Variable}}
+
 class GameLanguage
 
   def initialize
@@ -30,8 +38,9 @@ class GameLanguage
       token(/>=/){|m| CompOp.new(m) }
       token(/>/){|m| CompOp.new(m)  }
       
-      token(/\w+/) {|m| Identifier.new(m) } # returns variable names as an Identifier object
-
+      # returns variable/function names as an Identifier object
+      token(/\w+/) {|m| Identifier.new(m) }
+      
       token(/((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
@@ -61,7 +70,9 @@ class GameLanguage
 
       rule :function_def do
         match("def", Identifier, "(", :params, ")", :block) do
-          |_, func, _, params, _, block|
+          |_, func, _, params, _, block|  
+          #$scope = func.name
+          #$variables[$scope] = Hash.new
           $functions[func.name] = Function.new(params, block)
         end
       end
@@ -74,13 +85,16 @@ class GameLanguage
 
       rule :param do
         match(Identifier) do |m|
-          $variables[$scope][m.name] = Variable.new() # fel?
+          $variables[$scope][m.name] = Variable.new() # fel
           m.name
+          # m      # rekommenderas
         end
       end
 
       rule :block do
-        match("{", :statements, "}") {|_, m, _| m}
+        match("{", :statements, "}") {|_, m, _| m} # skapa ett block objekt
+        # som loopar igenom statement
+        # och evaluerar dem
       end
       
       rule :function_call do
@@ -209,7 +223,8 @@ class GameLanguage
         match("+", "(", :math_exp , ")"){|_, _, m, _| m }
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(Identifier) {|m| $variables[$scope][m.name] }
+        match(Identifier) {|m| $variables[$scope][m.name] } #skapa en identifier_node
+        # istället för att slå upp variabels värde 
       end
     end
 
