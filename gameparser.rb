@@ -7,7 +7,7 @@ require './classes'
                     # hantera scope
 
 $scope = "global"
-$variables = {$scope => {}}
+$variables = {}
 $functions = {}
 
 # 1) $variables = {"global" => {}, "test" => {}}
@@ -22,7 +22,7 @@ class GameLanguage
       token(/#.*/) # removes comment
       token(/\s+/) # removes whitespaces
       token(/^\d+/) {|m| m.to_i} # returns integers
-      
+
       token(/false/) {|m|m}
       token(/true/) {|m| m }
       token(/or/) {|m| m }
@@ -37,10 +37,10 @@ class GameLanguage
       token(/</){|m| CompOp.new(m)  }
       token(/>=/){|m| CompOp.new(m) }
       token(/>/){|m| CompOp.new(m)  }
-      
+
       # returns variable/function names as an Identifier object
-      token(/\w+/) {|m| Identifier.new(m) }
-      
+      token(/^[a-zA-Z][a-zA-Z_0-9]*/) {|m| Identifier.new(m) }
+
       token(/((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
@@ -70,13 +70,13 @@ class GameLanguage
 
       rule :function_def do
         match("def", Identifier, "(", :params, ")", :block) do
-          |_, func, _, params, _, block|  
+          |_, func, _, params, _, block|
           #$scope = func.name
           #$variables[$scope] = Hash.new
           $functions[func.name] = Function.new(params, block)
         end
       end
-      
+
       rule :params do
         match(:params, :param) {|m, n| m + Array(n) }
         match(:param) {|m| Array(m)}
@@ -85,18 +85,18 @@ class GameLanguage
 
       rule :param do
         match(Identifier) do |m|
-          $variables[$scope][m.name] = Variable.new() # fel
+          $variables[m.name] = Variable.new() # fel
           m.name
           # m      # rekommenderas
         end
       end
 
       rule :block do
-        match("{", :statements, "}") {|_, m, _| m} # skapa ett block objekt
+        match("{", :statements, "}") {|_, m, _| Block.new(m)} # skapa ett block objekt
         # som loopar igenom statement
         # och evaluerar dem
       end
-      
+
       rule :function_call do
         match(Identifier, "(", :values, ")") do |m, _, arguments, _|
           $functions[m.name].evaluate(arguments)
@@ -104,7 +104,7 @@ class GameLanguage
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
         match("write", "(", Identifier, ")") do |_, _, i, _|
-          Write.new($variables[$scope][i.name])
+          Write.new($variables[i.name])
         end
         match("write", "(", ")") { Write.new("")}
       end
@@ -121,7 +121,7 @@ class GameLanguage
         match(:function_call)
       end
 
-     
+
       rule :assignsments do
         match(:assignsments, :assignment)
         match(:assignment)
@@ -180,7 +180,7 @@ class GameLanguage
             Greater.new(lhs, rhs)
           end
          end
-         
+
         match(:bool_val, CompOp, :bool_val) do |lhs, c, rhs|
           case c.op
           when "==" then
@@ -189,11 +189,11 @@ class GameLanguage
             NotEqual.new(lhs, rhs)
           end
         end
-        
+
         match(:bool_val) {|m| m }
         match(Identifier) do |m|
-          if $variables[$scope][m.name].class == LiteralBool
-            $variables[$scope][m.name]
+          if $variables[m.name].class == LiteralBool
+            $variables[m.name]
           end
         end
       end
@@ -223,8 +223,8 @@ class GameLanguage
         match("+", "(", :math_exp , ")"){|_, _, m, _| m }
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(Identifier) {|m| $variables[$scope][m.name] } #skapa en identifier_node
-        # istället för att slå upp variabels värde 
+        match(Identifier) {|m| $variables[m.name] } #skapa en identifier_node
+        # istället för att slå upp variabels värde
       end
     end
 

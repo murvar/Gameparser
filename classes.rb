@@ -269,7 +269,7 @@ class LiteralString
   attr_accessor :str
   def initialize(st)
     @str = st.gsub(/\\/, "")
-    
+
   end
 
   def evaluate()
@@ -292,6 +292,7 @@ class Function
   def initialize(params, block)
     @params = params
     @block = block
+    puts @block.class
   end
 
   def evaluate(arguments)
@@ -299,29 +300,38 @@ class Function
     # skapa var
     counter = 0
     @params.each do |p|
-      $variables[$scope][p].value = arguments[counter].evaluate()
+      $variables[p].value = arguments[counter].evaluate()
       counter += 1
     end
-  
-    for object in @block
-      m = object.evaluate()
-    end
+
+    @block.evaluate().class
     # ta bort frame
-    
-    m
+    #puts m
+    #m
   end
 end
-#  k = 1
-#  k
+
+class Block
+  def initialize(statements)
+    @statements = statements
+  end
+
+  def evaluate()
+    for statement in @statements do
+      statement.evaluate()
+    end
+  end
+end
+
 class Assignment
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
-    $variables[$scope][@lhs] = Variable.new()
+    $variables[@lhs] = Variable.new()
   end
-  
+
   def evaluate()
-    $variables[$scope][@lhs].value = @rhs.evaluate()
+    $variables[@lhs].value = @rhs.evaluate()
   end
 end
 
@@ -366,7 +376,7 @@ class Write
   def initialize(string)
     @string = string
   end
-  
+
   def evaluate()
     puts @string.evaluate()
   end
