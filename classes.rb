@@ -292,7 +292,6 @@ class Function
   def initialize(params, block)
     @params = params
     @block = block
-    puts @block.class
   end
 
   def evaluate(arguments)
@@ -303,23 +302,23 @@ class Function
       $variables[p].value = arguments[counter].evaluate()
       counter += 1
     end
-
-    @block.evaluate().class
-    # ta bort frame
-    #puts m
-    #m
+    result = @block.evaluate()
+    # riva ner frame
+    result
   end
 end
 
 class Block
+  attr_reader :statements
   def initialize(statements)
     @statements = statements
   end
 
   def evaluate()
     for statement in @statements do
-      statement.evaluate()
+      result = statement.evaluate()
     end
+    result
   end
 end
 
