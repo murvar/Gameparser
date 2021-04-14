@@ -1,4 +1,4 @@
-# coding: utf-8
+3# coding: utf-8
 require './rdparse'
 require './classes'
 
@@ -31,24 +31,12 @@ class GameLanguage
       token(/>/){|m| CompOp.new(m)  }
       
       token(/\w+/) {|m| Identifier.new(m) } # returns variable names as an Identifier object
-      
-      # token(/".*?"/) do |m|
-      #   m = m[1...-1]
-      #   LiteralString.new(m)
-      # end # returns a LiteralString object
-
 
       token(/((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
       end # returns a LiteralString object
-      
-      
-      # token(/'.*?'/) do |m|
-      #   m = m[1...-1]
-      #   obj = LiteralString.new(m)
-      # end # returns string a LiteralString object
-      
+
       token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
       start :prog do
@@ -141,7 +129,7 @@ class GameLanguage
         match(LiteralString)
         match(:array)
         match(:exp)
-        #match(:function_call)
+        match(:function_call)
        end
 
       rule :array do
@@ -218,6 +206,8 @@ class GameLanguage
         match(Integer) {|m| LiteralInteger.new(m) }
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
+        match("+", "(", :math_exp , ")"){|_, _, m, _| m }
+        match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :math_exp , ")"){|_, m, _| m }
         match(Identifier) {|m| $variables[$scope][m.name] }
       end

@@ -286,6 +286,13 @@ class MultipleLine < Test::Unit::TestCase
     assert_equal(530, gp.parse_string(code))
     
     assert_equal(530, gp.parse_string("bool2"))
+
+    code = "bool1 = true and false or true
+            bool1 = 32 + 21
+            bool2 = bool1 * 10
+            2"
+    
+    assert_equal(2, gp.parse_string(code))
     
   end
 end
@@ -317,17 +324,18 @@ class FunctionTest < Test::Unit::TestCase
              p = ( j * 2 ) - 2
              p
             }
+            def test3(x)
+            {
+             y = ( x * 2 ) - 2
+             y
+             x
+            }
             "           
      assert_equal(nil, gp2.parse_string(code))          
      assert_equal(14, gp2.parse_string("test1(2)"))
      assert_equal(2, gp2.parse_string("test2(2)"))
      assert_equal(-4, gp2.parse_string("test2(-1)"))
-
-
-     
-     #puts gp.gameParser.test
-     #assert_equal( , gp.parse_string())
-     #assert_equal( , gp.parse_string())
+     assert_equal(30, gp2.parse_string("test3(30)"))
    end
 end
 
@@ -367,6 +375,8 @@ class WriteTest < Test::Unit::TestCase
     assert_equal(nil , gp.parse_string("write(c)"))
    end
 end
+
+
 
 # ============================================================
 # Template
