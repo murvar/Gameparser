@@ -114,11 +114,11 @@ class GameLanguage
       end
 
       rule :statement do
-       # match(:condition)
-       # match(:loop)
+        # match(:condition)
+        # match(:loop)
         match(:assignment)
         match(:value)
-        match(:function_call)
+        # match(:function_call) 
       end
 
 
@@ -142,9 +142,9 @@ class GameLanguage
       rule :value do
         match(LiteralString)
         match(:array)
-        match(:exp)
         match(:function_call)
-       end
+        match(:exp)
+      end
 
       rule :array do
         match("[", :values, "]") {|_, v, _| Arry.new(v)}
@@ -152,7 +152,7 @@ class GameLanguage
       end
 
       rule :exp do
-        match(:log_exp) {|e| e}
+        #match(:log_exp) {|e| e}
         match(:math_exp) {|e| e}
       end
 
@@ -206,13 +206,13 @@ class GameLanguage
 
       rule :math_exp do
         match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) }
-        match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
+        #match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
         match(:term) {|m| m}
       end
 
       rule :term do
-        match(:term, "*", :factor) {|m, _, n| Multiplication.new(m, n) }
-        match(:term, "/", :factor) {|m, _, n| Division.new(m, n) }
+        #match(:term, "*", :factor) {|m, _, n| Multiplication.new(m, n) }
+        #match(:term, "/", :factor) {|m, _, n| Division.new(m, n) }
         match(:factor) {|m| m}
       end
 
@@ -223,7 +223,8 @@ class GameLanguage
         match("+", "(", :math_exp , ")"){|_, _, m, _| m }
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :math_exp , ")"){|_, m, _| m }
-        match(Identifier) {|m| $variables[m.name] } #skapa en identifier_node
+        match(Identifier) {|m| IdentifierNode.new(m)}
+        #$variables[m.name] } #skapa en identifier_node
         # istället för att slå upp variabels värde
       end
     end
@@ -237,7 +238,7 @@ class GameLanguage
       ["quit","exit","bye",""].include?(str.chomp)
     end
     def parse_string(str)
-      log(false)
+      log(true)
       @gameParser.parse(str)
     end
     def parse()

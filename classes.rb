@@ -326,11 +326,12 @@ class Assignment
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
-    $variables[@lhs] = Variable.new()
+    # $variables[@lhs] = Variable.new()
   end
 
   def evaluate()
-    $variables[@lhs].value = @rhs.evaluate()
+    # $variables[@lhs].value = @rhs.evaluate()
+    $variables[@lhs] = @rhs.evaluate()
   end
 end
 
@@ -380,3 +381,20 @@ class Write
     puts @string.evaluate()
   end
 end
+
+class IdentifierNode
+  def initialize(idn)
+    @idn = idn
+  end
+
+  def evaluate()
+    puts "hi"
+    
+    ex = $variables[@idn.name]
+    puts ex.class
+
+    puts $variables
+    $variables[@idn.name]
+  end
+end
+
