@@ -11,10 +11,8 @@ require './classes'
 # $functions = {}
 
 $current_scope = 0
-$current_rep = 0
 $variables = [Hash.new()]
 $functions = [Hash.new()]
-$function_parameters = Hash.new()
 
 # 1) $variables= {"global" => {}, "test" => {}}
 # 2) $variables = {"global" => {}, "test" => {"i" => Variable, "k" => Variable}}
@@ -36,6 +34,7 @@ class GameLanguage
       token(/not/) {|m| m }
       token(/def/) {|m| m }
       token(/write/) {|m| m }
+      token(/read/) {|m| m }
 
       token(/<=/){|m| CompOp.new(m) }
       token(/==/){|m| CompOp.new(m) }
@@ -113,7 +112,9 @@ class GameLanguage
           Write.new($variables[$current_scope][i.name])
         end
         match("write", "(", ")") { Write.new("")}
+        match("read", "(", LiteralString, ")") {|_, _, m, _|Read.new(m)}
       end
+
       rule :statements do
         match(:statements, :statement) {|m, n| m + Array(n) }
         match(:statement) {|m| Array(m)}

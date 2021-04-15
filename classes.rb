@@ -263,13 +263,12 @@ class LiteralInteger
     return @value
   end
 
-end
+end 
 
 class LiteralString
   attr_accessor :str
   def initialize(st)
     @str = st.gsub(/\\/, "")
-
   end
 
   def evaluate()
@@ -296,7 +295,6 @@ class Function
 
   def evaluate(arguments)
     $current_scope += 1
-    $current_rep += 1
     $variables[$current_scope] = Hash.new()
     # skapa var
     counter = 0
@@ -305,11 +303,9 @@ class Function
       $variables[$current_scope][p.name] = Variable.new(arguments[counter].evaluate())
       counter += 1
     end
-    puts $variables
     result = @block.evaluate()
     # riva ner frame
     $current_scope -= 1
-    $current_rep -= 1
     result
   end
 end
@@ -385,6 +381,18 @@ class Write
 
   def evaluate()
     puts @string.evaluate()
+  end
+end
+
+class Read
+  def initialize(string)
+    @string = string
+  end
+
+  def evaluate()
+    puts @string.evaluate()
+    input = gets().chomp()
+    return input
   end
 end
 
