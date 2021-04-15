@@ -10,9 +10,10 @@ require './classes'
 # $variables = {}
 # $functions = {}
 
+
 $current_scope = 0
 $variables = [Hash.new()]
-$functions = [Hash.new()]
+$functions = Hash.new()
 
 # 1) $variables= {"global" => {}, "test" => {}}
 # 2) $variables = {"global" => {}, "test" => {"i" => Variable, "k" => Variable}}
@@ -78,7 +79,7 @@ class GameLanguage
           |_, func, _, params, _, block|
           #$scope = func.name
           #$variables[$current_scope][$scope] = Hash.new
-          $functions[$current_scope][func.name] = Function.new(params, block)
+          $functions[func.name] = Function.new(params, block)
         end
       end
 
@@ -104,7 +105,7 @@ class GameLanguage
 
       rule :function_call do
         match(Identifier, "(", :values, ")") do |m, _, arguments, _|
-          $functions[$current_scope][m.name].evaluate(arguments)
+          $functions[m.name].evaluate(arguments)
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
