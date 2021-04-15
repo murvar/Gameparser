@@ -152,8 +152,9 @@ class GameLanguage
       end
 
       rule :exp do
-        #match(:log_exp) {|e| e}
+       # match(:log_exp) {|e| e}
         match(:math_exp) {|e| e}
+       
       end
 
       rule :log_exp do
@@ -191,11 +192,18 @@ class GameLanguage
         end
 
         match(:bool_val) {|m| m }
-        match(Identifier) do |m|
-          if $variables[m.name].class == LiteralBool
-            $variables[m.name]
-          end
-        end
+
+
+       # match(Identifier, "+", Integer) {|lhs, _, rhs|
+       #   Addition.new(IdentifierNode.new(lhs), LiteralInteger.new(rhs))}
+
+        match(Identifier) {|m| IdentifierNode.new(m)}        
+
+        # match(Identifier) do |m|
+        #   if $variables[m.name].class == LiteralBool
+        #     $variables[m.name]
+        #   end
+        # end
       end
 
       rule :bool_val do
@@ -206,13 +214,13 @@ class GameLanguage
 
       rule :math_exp do
         match(:math_exp, "+", :term) {|m, _, n| Addition.new(m, n) }
-        #match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
+        match(:math_exp, "-", :term) {|m, _, n| Subtraction.new(m, n) }
         match(:term) {|m| m}
       end
 
       rule :term do
-        #match(:term, "*", :factor) {|m, _, n| Multiplication.new(m, n) }
-        #match(:term, "/", :factor) {|m, _, n| Division.new(m, n) }
+        match(:term, "*", :factor) {|m, _, n| Multiplication.new(m, n) }
+        match(:term, "/", :factor) {|m, _, n| Division.new(m, n) }
         match(:factor) {|m| m}
       end
 
@@ -238,7 +246,7 @@ class GameLanguage
       ["quit","exit","bye",""].include?(str.chomp)
     end
     def parse_string(str)
-      log(true)
+      log(false)
       @gameParser.parse(str)
     end
     def parse()

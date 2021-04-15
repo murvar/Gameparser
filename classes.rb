@@ -330,8 +330,8 @@ class Assignment
   end
 
   def evaluate()
-    # $variables[@lhs].value = @rhs.evaluate()
-    $variables[@lhs] = @rhs.evaluate()
+    $variables[@lhs] = Variable.new(@rhs.evaluate())
+    $variables[@lhs].value
   end
 end
 
@@ -388,13 +388,7 @@ class IdentifierNode
   end
 
   def evaluate()
-    puts "hi"
-    
-    ex = $variables[@idn.name]
-    puts ex.class
-
-    puts $variables
-    $variables[@idn.name]
+    $variables[@idn.name].evaluate()
   end
 end
 
