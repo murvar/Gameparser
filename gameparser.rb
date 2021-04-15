@@ -6,11 +6,17 @@ require './classes'
 # $variables = [{}] # rekommenderas på det sättet för att kunna
                     # hantera scope
 
-$scope = "global"
-$variables = {}
-$functions = {}
+# $scope = 0
+# $variables = {}
+# $functions = {}
 
-# 1) $variables = {"global" => {}, "test" => {}}
+$current_scope = 0
+$current_rep = 0
+$variables = [Hash.new()]
+$functions = [Hash.new()]
+$function_parameters = Hash.new()
+
+# 1) $variables= {"global" => {}, "test" => {}}
 # 2) $variables = {"global" => {}, "test" => {"i" => Variable, "k" => Variable}}
 
 class GameLanguage
@@ -72,8 +78,8 @@ class GameLanguage
         match("def", Identifier, "(", :params, ")", :block) do
           |_, func, _, params, _, block|
           #$scope = func.name
-          #$variables[$scope] = Hash.new
-          $functions[func.name] = Function.new(params, block)
+          #$variables[$current_scope][$scope] = Hash.new
+          $functions[$current_scope][func.name] = Function.new(params, block)
         end
       end
 
@@ -85,9 +91,9 @@ class GameLanguage
 
       rule :param do
         match(Identifier) do |m|
-          $variables[m.name] = Variable.new() # fel
-          m.name
-          # m      # rekommenderas
+          #$variables[$current_scope][m.name] = Variable.new() # fel
+          #m.name
+          m      # rekommenderas
         end
       end
 
@@ -99,12 +105,12 @@ class GameLanguage
 
       rule :function_call do
         match(Identifier, "(", :values, ")") do |m, _, arguments, _|
-          $functions[m.name].evaluate(arguments)
+          $functions[$current_scope][m.name].evaluate(arguments)
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
         match("write", "(", Identifier, ")") do |_, _, i, _|
-          Write.new($variables[i.name])
+          Write.new($variables[$current_scope][i.name])
         end
         match("write", "(", ")") { Write.new("")}
       end
@@ -200,8 +206,8 @@ class GameLanguage
         #match(Identifier) {|m| IdentifierNode.new(m)}
 
         # match(Identifier) do |m|
-        #   if $variables[m.name].class == LiteralBool
-        #     $variables[m.name]
+        #   if $variables[$current_scope][m.name].class == LiteralBool
+        #     $variables[$current_scope][m.name]
         #   end
         # end
       end
@@ -233,7 +239,7 @@ class GameLanguage
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :log_exp , ")"){|_, m, _| m }
         match(Identifier) {|m| IdentifierNode.new(m)}
-        #$variables[m.name] } #skapa en identifier_node
+        #$variables[$current_scope][m.name] } #skapa en identifier_node
         # istället för att slå upp variabels värde
       end
     end

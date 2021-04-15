@@ -295,15 +295,21 @@ class Function
   end
 
   def evaluate(arguments)
-    # skapa frame
+    $current_scope += 1
+    $current_rep += 1
+    $variables[$current_scope] = Hash.new()
     # skapa var
     counter = 0
     @params.each do |p|
-      $variables[p].value = arguments[counter].evaluate()
+      #$variables[$current_scope][p.name] = Variable.new()
+      $variables[$current_scope][p.name] = Variable.new(arguments[counter].evaluate())
       counter += 1
     end
+    puts $variables
     result = @block.evaluate()
     # riva ner frame
+    $current_scope -= 1
+    $current_rep -= 1
     result
   end
 end
@@ -330,8 +336,8 @@ class Assignment
   end
 
   def evaluate()
-    $variables[@lhs] = Variable.new(@rhs.evaluate())
-    $variables[@lhs].value
+    $variables[$current_scope][@lhs] = Variable.new(@rhs.evaluate())
+    $variables[$current_scope][@lhs].value
   end
 end
 
@@ -388,7 +394,6 @@ class IdentifierNode
   end
 
   def evaluate()
-    $variables[@idn.name].evaluate()
+    $variables[$current_scope][@idn.name].evaluate()
   end
 end
-
