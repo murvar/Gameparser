@@ -118,7 +118,7 @@ class GameLanguage
         # match(:loop)
         match(:assignment)
         match(:value)
-        # match(:function_call) 
+        # match(:function_call)
       end
 
 
@@ -152,9 +152,9 @@ class GameLanguage
       end
 
       rule :exp do
-       # match(:log_exp) {|e| e}
-        match(:math_exp) {|e| e}
-       
+        match(:log_exp) {|e| e}
+        #match(:math_exp) {|e| e}
+
       end
 
       rule :log_exp do
@@ -197,7 +197,7 @@ class GameLanguage
        # match(Identifier, "+", Integer) {|lhs, _, rhs|
        #   Addition.new(IdentifierNode.new(lhs), LiteralInteger.new(rhs))}
 
-        match(Identifier) {|m| IdentifierNode.new(m)}        
+        #match(Identifier) {|m| IdentifierNode.new(m)}
 
         # match(Identifier) do |m|
         #   if $variables[m.name].class == LiteralBool
@@ -209,7 +209,8 @@ class GameLanguage
       rule :bool_val do
         match("true") {|b| LiteralBool.new(b) }
         match("false") {|b| LiteralBool.new(b) }
-        match("(", :log_exp, ")") {|_, m, _| m }
+        #match("(", :log_exp, ")") {|_, m, _| m }
+        match(:math_exp)
       end
 
       rule :math_exp do
@@ -230,7 +231,7 @@ class GameLanguage
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("+", "(", :math_exp , ")"){|_, _, m, _| m }
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
-        match("(", :math_exp , ")"){|_, m, _| m }
+        match("(", :log_exp , ")"){|_, m, _| m }
         match(Identifier) {|m| IdentifierNode.new(m)}
         #$variables[m.name] } #skapa en identifier_node
         # istället för att slå upp variabels värde
