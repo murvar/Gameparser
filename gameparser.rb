@@ -116,6 +116,7 @@ class GameLanguage
         end
         match("write", "(", ")") { Write.new("")}
         match("read", "(", LiteralString, ")") {|_, _, m, _|Read.new(m)}
+        match("read", "(", ")") {|_, _, _|Read.new()}
       end
 
       rule :statements do
