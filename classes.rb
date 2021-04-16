@@ -444,8 +444,9 @@ class Case
   end
 
   def evaluate()
-    
+
   end
+end
 
 class While
   def initialize(exp, block)

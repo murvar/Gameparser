@@ -338,6 +338,18 @@ class WriteTest < Test::Unit::TestCase
     assert_equal(nil , gp.parse_string("write(c)"))
    end
 end
+
+class IfTest < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new
+    code = "x = 1
+    if x <10 {'low'} else {'high'}"
+    assert_equal("low", gp.parse_string(code))
+    code = "x = 10
+    if x <10 {'low'} else {'high'}"
+    assert_equal("high", gp.parse_string(code))
+  end
+end
 # class ReadTest < Test::Unit::TestCase
 #   def test1()
 #     gp = GameLanguage.new

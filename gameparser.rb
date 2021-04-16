@@ -150,7 +150,6 @@ class GameLanguage
       rule :value do
         match(LiteralString)
         match(:array)
-        match(:function_call)
         match(:exp)
       end
 
@@ -227,6 +226,7 @@ class GameLanguage
         match("+", "(", :math_exp , ")"){|_, _, m, _| m }
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :log_exp , ")"){|_, m, _| m }
+        match(:function_call)
         match(Identifier) {|m| IdentifierNode.new(m)}
       end
 
