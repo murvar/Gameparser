@@ -101,8 +101,11 @@ class GameLanguage
       end
 
       rule :function_call do
-        match(Identifier, "(", :values, ")") do |m, _, arguments, _|
-          $functions[m.name].evaluate(arguments)
+        match(Identifier, "(", :values, ")") do |idn, _, args, _|
+          # puts "#{idn.name}\t#{args}"
+          # puts $functions
+          FunctionCall.new(idn, args)
+          #$functions[m.name].evaluate(arguments)
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}

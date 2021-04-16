@@ -294,6 +294,11 @@ class MultipleLine < Test::Unit::TestCase
 
     assert_equal(2, gp.parse_string(code))
 
+    code = "m = 20
+            m = m + 20
+            "
+    assert_equal(40, gp.parse_string(code))
+
   end
 end
 

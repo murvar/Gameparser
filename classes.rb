@@ -296,17 +296,31 @@ class Function
   def evaluate(arguments)
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
-    # skapa var
     counter = 0
     @params.each do |p|
-      #$variables[$current_scope][p.name] = Variable.new()
       $variables[$current_scope][p.name] = Variable.new(arguments[counter].evaluate())
       counter += 1
     end
     result = @block.evaluate()
     # riva ner frame
     $current_scope -= 1
+    $variables.pop()
     result
+  end
+end
+
+class FunctionCall
+  def initialize(idn, args)
+    @idn = idn
+    @args = args
+  end
+
+  def evaluate()
+    params = []
+    for arg in @args
+      params << arg.evaluate()
+    end
+    $functions[@idn.name].evaluate(params)
   end
 end
 
