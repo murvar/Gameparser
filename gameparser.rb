@@ -38,6 +38,7 @@ class GameLanguage
       token(/read/) {|m| m }
       token(/if/) {|m| m }
       token(/else/) {|m| m }
+      token(/case/) {|m| m }
       token(/while/) {|m| m }
       token(/for/) {|m| m }
       token(/in/) {|m| m }
@@ -240,6 +241,7 @@ class GameLanguage
       end
 
       rule :switch do
+        match("case", Identifier, :block) {|_, id, b|Case.new(id, b)}
       end
 
       rule :loop do

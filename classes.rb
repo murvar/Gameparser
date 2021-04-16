@@ -438,6 +438,15 @@ class If
   end
 end
 
+class Case
+  def initialize(identifier)
+    @identifier = identifier
+  end
+
+  def evaluate()
+    
+  end
+
 class While
   def initialize(exp, block)
     @exp = exp
