@@ -446,11 +446,12 @@ class Switch
 
   def evaluate()
     for c in @cases
-      if c.value == @idn.evaluate()
-        c.evaluate()
-        #break
+      if c.value.evaluate() == @idn.evaluate()
+        return c.evaluate()
+        break
       end
     end
+    #temp
   end
 end
 
@@ -459,10 +460,10 @@ class Case
   def initialize(value, block)
     @value = value
     @block = block
-    puts ""
-    puts @value
-    puts @block
-    puts ""
+    # puts ""
+    # puts @value
+    # puts @block
+    # puts ""
   end
 
   def evaluate()

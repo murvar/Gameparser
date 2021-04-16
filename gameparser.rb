@@ -38,6 +38,7 @@ class GameLanguage
       token(/read/) {|m| m }
       token(/if/) {|m| m }
       token(/else/) {|m| m }
+      token(/switch/) {|m| m }
       token(/case/) {|m| m }
       token(/while/) {|m| m }
       token(/for/) {|m| m }
@@ -241,7 +242,7 @@ class GameLanguage
       end
 
       rule :switch do
-        match("switch", "(", Identifier, ")", :cases) {|_, _, id, _, cases| Switch.new(id, cases)}
+        match("switch", "(", :value, ")", :cases) {|_, _, val, _, cases| Switch.new(val, cases)}
       end
 
       rule :cases do
