@@ -438,13 +438,35 @@ class If
   end
 end
 
-class Case
-  def initialize(identifier)
-    @identifier = identifier
+class Switch
+  def initialize(idn, cases)
+    @idn = idn
+    @cases = cases
   end
 
   def evaluate()
+    for c in @cases
+      if c.value == @idn.evaluate()
+        c.evaluate()
+        #break
+      end
+    end
+  end
+end
 
+class Case
+  attr_reader :value
+  def initialize(value, block)
+    @value = value
+    @block = block
+    puts ""
+    puts @value
+    puts @block
+    puts ""
+  end
+
+  def evaluate()
+    @block.evaluate()
   end
 end
 

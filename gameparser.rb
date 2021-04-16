@@ -241,7 +241,16 @@ class GameLanguage
       end
 
       rule :switch do
-        match("case", Identifier, :block) {|_, id, b|Case.new(id, b)}
+        match("switch", "(", Identifier, ")", :cases) {|_, _, id, _, cases| Switch.new(id, cases)}
+      end
+
+      rule :cases do
+        match(:cases, :case) {|m, n| m + Array(n) }
+        match(:case) {|m| Array(m)}
+      end
+
+      rule :case do
+        match("case", "(", :value, ")", :block) {|_, _, val, _, block|  Case.new(val, block) }
       end
 
       rule :loop do
@@ -263,6 +272,7 @@ class GameLanguage
       @gameParser.parse(str)
     end
     def parse()
+      log(false)
       print "[gameParser] "
       #str = File.read(file)
       str = gets
