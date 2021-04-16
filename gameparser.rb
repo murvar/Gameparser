@@ -36,6 +36,11 @@ class GameLanguage
       token(/def/) {|m| m }
       token(/write/) {|m| m }
       token(/read/) {|m| m }
+      token(/if/) {|m| m }
+      token(/else/) {|m| m }
+      token(/while/) {|m| m }
+      token(/for/) {|m| m }
+      token(/in/) {|m| m }
 
       token(/<=/){|m| CompOp.new(m) }
       token(/==/){|m| CompOp.new(m) }
@@ -77,8 +82,6 @@ class GameLanguage
       rule :function_def do
         match("def", Identifier, "(", :params, ")", :block) do
           |_, func, _, params, _, block|
-          #$scope = func.name
-          #$variables[$current_scope][$scope] = Hash.new
           $functions[func.name] = Function.new(params, block)
         end
       end
@@ -90,17 +93,11 @@ class GameLanguage
       end
 
       rule :param do
-        match(Identifier) do |m|
-          #$variables[$current_scope][m.name] = Variable.new() # fel
-          #m.name
-          m      # rekommenderas
-        end
+        match(Identifier) {|m| m}
       end
 
       rule :block do
-        match("{", :statements, "}") {|_, m, _| Block.new(m)} # skapa ett block objekt
-        # som loopar igenom statement
-        # och evaluerar dem
+        match("{", :statements, "}") {|_, m, _| Block.new(m)}
       end
 
       rule :function_call do
@@ -122,11 +119,10 @@ class GameLanguage
       end
 
       rule :statement do
-        # match(:condition)
-        # match(:loop)
+        match(:condition)
+        #match(:loop)
         match(:assignment)
         match(:value)
-        # match(:function_call)
       end
 
 
@@ -161,7 +157,6 @@ class GameLanguage
 
       rule :exp do
         match(:log_exp) {|e| e}
-        #match(:math_exp) {|e| e}
 
       end
 
@@ -201,23 +196,11 @@ class GameLanguage
 
         match(:bool_val) {|m| m }
 
-
-       # match(Identifier, "+", Integer) {|lhs, _, rhs|
-       #   Addition.new(IdentifierNode.new(lhs), LiteralInteger.new(rhs))}
-
-        #match(Identifier) {|m| IdentifierNode.new(m)}
-
-        # match(Identifier) do |m|
-        #   if $variables[$current_scope][m.name].class == LiteralBool
-        #     $variables[$current_scope][m.name]
-        #   end
-        # end
       end
 
       rule :bool_val do
         match("true") {|b| LiteralBool.new(b) }
         match("false") {|b| LiteralBool.new(b) }
-        #match("(", :log_exp, ")") {|_, m, _| m }
         match(:math_exp)
       end
 
@@ -241,8 +224,24 @@ class GameLanguage
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :log_exp , ")"){|_, m, _| m }
         match(Identifier) {|m| IdentifierNode.new(m)}
-        #$variables[$current_scope][m.name] } #skapa en identifier_node
-        # istället för att slå upp variabels värde
+      end
+
+      rule :condition do
+        match(:if)
+        match(:switch)
+      end
+
+      rule :if do
+        match("if", :exp, :block, "else", :block) {|_, e, b, _, eb| If.new(e, b, eb)}
+        match("if", :exp, :block) {|_, e, b| If.new(e, b)}
+      end
+
+      rule :switch do
+      end
+
+      rule :loop do
+        match("while", :exp, :block) {|_, e, b| While.new(e, b)}
+        match("for", Identifier, "in", :array, :block) {|_, i, _, a, b| For.new(i, a, b)}
       end
     end
 

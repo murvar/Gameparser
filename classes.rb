@@ -263,7 +263,7 @@ class LiteralInteger
     return @value
   end
 
-end 
+end
 
 class LiteralString
   attr_accessor :str
@@ -403,5 +403,56 @@ class IdentifierNode
 
   def evaluate()
     $variables[$current_scope][@idn.name].evaluate()
+  end
+end
+
+class If
+  def initialize(exp, block, elseblock = nil)
+    @exp = exp
+    @block = block
+    @elseblock = elseblock
+  end
+
+  def evaluate()
+    if @exp.evaluate()
+      @block.evaluate
+    else
+      if @elseblock != nil
+        @elseblock.evaluate
+      end
+    end
+  end
+end
+
+class While
+  def initialize(exp, block)
+    @exp = exp
+    @block = block
+  end
+
+  def evaluate()
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    while @exp.evaluate
+      @block.evaluate
+    end
+    $current_scope -= 1
+  end
+end
+
+class For
+  def initialize(identifier, array, block)
+    @identifier = identifier
+    @array = array
+    @block = block
+  end
+
+  def evaluate()
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    for @identifier in @array.evaluate()
+      @block.evaluate()
+    end
+    $current_scope -= 1
   end
 end
