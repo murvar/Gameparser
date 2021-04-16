@@ -259,26 +259,137 @@ class Variable_assignment < Test::Unit::TestCase
 
 end
 
-class FunctionTest < Test::Unit::TestCase
-   def test222222()
-     gp = GameLanguage.new
-     #puts "Helloooooooooooooooooo"
-     # Hur ska vi spara kod till senare och inte köra den direkt?
-     # Vi får ett error för "k = i + 5" eftersom den vill köra
-     # koden direkt
-     var1 = "def test(i)
-{
-  k = 100 + i
-  k
-}
-test(22)
-"
-     assert_equal(23, gp.parse_string(var1))
-     #puts gp.gameParser.test
-     #assert_equal( , gp.parse_string())
-     #assert_equal( , gp.parse_string())
+class MultipleLine < Test::Unit::TestCase
+  def test_mini()
+    gp = GameLanguage.new
+
+
+    code = "bool = true and false
+            bool"
+    assert_equal(false, gp.parse_string(code))
+
+
+    code = "bool = true and false or true
+            bool"
+    assert_equal(true , gp.parse_string(code))
+
+    code = "bool = true and false or true
+            bool = 32 + 21
+            bool"
+    assert_equal(53, gp.parse_string(code))
+
+    code = "bool1 = true and false or true
+            bool1 = 32 + 21
+            bool2 = bool1 * 10
+            bool2"
+
+    assert_equal(530, gp.parse_string(code))
+
+    assert_equal(530, gp.parse_string("bool2"))
+
+    code = "bool1 = true and false or true
+            bool1 = 32 + 21
+            bool2 = bool1 * 10
+            2"
+
+    assert_equal(2, gp.parse_string(code))
+
+    code = "m = 20
+            m = m + 20
+            "
+    assert_equal(40, gp.parse_string(code))
+
+  end
+end
+
+class WriteTest < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new
+
+    assert_equal(nil , gp.parse_string('write()'))
+    assert_equal(nil , gp.parse_string('write("Testing \"write\":")'))
+    assert_equal(nil , gp.parse_string('write("Hello World!")'))
+    assert_equal(nil , gp.parse_string('write("write()")'))
+    assert_equal(nil , gp.parse_string('write("My name is Hadi")'))
+  end
+
+  def test2()
+    gp = GameLanguage.new
+
+    assert_equal(nil , gp.parse_string("write()"))
+
+    # Works in interactive mode
+    # assert_equal(nil , gp.parse_string("write('Testing \'write\':')"))
+
+    assert_equal(nil , gp.parse_string("write('Hello World!')"))
+    assert_equal(nil , gp.parse_string("write('write()')"))
+    assert_equal(nil , gp.parse_string("write('My name is Hadi')"))
+  end
+   def test3()
+    gp = GameLanguage.new
+
+    code = 'a = 12
+            b = false
+            c = "hi"'
+
+    assert_equal("hi" , gp.parse_string(code))
+    assert_equal(nil , gp.parse_string("write(a)"))
+    assert_equal(nil , gp.parse_string("write(b)"))
+    assert_equal(nil , gp.parse_string("write(c)"))
    end
- end
+end
+
+class IfTest < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new
+    code = "x = 1
+    if x <10 {'low'} else {'high'}"
+    assert_equal("low", gp.parse_string(code))
+    code = "x = 10
+    if x <10 {'low'} else {'high'}"
+    assert_equal("high", gp.parse_string(code))
+  end
+end
+# class ReadTest < Test::Unit::TestCase
+#   def test1()
+#     gp = GameLanguage.new
+#     code = '
+#       read("hello") 5
+#     '
+#
+#     assert_equal(nil , gp.parse_string('read()'))
+#     assert_equal(nil , gp.parse_string('read("Testing \"write\":")'))
+#     assert_equal(nil , gp.parse_string('read("Hello World!")'))
+#     assert_equal(nil , gp.parse_string('read("write()")'))
+#     assert_equal(nil , gp.parse_string('read("My name is Hadi")'))
+#   end
+#
+#   def test2()
+#     gp = GameLanguage.new
+#
+#     assert_equal(nil , gp.parse_string("write()"))
+#
+#     # Works in interactive mode
+#     # assert_equal(nil , gp.parse_string("write('Testing \'write\':')"))
+#
+#     assert_equal(nil , gp.parse_string("write('Hello World!')"))
+#     assert_equal(nil , gp.parse_string("write('write()')"))
+#     assert_equal(nil , gp.parse_string("write('My name is Hadi')"))
+#   end
+#    def test3()
+#     gp = GameLanguage.new
+#
+#     code = 'a = 12
+#             b = false
+#             c = "hi"'
+#
+#     assert_equal("hi" , gp.parse_string(code))
+#     assert_equal(nil , gp.parse_string("write(a)"))
+#     assert_equal(nil , gp.parse_string("write(b)"))
+#     assert_equal(nil , gp.parse_string("write(c)"))
+#    end
+# end
+
 
 # ============================================================
 # Template

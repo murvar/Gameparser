@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # coding: utf-8
 
-#require "rdparse"
 require './gameparser'
 
 class Prog
@@ -45,7 +44,6 @@ class Definition
   end
 
   def evaluate()
-    #@object.evaluate()
     nil
   end
 end
@@ -57,17 +55,6 @@ class Statement
 
   def evaluate()
     return @object.evaluate()
-  end
-end
-
-class Assignment
-  def initialize(lhs, rhs)
-    @lhs = lhs
-    @rhs = rhs
-  end
-
-  def evaluate()
-    $variables[@lhs] = @rhs.evaluate()
   end
 end
 
@@ -207,7 +194,7 @@ class Addition
   end
 
   def evaluate()
-    return (@lhs.evaluate() + @rhs.evaluate())
+    return @lhs.evaluate() + @rhs.evaluate()
   end
 
 end
@@ -281,7 +268,7 @@ end
 class LiteralString
   attr_accessor :str
   def initialize(st)
-    @str = st
+    @str = st.gsub(/\\/, "")
   end
 
   def evaluate()
@@ -289,63 +276,78 @@ class LiteralString
   end
 end
 
-
 class Variable
-  def initialize(value)
+  attr_accessor :value
+  def initialize(value = 0)
     @value = value
   end
 
   def evaluate()
-    return @value
+    @value
   end
 end
 
-
-# def test(i)
-#   {
-#    k = 5 + i
-#    k
-#  }
-# [i] {"i": 0}
 class Function
   def initialize(params, block)
-    #puts params
-    #puts block
     @params = params
     @block = block
   end
-#{"i": object}
-#[1]
-  def evaluate(arguments)
-    print "Block:", @block
-    puts ""
-    counter = 0
-    # print "$variables before: ", $variables
-    # puts ""
-    # print "Arguments: ", arguments
-    # puts ""
-    for i in 0..@params.lenght
-      $variables[@params[i]]  = arguments[i]
-    end
-    # @params.each do |p|
-    #   puts p
-    #   $variables[p] = arguments[counter]
-    #   #@params_hash[k] = arguments[counter]
-    #   counter += 1
-    # end
-    # print "params_hash: ", @params_hash
-    # puts ""
-    # print "$variables after: ", $variables
-    # puts ""
-    # print "counter:  " , counter
-    # puts ""
 
-    for object in @block
-      puts object
-      m = object.evaluate()
+  def evaluate(arguments)
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    counter = 0
+    @params.each do |p|
+      $variables[$current_scope][p.name] = Variable.new(arguments[counter].evaluate())
+      counter += 1
     end
-    puts m
-    return m
+    result = @block.evaluate()
+    # riva ner frame
+    $current_scope -= 1
+    $variables.pop()
+    result
+  end
+end
+
+class FunctionCall
+  def initialize(idn, args)
+    @idn = idn
+    @args = args
+  end
+
+  def evaluate()
+    params = []
+    for arg in @args
+      params << arg.evaluate()
+    end
+    $functions[@idn.name].evaluate(params)
+  end
+end
+
+class Block
+  attr_reader :statements
+  def initialize(statements)
+    @statements = statements
+  end
+
+  def evaluate()
+    for statement in @statements do
+      result = statement.evaluate()
+    end
+    result
+  end
+end
+
+class Assignment
+  def initialize(lhs, rhs)
+    @lhs = lhs
+    @rhs = rhs
+    # $variables[@lhs] = Variable.new()
+  end
+
+  def evaluate()
+    $variables[$current_scope][@lhs] = Variable.new(@rhs.evaluate())
+    $variables[$current_scope][@lhs].value
   end
 end
 
@@ -369,5 +371,112 @@ end
 class FalseClass
   def evaluate()
     self
+  end
+end
+
+class Identifier
+  attr_accessor :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+class CompOp
+  attr_reader :op
+  def initialize(op)
+    @op = op
+  end
+end
+
+class Write
+  def initialize(string)
+    @string = string
+  end
+
+  def evaluate()
+    puts @string.evaluate()
+  end
+end
+
+class Read
+  def initialize(string)
+    @string = string
+  end
+
+  def evaluate()
+    puts @string.evaluate()
+    input = gets().chomp()
+    return input
+  end
+end
+
+class IdentifierNode
+  def initialize(idn)
+    @idn = idn
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].evaluate()
+  end
+end
+
+class If
+  def initialize(exp, block, elseblock = nil)
+    @exp = exp
+    @block = block
+    @elseblock = elseblock
+  end
+
+  def evaluate()
+    if @exp.evaluate()
+      @block.evaluate
+    else
+      if @elseblock != nil
+        @elseblock.evaluate
+      end
+    end
+  end
+end
+
+class Case
+  def initialize(identifier)
+    @identifier = identifier
+  end
+
+  def evaluate()
+
+  end
+end
+
+class While
+  def initialize(exp, block)
+    @exp = exp
+    @block = block
+  end
+
+  def evaluate()
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    while @exp.evaluate
+      @block.evaluate
+    end
+    $current_scope -= 1
+  end
+end
+
+class For
+  def initialize(identifier, array, block)
+    @identifier = identifier
+    @array = array
+    @block = block
+  end
+
+  def evaluate()
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    for @identifier in @array.evaluate()
+      @block.evaluate()
+    end
+    $current_scope -= 1
   end
 end
