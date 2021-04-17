@@ -89,7 +89,7 @@ class GameLanguage
       end
 
       rule :params do
-        match(:params, :param) {|m, n| m + Array(n) }
+        match(:params, ",", :param) {|m, _, n| m + Array(n) }
         match(:param) {|m| Array(m)}
         match(:empty)  {|m| [] }
       end

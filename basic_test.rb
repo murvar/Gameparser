@@ -48,6 +48,31 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-4, gp.parse_string("1 -2-2 - 1"))
 
   end
+  
+  def test_multiplication
+    gp = GameLanguage.new
+
+    
+    assert_equal(0, gp.parse_string("2 *0"))
+    assert_equal(0, gp.parse_string("0 *0"))
+    assert_equal(40, gp.parse_string("20 *2"))
+    assert_equal(-10, gp.parse_string("10 *-1"))
+    assert_equal(3300, gp.parse_string("33* 100"))
+
+  end
+   
+  def test_division
+    gp = GameLanguage.new
+
+    assert_equal(0, gp.parse_string("0/2"))
+    assert_equal(0, gp.parse_string("0 /110"))
+    assert_equal(10, gp.parse_string("20 /2"))
+    assert_equal(-10, gp.parse_string("10 /-1"))
+    assert_equal(0, gp.parse_string("33/ 100")) # Integer division
+  
+  end
+  
+  
 end
 
 class ArithmeticPriority < Test::Unit::TestCase
