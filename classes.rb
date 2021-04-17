@@ -399,12 +399,14 @@ class Write
 end
 
 class Read
-  def initialize(string)
+  def initialize(string = nil)
     @string = string
   end
 
   def evaluate()
-    puts @string.evaluate()
+    if @string != nil
+      puts @string.evaluate()
+    end
     input = gets().chomp()
     return input
   end
@@ -448,10 +450,8 @@ class Switch
     for c in @cases
       if c.value.evaluate() == @idn.evaluate()
         return c.evaluate()
-        break
       end
     end
-    #temp
   end
 end
 
