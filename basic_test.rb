@@ -262,7 +262,7 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal("nO", gp.parse_string(' i = "nO"'))
     assert_equal("nO", gp.parse_string("i"))
 
-    #asser_equal("Hello Worlds!", gp.parse_string('"Hello" + "World!"'))
+    assert_equal("Hello World!", gp.parse_string('"Hello " + "World!"'))
 
   end
 

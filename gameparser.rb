@@ -104,10 +104,7 @@ class GameLanguage
 
       rule :function_call do
         match(Identifier, "(", :values, ")") do |idn, _, args, _|
-          # puts "#{idn.name}\t#{args}"
-          # puts $functions
           FunctionCall.new(idn, args)
-          #$functions[m.name].evaluate(arguments)
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
@@ -150,7 +147,6 @@ class GameLanguage
       end
 
       rule :value do
-        match(LiteralString)
         match(:array)
         match(:exp)
       end
@@ -230,6 +226,8 @@ class GameLanguage
         match("(", :log_exp , ")"){|_, m, _| m }
         match(:function_call)
         match(Identifier) {|m| IdentifierNode.new(m)}
+        match(LiteralString)
+        
       end
 
       rule :condition do
