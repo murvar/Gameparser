@@ -494,12 +494,13 @@ class While
   end
 
   def evaluate()
-    $current_scope += 1
-    $variables[$current_scope] = Hash.new()
+    #$current_scope += 1
+    #$variables[$current_scope] = Hash.new()
     while @exp.evaluate
-      @block.evaluate
+      temp = @block.evaluate
     end
-    $current_scope -= 1
+    nil
+    #$current_scope -= 1
   end
 end
 

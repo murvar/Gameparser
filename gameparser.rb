@@ -123,7 +123,7 @@ class GameLanguage
 
       rule :statement do
         match(:condition)
-        #match(:loop)
+        match(:loop)
         match(:assignment)
         match(:exp)
       end

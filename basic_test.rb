@@ -431,6 +431,36 @@ class IfTest < Test::Unit::TestCase
     assert_equal("high", gp.parse_string(code))
   end
 end
+
+class WhileTest < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new
+
+    code = "i = 0
+            while (i < 5)
+            {
+              i = i + 1
+            }"
+    
+    assert_equal(nil , gp.parse_string(code))
+    assert_equal(5, gp.parse_string("i"))
+  end
+  
+  def test2()
+    gp = GameLanguage.new
+
+    code = "i = 0
+            while (2*i < 20)
+            {
+              i = i + 1
+            }"
+    
+    assert_equal(nil , gp.parse_string(code))
+    assert_equal(10, gp.parse_string("i"))
+    
+  end
+end
+
 # class ReadTest < Test::Unit::TestCase
 #   def test1()
 #     gp = GameLanguage.new
