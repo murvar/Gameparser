@@ -135,8 +135,11 @@ class GameLanguage
       end
 
       rule :assignment do
-        match(Identifier, "=", :value) do |m,  _, n|
+        match(Identifier, "=", :value) do |m, _, n|
           Assignment.new(m.name, n)
+        end
+        match(Identifier, "[", Integer, "]", "=", :value) do |idn, _, index, _, _, val|
+          ElementWriter.new(idn.name, index ,val)
         end
       end
 
@@ -152,6 +155,9 @@ class GameLanguage
       end
 
       rule :array do
+        match(Identifier, "[", Integer, "]") do |idn, _, index, _|
+          ElementReader.new(idn.name, index)
+        end
         match("[", :values, "]") {|_, v, _| Arry.new(v)}
         match("[", "]") { Arry.new([]) }
       end
@@ -226,8 +232,7 @@ class GameLanguage
         match("(", :log_exp , ")"){|_, m, _| m }
         match(:function_call)
         match(Identifier) {|m| IdentifierNode.new(m)}
-        match(LiteralString)
-        
+        match(LiteralString)        
       end
 
       rule :condition do

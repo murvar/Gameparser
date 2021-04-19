@@ -81,7 +81,30 @@ class Arry
       result_list << element.evaluate()
     end
 
-    return result_list
+    result_list
+  end
+end
+
+class ElementReader
+  def initialize(name, index)
+    @name = name 
+    @index = index
+  end
+
+  def evaluate()
+    $variables[$current_scope][@name].value[@index]
+  end
+end
+
+class ElementWriter
+  def initialize(name, index, value)
+    @name = name 
+    @index = index
+    @value = value
+  end
+
+  def evaluate()
+    $variables[$current_scope][@name].value[@index] = @value.evaluate()
   end
 end
 
@@ -342,7 +365,6 @@ class Assignment
   def initialize(lhs, rhs)
     @lhs = lhs
     @rhs = rhs
-    # $variables[@lhs] = Variable.new()
   end
 
   def evaluate()
@@ -460,10 +482,6 @@ class Case
   def initialize(value, block)
     @value = value
     @block = block
-    # puts ""
-    # puts @value
-    # puts @block
-    # puts ""
   end
 
   def evaluate()

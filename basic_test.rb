@@ -3,19 +3,47 @@ require './gameparser'
 require 'test/unit'
 
 
-class StrTest < Test::Unit::TestCase
+class SimpleTest < Test::Unit::TestCase
+
   def test1
     gp = GameLanguage.new
-
-    assert_equal("Hi" , gp.parse_string('"Hi"'))
-    assert_equal("Hi123" , gp.parse_string('"Hi123"'))
-    assert_equal("123Hi" , gp.parse_string('"123Hi"'))
-    assert_equal("Hello World" , gp.parse_string('"Hello World"'))
-    assert_equal("Hey!" , gp.parse_string('"Hey!"'))
-    assert_equal("###Bye" , gp.parse_string('"###Bye"'))
-
+  
+    assert_equal(1, gp.parse_string("1"))
+    assert_equal(123, gp.parse_string("123"))
+    assert_equal(888, gp.parse_string("888"))
+    assert_equal(10000, gp.parse_string("10000"))
+    assert_equal(100000000, gp.parse_string("100000000"))
   end
-end
+  
+  def test2
+    gp = GameLanguage.new
+
+    assert_equal("Hi", gp.parse_string('"Hi"'))
+    assert_equal("Hi123", gp.parse_string('"Hi123"'))
+    assert_equal("123Hi", gp.parse_string('"123Hi"'))
+    assert_equal("Hello World", gp.parse_string('"Hello World"'))
+    assert_equal("Hey!", gp.parse_string('"Hey!"'))
+    assert_equal("###Bye", gp.parse_string('"###Bye"'))
+  end
+  
+  def test3
+    gp = GameLanguage.new
+
+    assert_equal(true, gp.parse_string("true"))
+    assert_equal(false, gp.parse_string("false"))
+  end
+
+  def test4
+    gp = GameLanguage.new
+
+    assert_equal([], gp.parse_string("[]"))
+    assert_equal([1,2,3], gp.parse_string("[1,2,3]"))
+    assert_equal(["a", "b", "c"], gp.parse_string('["a","b","c"]'))
+    assert_equal(["a", "b", "c"], gp.parse_string("['a','b','c']"))
+    assert_equal([true, true, false], gp.parse_string("[true,true,false]"))
+    assert_equal([1, "a", true], gp.parse_string("[1,'a',true]"))
+  end
+end 
 
 class SimpleArithmetic < Test::Unit::TestCase
   def test_addition
@@ -46,19 +74,16 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-42, gp.parse_string("(-22) - 20"))
     assert_equal(-1, gp.parse_string("1 -2"))
     assert_equal(-4, gp.parse_string("1 -2-2 - 1"))
-
   end
   
   def test_multiplication
     gp = GameLanguage.new
 
-    
     assert_equal(0, gp.parse_string("2 *0"))
     assert_equal(0, gp.parse_string("0 *0"))
     assert_equal(40, gp.parse_string("20 *2"))
     assert_equal(-10, gp.parse_string("10 *-1"))
     assert_equal(3300, gp.parse_string("33* 100"))
-
   end
    
   def test_division
@@ -69,10 +94,7 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(10, gp.parse_string("20 /2"))
     assert_equal(-10, gp.parse_string("10 /-1"))
     assert_equal(0, gp.parse_string("33/ 100")) # Integer division
-  
-  end
-  
-  
+  end 
 end
 
 class ArithmeticPriority < Test::Unit::TestCase
@@ -81,6 +103,10 @@ class ArithmeticPriority < Test::Unit::TestCase
 
     assert_equal(22, gp.parse_string("2 + 2 * 10"))
     assert_equal(40, gp.parse_string("(2 + 2) * 10"))
+    assert_equal(14, gp.parse_string("2 * 2 + 10"))
+    assert_equal(11, gp.parse_string("2 / 2 + 10"))
+    assert_equal(21, gp.parse_string("2 / 2 + 10 * 2"))
+    assert_equal(22, gp.parse_string("2 / 2 + 10 * 2 + 1"))
     assert_equal(16, gp.parse_string("(2 + 2) * (2 + 2)"))
     assert_equal(1, gp.parse_string("(22/2) + (2 * 5) - (+20)"))
   end
@@ -95,20 +121,20 @@ class SimpleLogicalExpression < Test::Unit::TestCase
     assert_equal(false, gp.parse_string("false and true"))
     assert_equal(false, gp.parse_string("false and false"))
   end
-   def test_or
-     gp = GameLanguage.new
+  def test_or
+    gp = GameLanguage.new
 
-     assert_equal(true, gp.parse_string("true or true"))
-     assert_equal(true, gp.parse_string("true or false"))
-     assert_equal(true, gp.parse_string("false or true"))
-     assert_equal(false, gp.parse_string("false or false"))
-   end
-   def test_not
-     gp = GameLanguage.new
+    assert_equal(true, gp.parse_string("true or true"))
+    assert_equal(true, gp.parse_string("true or false"))
+    assert_equal(true, gp.parse_string("false or true"))
+    assert_equal(false, gp.parse_string("false or false"))
+  end
+  def test_not
+    gp = GameLanguage.new
 
-     assert_equal(false, gp.parse_string("not true"))
-     assert_equal(true, gp.parse_string("not false"))
-   end
+    assert_equal(false, gp.parse_string("not true"))
+    assert_equal(true, gp.parse_string("not false"))
+  end
 end
 
 class LogicalExpressionPriority < Test::Unit::TestCase
@@ -195,21 +221,6 @@ class BoolLogic < Test::Unit::TestCase
   end
 end
 
-class Lista < Test::Unit::TestCase
-  def test_lista
-    gp = GameLanguage.new
-
-    assert_equal([], gp.parse_string("[]"))
-    assert_equal([1,2,3], gp.parse_string("[1,2,3]"))
-    assert_equal(["a", "b", "c"], gp.parse_string('["a","b","c"]'))
-    assert_equal(["a", "b", "c"], gp.parse_string("['a','b','c']"))
-    assert_equal([true, true, false], gp.parse_string("[true,true,false]"))
-    assert_equal([1,"a",1<5], gp.parse_string("[1,'a',true]"))
-  end
-end
-
-
-
 class Variable_assignment < Test::Unit::TestCase
 
   def test_int
@@ -262,7 +273,7 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal("nO", gp.parse_string(' i = "nO"'))
     assert_equal("nO", gp.parse_string("i"))
 
-    assert_equal("Hello World!", gp.parse_string('"Hello " + "World!"'))
+    assert_equal("Hello World!", gp.parse_string('greeting = "Hello " + "World!"'))
 
   end
 
@@ -281,7 +292,52 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal(false, gp.parse_string(" value = false or (not(true or false))"))
     assert_equal(false, gp.parse_string(" value"))
   end
+  
+  def test_lista
+    gp = GameLanguage.new
+    
+    assert_equal([23, 11, 578], gp.parse_string("l = [23, 11, 578]"))
+    assert_equal([23, 11, 578], gp.parse_string("l"))
+    assert_equal(23, gp.parse_string("l[0]"))
+    assert_equal(11, gp.parse_string("l[1]"))
+    assert_equal(578, gp.parse_string("l[2]"))
 
+    assert_equal(1, gp.parse_string("l[0] = 1"))
+    assert_equal([1, 11, 578], gp.parse_string("l"))
+    assert_equal(2, gp.parse_string("l[1] = 2"))
+    assert_equal([1, 2, 578], gp.parse_string("l"))
+    assert_equal(3, gp.parse_string("l[2] = 3"))
+    assert_equal([1, 2, 3], gp.parse_string("l"))
+    
+
+    assert_equal([true, false, true], gp.parse_string("l2 = [true, false, true]"))
+    assert_equal([true, false, true], gp.parse_string("l2"))
+    assert_equal(true, gp.parse_string("l2[0]"))
+    assert_equal(false, gp.parse_string("l2[1]"))
+    assert_equal(true, gp.parse_string("l2[2]"))
+
+    assert_equal(true, gp.parse_string("l2[0] = true"))
+    assert_equal([true, false, true], gp.parse_string("l2"))
+    assert_equal(true, gp.parse_string("l2[1] = true"))
+    assert_equal([true, true, true], gp.parse_string("l2"))
+    assert_equal(true, gp.parse_string("l2[2] = true"))
+    assert_equal([true, true, true], gp.parse_string("l2"))
+
+    
+    assert_equal(["a", "b", "c"], gp.parse_string('l3 = ["a","b","c"]'))
+    assert_equal(["a", "b", "c"], gp.parse_string("l3"))
+    assert_equal("a", gp.parse_string("l3[0]"))
+    assert_equal("b", gp.parse_string("l3[1]"))
+    assert_equal("c", gp.parse_string("l3[2]"))
+    
+    assert_equal("x", gp.parse_string('l3[0] = "x"'))
+    assert_equal(["x", "b", "c"], gp.parse_string("l3"))
+    assert_equal("y", gp.parse_string('l3[1] = "y"'))
+    assert_equal(["x", "y", "c"], gp.parse_string("l3"))
+    assert_equal("z", gp.parse_string('l3[2] = "z"'))
+    assert_equal(["x", "y", "z"], gp.parse_string("l3"))
+    
+  end
 end
 
 class MultipleLine < Test::Unit::TestCase
