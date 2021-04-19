@@ -21,7 +21,7 @@ $functions = Hash.new()
 class GameLanguage
 
   def initialize
-
+    @line = 1
     @gameParser = Parser.new("game language") do
 
       token(/#.*/) # removes comment
@@ -125,7 +125,7 @@ class GameLanguage
         match(:condition)
         #match(:loop)
         match(:assignment)
-        match(:value)
+        match(:exp)
       end
 
 
@@ -135,42 +135,18 @@ class GameLanguage
       end
 
       rule :assignment do
-        match(Identifier, "=", :value) do |m, _, n|
+        match(Identifier, "=", :exp) do |m, _, n|
           Assignment.new(m.name, n)
         end
-        match(Identifier, "[", Integer, "]", "=", :value) do |idn, _, index, _, _, val|
+        match(Identifier, "[", Integer, "]", "=", :exp) do |idn, _, index, _, _, val|
           ElementWriter.new(idn.name, index ,val)
         end
       end
 
-      rule :values do
-        match(:values, ",", :value) {|m, _, n| m + Array(n)}
-        match(:value) {|m| Array(m)}
-        match(:empty)  {|m| [] }
-      end
-
-      rule :value do
-        match(:array)
-        match(:exp)
-      end
-
-      rule :array do
-        match(Identifier, "[", Integer, "]") do |idn, _, index, _|
-          ElementReader.new(idn.name, index)
-        end
-        match("[", :values, "]") {|_, v, _| Arry.new(v)}
-        match("[", "]") { Arry.new([]) }
-      end
-
       rule :exp do
-        match(:log_exp) {|e| e}
-
-      end
-
-      rule :log_exp do
-        match(:bool_exp, "and", :log_exp) {|lhs, _, rhs| And.new(lhs, rhs) }
-        match(:bool_exp, "or", :log_exp) {|lhs, _, rhs| Or.new(lhs, rhs) }
-        match("not", :log_exp) {|_, m, _| Not.new(m) }
+        match(:bool_exp, "and", :exp) {|lhs, _, rhs| And.new(lhs, rhs) }
+        match(:bool_exp, "or", :exp) {|lhs, _, rhs| Or.new(lhs, rhs) }
+        match("not", :exp) {|_, m, _| Not.new(m) }
         match(:bool_exp) {|m| m}
       end
 
@@ -229,12 +205,27 @@ class GameLanguage
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
         match("+", "(", :math_exp , ")"){|_, _, m, _| m }
         match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
-        match("(", :log_exp , ")"){|_, m, _| m }
+        match("(", :exp , ")"){|_, m, _| m }
         match(:function_call)
+        match(:array)
         match(Identifier) {|m| IdentifierNode.new(m)}
-        match(LiteralString)        
+        match(LiteralString)
       end
 
+      rule :array do
+        match(Identifier, "[", Integer, "]") do |idn, _, index, _|
+          ElementReader.new(idn.name, index)
+        end
+        match("[", :values, "]") {|_, v, _| Arry.new(v)}
+        match("[", "]") { Arry.new([]) }
+      end
+      
+      rule :values do
+        match(:values, ",", :exp) {|m, _, n| m + Array(n)}
+        match(:exp) {|m| Array(m)}
+        match(:empty)  {|m| [] }
+      end
+      
       rule :condition do
         match(:if)
         match(:switch)
@@ -246,7 +237,7 @@ class GameLanguage
       end
 
       rule :switch do
-        match("switch", "(", :value, ")", :cases) {|_, _, val, _, cases| Switch.new(val, cases)}
+        match("switch", "(", :exp, ")", :cases) {|_, _, val, _, cases| Switch.new(val, cases)}
       end
 
       rule :cases do
@@ -255,7 +246,7 @@ class GameLanguage
       end
 
       rule :case do
-        match("case", "(", :value, ")", :block) {|_, _, val, _, block|  Case.new(val, block) }
+        match("case", "(", :exp, ")", :block) {|_, _, val, _, block|  Case.new(val, block) }
       end
 
       rule :loop do
@@ -278,14 +269,15 @@ class GameLanguage
     end
     def parse()
       log(false)
-      print "[gameParser] "
+      print "[gameParser] #{format('%03d', @line)}: "
       #str = File.read(file)
       str = gets
       if done(str) then
         puts "Bye."
       else
         puts "=> #{@gameParser.parse str}"
-        parse
+        @line +=1
+        parse()
       end
     end
 

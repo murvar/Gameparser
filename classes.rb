@@ -289,7 +289,6 @@ class LiteralInteger
 end
 
 class LiteralString
-  attr_accessor :str
   def initialize(st)
     @str = st.gsub(/\\/, "")
   end
@@ -325,7 +324,6 @@ class Function
       counter += 1
     end
     result = @block.evaluate()
-    # riva ner frame
     $current_scope -= 1
     $variables.pop()
     result
