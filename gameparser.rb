@@ -108,12 +108,12 @@ class GameLanguage
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
-        match("write", "(", Identifier, ")") do |_, _, i, _|
-          Write.new($variables[$current_scope][i.name])
+        match("write", "(", Identifier, ")") do |_, _, idn, _|
+          Write.new(IdentifierNode.new(idn))
         end
         match("write", "(", ")") { Write.new("")}
-        match("read", "(", LiteralString, ")") {|_, _, m, _|Read.new(m)}
-        match("read", "(", ")") {|_, _, _|Read.new()}
+        match("read", "(", LiteralString, ")") {|_, _, m, _| Read.new(m)}
+        match("read", "(", ")") {|_, _, _| Read.new()}
       end
 
       rule :statements do
@@ -127,7 +127,6 @@ class GameLanguage
         match(:assignment)
         match(:exp)
       end
-
 
       rule :assignsments do
         match(:assignsments, :assignment)
@@ -203,9 +202,9 @@ class GameLanguage
         match(Integer) {|m| LiteralInteger.new(m) }
         match("-", Integer) {|_, m| LiteralInteger.new(-m) }
         match("+", Integer) {|_, m| LiteralInteger.new(m) }
-        match("+", "(", :math_exp , ")"){|_, _, m, _| m }
-        match("-", "(", :math_exp , ")"){|_, _, m, _| Multiplication.new(m, -1) }
-        match("(", :exp , ")"){|_, m, _| m }
+        match("+", "(", :math_exp , ")") {|_, _, m, _| m }
+        match("-", "(", :math_exp , ")") {|_, _, m, _| Multiplication.new(m, -1) }
+        match("(", :exp , ")") {|_, m, _| m }
         match(:function_call)
         match(:array)
         match(Identifier) {|m| IdentifierNode.new(m)}
