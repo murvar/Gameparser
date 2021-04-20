@@ -3,20 +3,9 @@
 require './rdparse'
 require './classes'
 
-# $variables = [{}] # rekommenderas på det sättet för att kunna
-                    # hantera scope
-
-# $scope = 0
-# $variables = {}
-# $functions = {}
-
-
 $current_scope = 0
 $variables = [Hash.new()]
 $functions = Hash.new()
-
-# 1) $variables= {"global" => {}, "test" => {}}
-# 2) $variables = {"global" => {}, "test" => {"i" => Variable, "k" => Variable}}
 
 class GameLanguage
 
@@ -155,7 +144,7 @@ class GameLanguage
       end
 
       rule :bool_exp do
-         match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs|
+        match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs|
           case c.op
           when "<=" then
             LessEqual.new(lhs, rhs)
@@ -170,7 +159,7 @@ class GameLanguage
           when ">" then
             Greater.new(lhs, rhs)
           end
-         end
+        end
 
         match(:bool_val, CompOp, :bool_val) do |lhs, c, rhs|
           case c.op
@@ -221,8 +210,8 @@ class GameLanguage
         match(Identifier, "[", Integer, "]") do |idn, _, index, _|
           ElementReader.new(idn.name, index)
         end
-        match("[", :values, "]") {|_, v, _| Arry.new(v)}
-        match("[", "]") { Arry.new([]) }
+        match("[", :values, "]") {|_, v, _| List.new(v)}
+        match("[", "]") { List.new([]) }
       end
 
       rule :values do
@@ -264,9 +253,9 @@ class GameLanguage
       end
     end
 
-# ============================================================
-# Parser end
-# ============================================================
+    # ============================================================
+    # Parser end
+    # ============================================================
 
 
     def done(str)

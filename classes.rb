@@ -9,7 +9,7 @@ class Prog
   end
 
   def evaluate()
-    return @comps.evaluate()
+    @comps.evaluate()
   end
 end
 
@@ -19,12 +19,10 @@ class Comps
   end
 
   def evaluate()
-
     for object in @comps
        temp = object.evaluate()
-
     end
-    return temp
+    temp
   end
 end
 
@@ -34,7 +32,7 @@ class Comp
   end
 
   def evaluate()
-    return @comp.evaluate()
+    @comp.evaluate()
   end
 end
 
@@ -54,7 +52,7 @@ class Statement
   end
 
   def evaluate()
-    return @object.evaluate()
+    @object.evaluate()
   end
 end
 
@@ -69,18 +67,16 @@ class Value
   end
 end
 
-class Arry
+class List
   def initialize(list)
     @list = list
   end
 
   def evaluate()
     result_list = []
-
     for element in @list
       result_list << element.evaluate()
     end
-
     result_list
   end
 end
@@ -115,7 +111,7 @@ class And
   end
 
   def evaluate()
-    return (@lhs.evaluate() and @rhs.evaluate())
+    @lhs.evaluate() and @rhs.evaluate()
   end
 end
 
@@ -126,7 +122,7 @@ class Or
   end
 
   def evaluate()
-    return (@lhs.evaluate() or @rhs.evaluate())
+    @lhs.evaluate() or @rhs.evaluate()
   end
 end
 
@@ -136,7 +132,7 @@ class Not
   end
 
   def evaluate()
-    return (not @object.evaluate())
+    not @object.evaluate()
   end
 end
 
@@ -147,7 +143,7 @@ class Less
   end
 
   def evaluate()
-    return @lhs.evaluate() < @rhs.evaluate()
+    @lhs.evaluate() < @rhs.evaluate()
   end
 end
 
@@ -169,7 +165,7 @@ class Greater
   end
 
   def evaluate()
-    return @lhs.evaluate() > @rhs.evaluate()
+    @lhs.evaluate() > @rhs.evaluate()
   end
 end
 
@@ -180,11 +176,9 @@ class GreaterEqual
   end
 
   def evaluate()
-    return @lhs.evaluate() >= @rhs.evaluate()
+    @lhs.evaluate() >= @rhs.evaluate()
   end
-
 end
-
 
 class Equal
   def initialize(lhs, rhs)
@@ -193,9 +187,8 @@ class Equal
   end
 
   def evaluate()
-    return @lhs.evaluate() == @rhs.evaluate()
+    @lhs.evaluate() == @rhs.evaluate()
   end
-
 end
 
 class NotEqual
@@ -205,9 +198,8 @@ class NotEqual
   end
 
   def evaluate()
-    return @lhs.evaluate() != @rhs.evaluate()
+    @lhs.evaluate() != @rhs.evaluate()
   end
-
 end
 
 class Addition
@@ -217,9 +209,8 @@ class Addition
   end
 
   def evaluate()
-    return @lhs.evaluate() + @rhs.evaluate()
+    @lhs.evaluate() + @rhs.evaluate()
   end
-
 end
 
 class Subtraction
@@ -229,9 +220,8 @@ class Subtraction
   end
 
   def evaluate()
-    return @lhs.evaluate() - @rhs.evaluate()
+    @lhs.evaluate() - @rhs.evaluate()
   end
-
 end
 
 class Multiplication
@@ -242,9 +232,8 @@ class Multiplication
   end
 
   def evaluate()
-    return @lhs.evaluate() * @rhs.evaluate()
+    @lhs.evaluate() * @rhs.evaluate()
   end
-
 end
 
 class Division
@@ -255,9 +244,8 @@ class Division
   end
 
   def evaluate()
-    return @lhs.evaluate() / @rhs.evaluate()
+    @lhs.evaluate() / @rhs.evaluate()
   end
-
 end
 
 class LiteralBool
@@ -271,21 +259,18 @@ class LiteralBool
   end
 
   def evaluate()
-    return @value
+    @value
   end
-
 end
 
 class LiteralInteger
   def initialize(value)
     @value = value
-
   end
 
   def evaluate()
     return @value
   end
-
 end
 
 class LiteralString
@@ -294,7 +279,7 @@ class LiteralString
   end
 
   def evaluate()
-    return @str
+    @str
   end
 end
 
@@ -376,6 +361,7 @@ class Integer
     self
   end
 end
+
 class String
   def evaluate()
     self
@@ -427,7 +413,6 @@ class Range
 
   def evaluate()
     list = []
-
     if @stop > @start
       if @dots == 2
         list = Array((@start..@stop))
@@ -443,7 +428,7 @@ class Range
         list.reverse!
       end
     end
-    return list
+    list
   end
 end
 
@@ -467,7 +452,7 @@ class Read
       puts @string.evaluate()
     end
     input = gets().chomp()
-    return input
+    input
   end
 end
 
