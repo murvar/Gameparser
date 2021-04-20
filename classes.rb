@@ -87,7 +87,7 @@ end
 
 class ElementReader
   def initialize(name, index)
-    @name = name 
+    @name = name
     @index = index
   end
 
@@ -98,7 +98,7 @@ end
 
 class ElementWriter
   def initialize(name, index, value)
-    @name = name 
+    @name = name
     @index = index
     @value = value
   end
@@ -408,6 +408,36 @@ class CompOp
   end
 end
 
+class Range
+  def initialize(start, dots, stop)
+    @start = start
+    @stop = stop
+    @dots = dots.length()
+  end
+
+  def evaluate()
+    list = []
+    puts @start.class
+    puts @stop.class
+    if @stop > @start
+      if @dots == 2
+        list = Array((@start..@stop))
+      else
+        list = Array((@start...@stop))
+      end
+    else
+      if @dots == 2
+        list= Array((@stop..@start))
+        list.reverse!
+      else
+        list= Array((@stop+1...@start+1))
+        list.reverse!
+      end
+    end
+    return list
+  end
+end
+
 class Write
   def initialize(string)
     @string = string
@@ -494,29 +524,26 @@ class While
   end
 
   def evaluate()
-    #$current_scope += 1
-    #$variables[$current_scope] = Hash.new()
     while @exp.evaluate
       temp = @block.evaluate
     end
     nil
-    #$current_scope -= 1
   end
 end
 
 class For
-  def initialize(identifier, array, block)
+  def initialize(identifier, iterable, block)
     @identifier = identifier
-    @array = array
+    @iterable = iterable
     @block = block
   end
 
   def evaluate()
-    $current_scope += 1
-    $variables[$current_scope] = Hash.new()
-    for @identifier in @array.evaluate()
+    for var in @iterable.evaluate()
+      $variables[$current_scope][@identifier.name] = Variable.new(var)
       @block.evaluate()
     end
-    $current_scope -= 1
+    $variables[$current_scope].tap { |h| h.delete(@identifier.name) }
+    nil
   end
 end

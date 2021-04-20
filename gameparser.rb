@@ -43,6 +43,10 @@ class GameLanguage
       token(/while/) {|m| m }
       token(/for/) {|m| m }
       token(/in/) {|m| m }
+      token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
+        mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)
+        Range.new(mymatch[1].to_i, mymatch[2], mymatch[3].to_i)
+      end
 
       token(/<=/){|m| CompOp.new(m) }
       token(/==/){|m| CompOp.new(m) }
@@ -108,6 +112,7 @@ class GameLanguage
         end
 
         match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
+        match("write", "(", :exp, ")") {|_, _, s, _| Write.new(s)}
         match("write", "(", Identifier, ")") do |_, _, idn, _|
           Write.new(IdentifierNode.new(idn))
         end
@@ -209,6 +214,7 @@ class GameLanguage
         match(:array)
         match(Identifier) {|m| IdentifierNode.new(m)}
         match(LiteralString)
+        match(Range)
       end
 
       rule :array do
@@ -218,13 +224,13 @@ class GameLanguage
         match("[", :values, "]") {|_, v, _| Arry.new(v)}
         match("[", "]") { Arry.new([]) }
       end
-      
+
       rule :values do
         match(:values, ",", :exp) {|m, _, n| m + Array(n)}
         match(:exp) {|m| Array(m)}
         match(:empty)  {|m| [] }
       end
-      
+
       rule :condition do
         match(:if)
         match(:switch)
@@ -250,6 +256,7 @@ class GameLanguage
 
       rule :loop do
         match("while", :exp, :block) {|_, e, b| While.new(e, b)}
+        match("for", Identifier, "in", Range, :block) { |_, i, _, r, b| For.new(i, r, b)}
         match("for", Identifier, "in", :array, :block) {|_, i, _, a, b| For.new(i, a, b)}
       end
     end
