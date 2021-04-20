@@ -401,6 +401,16 @@ class Identifier
   end
 end
 
+class IdentifierNode
+  def initialize(idn)
+    @idn = idn
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].evaluate()
+  end
+end
+
 class CompOp
   attr_reader :op
   def initialize(op)
@@ -417,8 +427,7 @@ class Range
 
   def evaluate()
     list = []
-    puts @start.class
-    puts @stop.class
+
     if @stop > @start
       if @dots == 2
         list = Array((@start..@stop))
@@ -459,16 +468,6 @@ class Read
     end
     input = gets().chomp()
     return input
-  end
-end
-
-class IdentifierNode
-  def initialize(idn)
-    @idn = idn
-  end
-
-  def evaluate()
-    $variables[$current_scope][@idn.name].evaluate()
   end
 end
 

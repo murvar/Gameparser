@@ -258,6 +258,9 @@ class GameLanguage
         match("while", :exp, :block) {|_, e, b| While.new(e, b)}
         match("for", Identifier, "in", Range, :block) { |_, i, _, r, b| For.new(i, r, b)}
         match("for", Identifier, "in", :array, :block) {|_, i, _, a, b| For.new(i, a, b)}
+        match("for", Identifier, "in", Identifier, :block) do |_, i1, _, i2, b|
+          For.new(i1, IdentifierNode.new(i2), b)
+        end
       end
     end
 

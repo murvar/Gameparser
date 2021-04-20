@@ -455,11 +455,156 @@ class WhileTest < Test::Unit::TestCase
               i = i + 1
             }"
     
-    assert_equal(nil , gp.parse_string(code))
+    assert_equal(nil, gp.parse_string(code))
     assert_equal(10, gp.parse_string("i"))
     
   end
 end
+
+class ForTest < Test::Unit::TestCase
+  def test1_literal_list()
+    gp = GameLanguage.new()
+  
+    code1 = "sum = 0
+            for i in [1, 2, 3] 
+            {
+                sum = sum + i
+            }
+            "
+    
+    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(6, gp.parse_string("sum"))
+
+    code2 = "for i in [1, 2, 3] 
+            {
+                sum = sum + i
+            }
+            "
+    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(12, gp.parse_string("sum"))
+  end
+  
+  def test2_list()
+    gp = GameLanguage.new()
+
+    code1 = "l = [1, 2, 3]
+            sum = 0
+            for i in l
+            {
+                sum = sum + i
+            }
+            "
+    
+    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(6, gp.parse_string("sum"))
+
+    code2 = "for i in l
+            {
+                sum = sum + i
+            }
+            "
+    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(12, gp.parse_string("sum"))
+  end
+
+  def test3_literal_range()
+    gp = GameLanguage.new()
+
+    code1 = "sum = 0
+            for i in (1..5)
+            {
+                sum = sum + i
+            }
+            "
+    
+    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(15, gp.parse_string("sum"))
+
+    code2 = "for i in (1..5)
+            {
+                sum = sum + i
+            }
+            "
+    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(30, gp.parse_string("sum"))
+
+    code3 = "sum = 0
+            for i in (1...5)
+            {
+                sum = sum + i
+            }
+            "
+    assert_equal(nil, gp.parse_string(code3))
+    assert_equal(10, gp.parse_string("sum"))
+  end
+  def test4_range()
+    gp = GameLanguage.new()
+
+    code1 = "r = (1..5)
+            sum = 0
+            for i in r
+            {
+                sum = sum + i
+            }
+            "
+    
+    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(15, gp.parse_string("sum"))
+
+    code2 = "for i in r
+            {
+                sum = sum + i
+            }
+            "
+    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(30, gp.parse_string("sum"))
+  end
+  
+  def test5_range_descending()
+    gp = GameLanguage.new()
+
+    code1 = 'write("Printing numbers in range(5..0)")
+            r = (5..0)
+            for i in r
+            {
+                write(i)
+            }
+            '
+    
+    assert_equal(nil, gp.parse_string(code1))
+    
+    code1 = 'write("Printing numbers in range(-2..2)")
+            r = (-2..2)
+            for i in r
+            {
+                write(i)
+            }
+            '
+    
+    assert_equal(nil, gp.parse_string(code1))
+    
+    code1 = 'write("Printing numbers in range(-4..-1)")
+            r = (-4..-1)
+            for i in r
+            {
+                write(i)
+            }
+            '
+    
+    assert_equal(nil, gp.parse_string(code1))
+
+    code1 = 'write("Printing numbers in range(4...0)")
+            r = (4...0)
+            for i in r
+            {
+                write(i)
+            }
+            '
+    
+    assert_equal(nil, gp.parse_string(code1))
+  end
+end
+
 
 # ============================================================
 # Template
