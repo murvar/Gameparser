@@ -26,6 +26,7 @@ class GameLanguage
       token(/def/) {|m| m }
       token(/write/) {|m| m }
       token(/read/) {|m| m }
+      token(/wait/) {|m| m }
       token(/if/) {|m| m }
       token(/else/) {|m| m }
       token(/switch/) {|m| m }
@@ -124,6 +125,7 @@ class GameLanguage
         match("write", "(", ")") { Write.new("")}
         match("read", "(", LiteralString, ")") {|_, _, m, _| Read.new(m)}
         match("read", "(", ")") {|_, _, _| Read.new()}
+        match("wait", "(", Integer, ")") {|_, _, s, _| Wait.new(s)}
         match("load", "(", Identifier, ")") {|_, _, idn, _| Load.new(idn.name)}
       end
 

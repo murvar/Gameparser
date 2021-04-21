@@ -456,6 +456,17 @@ class Read
   end
 end
 
+class Wait
+  def initialize(time_in_sec)
+    @time_in_sec = time_in_sec
+  end
+
+  def evaluate()
+    sleep(@time_in_sec)
+    nil
+  end
+end
+
 class If
   def initialize(exp, block, elseblock = nil)
     @exp = exp
