@@ -496,6 +496,24 @@ class WhileTest < Test::Unit::TestCase
     assert_equal(6, gp.parse_string("i"))
     
   end
+
+  def test3_break()
+    gp = GameLanguage.new
+
+    code = "i = 0
+            while true
+            {
+              i = i + 1
+              if i > 10
+              {
+                break
+              }
+            }"
+    
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(11, gp.parse_string("i"))
+    
+  end
 end
 
 class ForTest < Test::Unit::TestCase
@@ -656,6 +674,25 @@ class ForTest < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(36, gp.parse_string("result"))
   end
+  
+  def test7_break()
+    gp = GameLanguage.new()
+
+    code1 = "result = 0
+            for x in [1, 2, 3]
+            {
+                 if x == 2
+                 {
+                        result = x
+                        break
+                 }
+            }
+            "
+    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(2, gp.parse_string("result"))
+  end
+
+  
 end
 
 # ============================================================

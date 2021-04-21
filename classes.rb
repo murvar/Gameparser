@@ -510,6 +510,9 @@ class While
   def evaluate()
     while @exp.evaluate
       temp = @block.evaluate
+      if temp == false
+        return nil
+      end
     end
     nil
   end
@@ -525,9 +528,22 @@ class For
   def evaluate()
     for var in @iterable.evaluate()
       $variables[$current_scope][@identifier.name] = Variable.new(var)
-      @block.evaluate()
+      temp = @block.evaluate()
+      if temp == false
+        $variables[$current_scope].tap { |h| h.delete(@identifier.name) }
+        return nil
+      end
     end
     $variables[$current_scope].tap { |h| h.delete(@identifier.name) }
     nil
+  end
+end
+
+class Break
+  # def initialize()
+  # end
+
+  def evaluate()
+    false
   end
 end

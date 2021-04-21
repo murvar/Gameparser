@@ -32,6 +32,7 @@ class GameLanguage
       token(/while/) {|m| m }
       token(/for/) {|m| m }
       token(/in/) {|m| m }
+      token(/break/) { Break.new() }
       token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
         mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)
         Range.new(mymatch[1].to_i, mymatch[2], mymatch[3].to_i)
@@ -120,6 +121,7 @@ class GameLanguage
         match(:loop)
         match(:assignment)
         match(:exp)
+        match(Break)
       end
 
       rule :assignsments do
