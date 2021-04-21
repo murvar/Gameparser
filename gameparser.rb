@@ -6,6 +6,7 @@ require './classes'
 $current_scope = 0
 $variables = [Hash.new()]
 $functions = Hash.new()
+$events = Hash.new()
 
 class GameLanguage
 
@@ -31,7 +32,11 @@ class GameLanguage
       token(/case/) {|m| m }
       token(/while/) {|m| m }
       token(/for/) {|m| m }
+      token(/init/) {|m| m }
+      token(/run/) {|m| m }
       token(/in/) {|m| m }
+      token(/event/) {|m| m }
+      token(/load/) {|m| m }
       token(/break/) { Break.new() }
       token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
         mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)
@@ -70,9 +75,19 @@ class GameLanguage
       end
 
       rule :definition do
-        match(:type)
+        match(:object)
         match(:event)
         match(:function_def)
+      end
+
+      rule :event do
+        match("event", Identifier, "{",:init, "run", :block, "}") do |_, idn, _, i, _, b, _|
+          $events[idn.name]= Event.new(i, b)
+        end
+      end
+
+      rule :init do
+        match("init", "{", :assignsments, "}") {|_, _, a, _| a }
       end
 
       rule :function_def do
@@ -109,6 +124,7 @@ class GameLanguage
         match("write", "(", ")") { Write.new("")}
         match("read", "(", LiteralString, ")") {|_, _, m, _| Read.new(m)}
         match("read", "(", ")") {|_, _, _| Read.new()}
+        match("load", "(", Identifier, ")") {|_, _, idn, _| Load.new(idn.name)}
       end
 
       rule :statements do
@@ -125,8 +141,8 @@ class GameLanguage
       end
 
       rule :assignsments do
-        match(:assignsments, :assignment)
-        match(:assignment)
+        match(:assignsments, :assignment) {|m, n| m + Array(n) }
+        match(:assignment) {|m| Array(m)}
       end
 
       rule :assignment do

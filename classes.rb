@@ -544,3 +544,44 @@ class Break
     self.class
   end
 end
+
+class Event
+  def initialize(init, block)
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    @init = init
+    for assignment in @init
+      assignment.evaluate()
+    end
+    #@init.evaluate()
+    @variables = $variables[$current_scope]
+    $current_scope -= 1
+    $variables.pop()
+    @block = block
+  end
+
+  def evaluate()
+    $current_scope += 1
+    $variables[$current_scope] = @variables
+
+    @block.evaluate()
+
+    @variables = $variables[$current_scope]
+
+    $variables.pop()
+    $current_scope -= 1
+
+    nil
+  end
+end
+
+class Load
+  def initialize(event)
+    @event = event
+  end
+
+  def evaluate()
+    $events[@event].evaluate()
+    nil
+  end
+end
