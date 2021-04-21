@@ -423,11 +423,28 @@ end
 class IfTest < Test::Unit::TestCase
   def test1()
     gp = GameLanguage.new
+
     code = "x = 1
-    if x <10 {'low'} else {'high'}"
+           if x <10 
+           {
+                'low'
+           }
+           else
+           {
+                'high'
+           }"
+
     assert_equal("low", gp.parse_string(code))
+    
     code = "x = 10
-    if x <10 {'low'} else {'high'}"
+           if x <10
+           {
+                'low'
+           }
+           else
+           {
+                'high'
+           }"
     assert_equal("high", gp.parse_string(code))
   end
 end
@@ -457,6 +474,26 @@ class WhileTest < Test::Unit::TestCase
     
     assert_equal(nil, gp.parse_string(code))
     assert_equal(10, gp.parse_string("i"))
+    
+  end
+
+  def test3()
+    gp = GameLanguage.new
+
+    code = "i = 0
+            bool = true
+            while (bool)
+            {
+              i = i + 1
+              if i > 5
+              {
+                bool = false
+              }
+            }"
+    
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(false, gp.parse_string("bool"))
+    assert_equal(6, gp.parse_string("i"))
     
   end
 end
@@ -603,8 +640,23 @@ class ForTest < Test::Unit::TestCase
     
     assert_equal(nil, gp.parse_string(code1))
   end
-end
+  
+  def test6_nested()
+    gp = GameLanguage.new()
 
+    code1 = "result = 0
+            for x in [1, 2, 3]
+            {
+                 for y in [1, 2, 3]
+                 {    
+                      result = result + (x * y)
+                 }
+            }
+            "
+    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(36, gp.parse_string("result"))
+  end
+end
 
 # ============================================================
 # Template
