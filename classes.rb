@@ -82,25 +82,25 @@ class List
 end
 
 class ElementReader
-  def initialize(name, index)
-    @name = name
+  def initialize(idn, index)
+    @idn = idn
     @index = index
   end
 
   def evaluate()
-    $variables[$current_scope][@name].value[@index]
+    $variables[$current_scope][@idn.name].value[@index]
   end
 end
 
 class ElementWriter
-  def initialize(name, index, value)
-    @name = name
+  def initialize(idn, index, value)
+    @idn = idn
     @index = index
     @value = value
   end
 
   def evaluate()
-    $variables[$current_scope][@name].value[@index] = @value.evaluate()
+    $variables[$current_scope][@idn.name].value[@index] = @value.evaluate()
   end
 end
 
@@ -300,12 +300,12 @@ class Function
     @block = block
   end
 
-  def evaluate(arguments)
+  def evaluate(values)
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
     counter = 0
     @params.each do |p|
-      $variables[$current_scope][p.name] = Variable.new(arguments[counter].evaluate())
+      $variables[$current_scope][p.name] = Variable.new(values[counter].evaluate())
       counter += 1
     end
     result = @block.evaluate()
@@ -316,17 +316,17 @@ class Function
 end
 
 class FunctionCall
-  def initialize(idn, args)
+  def initialize(idn, values)
     @idn = idn
-    @args = args
+    @values = values
   end
 
   def evaluate()
-    params = []
-    for arg in @args
-      params << arg.evaluate()
+    values = []
+    for value in @values
+      values << value.evaluate()
     end
-    $functions[@idn.name].evaluate(params)
+    $functions[@idn.name].evaluate(values)
   end
 end
 
@@ -351,8 +351,8 @@ class Assignment
   end
 
   def evaluate()
-    $variables[$current_scope][@lhs] = Variable.new(@rhs.evaluate())
-    $variables[$current_scope][@lhs].value
+    $variables[$current_scope][@lhs.name] = Variable.new(@rhs.evaluate())
+    $variables[$current_scope][@lhs.name].value
   end
 end
 
@@ -557,18 +557,64 @@ class Break
 end
 
 class Prop
-  def initialize(init)
+  attr_accessor :vars
+  def initialize(params, block)
+    @params = params
+    @block = block
     @vars = Hash.new()
-    for param in init[0]
-      @vars[param.name] = nil
-    @init = init
-    puts @init
+  end
+
+  def evaluate(values)
+    $current_scope += 1
+    $variables[$current_scope] = Hash.new()
+    counter = 0
+    @params.each do |p|
+      $variables[$current_scope][p.name] = Variable.new(values[counter].evaluate())
+      counter += 1
+    end
+    @block.evaluate()
+    @vars = $variables[$current_scope] 
+    $current_scope -= 1
+    $variables.pop()
+    self
+  end
+end
+
+class Instance
+  def initialize(idn, values)
+    @idn = idn
+    @values = values
   end
 
   def evaluate()
-    for assignment in @init
-      assignment.evaluate()
+    values = []
+    for value in @values
+      values << value.evaluate()
     end
+    $props[@idn.name].evaluate(values)
+  end
+end
+
+class InstanceReader
+  def initialize(idn, attr)
+    @idn = idn
+    @attr = attr
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].value.vars[@attr.name].evaluate()
+  end
+end
+
+class InstanceWriter
+  def initialize(idn, attr, exp)
+    @idn = idn
+    @attr = attr
+    @exp = exp
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].value.vars[@attr.name] = @exp.evaluate()
   end
 end
 
@@ -577,10 +623,11 @@ class Event
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
     @init = init
-    for assignment in @init
-      assignment.evaluate()
-    end
-    #@init.evaluate()
+    # for obj in @init
+    #   obj.evaluate()
+    # end
+    @init.evaluate()
+    
     @variables = $variables[$current_scope]
     $current_scope -= 1
     $variables.pop()
