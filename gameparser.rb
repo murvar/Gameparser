@@ -6,6 +6,7 @@ require './classes'
 $current_scope = 0
 $variables = [Hash.new()]
 $functions = Hash.new()
+$objects = Hash.new()
 $events = Hash.new()
 
 class GameLanguage
@@ -36,6 +37,7 @@ class GameLanguage
       token(/init/) {|m| m }
       token(/run/) {|m| m }
       token(/in/) {|m| m }
+      token(/object/) {|m| m }
       token(/event/) {|m| m }
       token(/load/) {|m| m }
       token(/break/) { Break.new() }
@@ -86,6 +88,9 @@ class GameLanguage
           $events[idn.name]= Event.new(i, b)
         end
       end
+
+      rule :object do
+        match("object", Identifier, "{", :init, "}") {|_, idn, _, i, _| $objects[idn.name]= Object.new(i)}
 
       rule :init do
         match("init", "{", :assignsments, "}") {|_, _, a, _| a }

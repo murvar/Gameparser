@@ -556,6 +556,15 @@ class Break
   end
 end
 
+class Object
+  def initialize(init)
+    @init = inits
+    for assignment in @init
+      assignment.evaluate()
+    end
+  end
+end
+
 class Event
   def initialize(init, block)
     $current_scope += 1
