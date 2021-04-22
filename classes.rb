@@ -556,9 +556,16 @@ class Break
   end
 end
 
-class Object
+class Prop
   def initialize(init)
-    @init = inits
+    @vars = Hash.new()
+    for param in init[0]
+      @vars[param.name] = nil
+    @init = init
+    puts @init
+  end
+
+  def evaluate()
     for assignment in @init
       assignment.evaluate()
     end

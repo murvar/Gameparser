@@ -6,7 +6,7 @@ require './classes'
 $current_scope = 0
 $variables = [Hash.new()]
 $functions = Hash.new()
-$objects = Hash.new()
+$props = Hash.new()
 $events = Hash.new()
 
 class GameLanguage
@@ -37,7 +37,7 @@ class GameLanguage
       token(/init/) {|m| m }
       token(/run/) {|m| m }
       token(/in/) {|m| m }
-      token(/object/) {|m| m }
+      token(/prop/) {|m| m }
       token(/event/) {|m| m }
       token(/load/) {|m| m }
       token(/break/) { Break.new() }
@@ -53,13 +53,13 @@ class GameLanguage
       token(/>=/){|m| CompOp.new(m) }
       token(/>/){|m| CompOp.new(m)  }
 
-      # returns variable/function names as an Identifier object
+      # returns variable/function names as an Identifier prop
       token(/^[a-zA-Z][a-zA-Z_0-9]*/) {|m| Identifier.new(m) }
 
       token(/((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
-      end # returns a LiteralString object
+      end # returns a LiteralString prop
 
       token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
@@ -78,10 +78,17 @@ class GameLanguage
       end
 
       rule :definition do
-        match(:object)
+        match(:prop)
         match(:event)
         match(:function_def)
       end
+
+      rule :prop do
+        match("prop", Identifier, "{", :init, "}") {|_, idn, _, i, _|
+          $props[idn.name] = Prop.new(i)}
+      end
+
+      #prop t {init(a,b) { c = 1 d = 2 } }
 
       rule :event do
         match("event", Identifier, "{",:init, "run", :block, "}") do |_, idn, _, i, _, b, _|
@@ -89,11 +96,9 @@ class GameLanguage
         end
       end
 
-      rule :object do
-        match("object", Identifier, "{", :init, "}") {|_, idn, _, i, _| $objects[idn.name]= Object.new(i)}
-
       rule :init do
-        match("init", "{", :assignsments, "}") {|_, _, a, _| a }
+        match("init", "(", :params, ")", "{", :statements, "}" ) {|_, _, p, _, _, s, _| [p,s] }
+        match("init", "{", :statements, "}") {|_, _, s, _| s }
       end
 
       rule :function_def do
@@ -147,8 +152,8 @@ class GameLanguage
         match(Break)
       end
 
-      rule :assignsments do
-        match(:assignsments, :assignment) {|m, n| m + Array(n) }
+      rule :assignments do
+        match(:assignments, :assignment) {|m, n| m + Array(n) }
         match(:assignment) {|m| Array(m)}
       end
 

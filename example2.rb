@@ -1,11 +1,12 @@
 # coding: utf-8
 type Character
 {
-  init(attack, agility, health)
+  init(att, agi, hp)
   {
-    @attack = attack
-    @agility = agility
-    @health = health
+    attack = att
+    agility = agi
+    health = hp
+
 
     #slots = {"sword" = RustySword, "helmet" = nil, "chest" = nil}
   }
@@ -20,7 +21,7 @@ minion = Character.new(1, 1, 4)
 # Aggregering problem!
 # Hur ska en karaktär i spelet äga ett svärd?
 # ============================================================
-# type Sword 
+# type Sword
 # {
 #   init(attack, agility)
 #   {
@@ -45,7 +46,7 @@ event Forest
     write("2. Walk forward.")
     write_if(not boss_defeated)("3. Initiate battle with Bossman.")
     write_if(not chest_opended)("4. Open the chest.")
-    
+
     counter = 0
     for option in option_list
       {
@@ -96,7 +97,7 @@ event Battle
    write ("1. Attack.")
 
    choice = read()
-   
+
    case choice
    when 1
      {
@@ -104,7 +105,7 @@ event Battle
          {
            bossman.health -= kratos.attack
            for i in minions
-           
+
          }
      }
  }
