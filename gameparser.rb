@@ -337,5 +337,15 @@ class GameLanguage
 end
 
 if __FILE__ == $0
-  GameLanguage.new.parse()
+  if ARGV[0] == nil
+    GameLanguage.new.parse()
+  else
+    file = File.read(ARGV[0])
+    gp = GameLanguage.new()
+    gp.parse_string(file)
+  end
 end
+
+# file = File.read(ARGV[0])
+# gp = GameLanguage.new()
+# gp.parse_string(file)
