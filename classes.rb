@@ -573,7 +573,17 @@ class Prop
       counter += 1
     end
     @block.evaluate()
-    @vars = $variables[$current_scope] 
+    @vars = $variables[$current_scope]
+
+    lista = []
+    @params.each {|e| lista << e.name}
+
+    for v in @vars.keys()
+      if lista.include?(v)
+        @vars.tap { |h| h.delete(v) }
+      end
+    end
+
     $current_scope -= 1
     $variables.pop()
     self
@@ -627,7 +637,7 @@ class Event
     #   obj.evaluate()
     # end
     @init.evaluate()
-    
+
     @variables = $variables[$current_scope]
     $current_scope -= 1
     $variables.pop()

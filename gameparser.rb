@@ -90,12 +90,12 @@ class GameLanguage
       end
 
       rule :event do
-        match("event", Identifier, "{",:init, "run", :block, "}") do |_, idn, _, i, _, b, _|
+        match("event", Identifier, "{", :init, "run", :block, "}") do |_, idn, _, i, _, b, _|
           $events[idn.name]= Event.new(i, b)
         end
       end
 
-      rule :init do
+      rule :init do #Kan vi avgöra vilken init som skall tillåtas på det här djupet?
         match("init", "(", :params, ")", :block) {|_, _, p, _, b, _| [p,b] }
         match("init", :block) {|_, b| b }
       end
@@ -119,6 +119,7 @@ class GameLanguage
 
       rule :block do
         match("{", :statements, "}") {|_, m, _| Block.new(m)}
+        match("{", :empty, "}") {|_, m, _| Block.new(m)}
       end
 
       rule :function_call do
@@ -158,7 +159,7 @@ class GameLanguage
 
       rule :assignment do
         match(Identifier, "=", :exp) do |idn, _, exp|
-          
+
           Assignment.new(idn, exp)
         end
         match(Identifier, "[", Integer, "]", "=", :exp) do |idn, _, index, _, _, exp|
