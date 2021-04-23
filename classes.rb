@@ -332,11 +332,14 @@ end
 
 class Block
   attr_reader :statements
-  def initialize(statements)
+  def initialize(statements = false)
     @statements = statements
   end
 
   def evaluate()
+    if !@statements
+      return nil
+    end
     for statement in @statements do
       result = statement.evaluate()
     end
@@ -666,6 +669,6 @@ class Load
 
   def evaluate()
     $events[@event].evaluate()
-    nil
+    true
   end
 end

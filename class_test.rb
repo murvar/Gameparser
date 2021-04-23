@@ -70,5 +70,54 @@ class EventTest < Test::Unit::TestCase
 
     assert_equal(nil, gp.parse_string(code2))
   end
+end
 
+class EventTraverse < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new()
+    
+    code = 'event room
+           {
+            init
+            {            
+   	   
+            }
+            run
+            {
+   	      write("You are in an empty room")
+   	      write("1. Go to the yard")
+   	
+              choice = read()
+   	      switch (choice)
+   	        case(1)
+   	        {
+   	          load(yard)
+   	        }
+   	
+            }
+           }
+
+           event yard
+           {        
+             init
+             {
+   	      
+             }
+             run     
+             {
+               write("You are in a dark yard")
+   	       write("1. Go back to the house")
+   	
+               choice = read()
+   	       switch (choice)
+   	         case(1)
+   	         {
+   	           load(room)
+   	         }
+   	
+             }
+           }'
+
+    assert_equal(nil, gp.parse_string(code))    
+  end
 end

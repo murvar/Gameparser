@@ -119,7 +119,7 @@ class GameLanguage
 
       rule :block do
         match("{", :statements, "}") {|_, m, _| Block.new(m)}
-        match("{", :empty, "}") {|_, m, _| Block.new(m)}
+        match("{", :empty, "}") { Block.new()}
       end
 
       rule :function_call do

@@ -420,6 +420,27 @@ class WriteTest < Test::Unit::TestCase
    end
 end
 
+# class SwitchTest < Test::Unit::TestCase
+#   def test1()
+#     gp = GameLanguage.new
+#     puts "Test "
+
+#     code = ''
+    
+#     assert_equal(, gp.parse_string(code))
+#   end
+
+#   def test2()
+#     gp = GameLanguage.new
+#     puts "Test 2"
+
+#     code = ''
+    
+#     assert_equal(, gp.parse_string(code))
+#   end
+
+  
+
 class IfTest < Test::Unit::TestCase
   def test1()
     gp = GameLanguage.new
