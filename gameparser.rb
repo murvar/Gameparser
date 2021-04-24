@@ -19,28 +19,28 @@ class GameLanguage
       token(/\s+/) # removes whitespaces
       token(/^\d+/) {|m| m.to_i} # returns integers
 
-      token(/false/) {|m|m}
-      token(/true/) {|m| m }
-      token(/or/) {|m| m }
-      token(/and/) {|m| m }
-      token(/not/) {|m| m }
-      token(/def/) {|m| m }
-      token(/write/) {|m| m }
-      token(/read/) {|m| m }
-      token(/wait/) {|m| m }
-      token(/if/) {|m| m }
-      token(/else/) {|m| m }
-      token(/switch/) {|m| m }
-      token(/case/) {|m| m }
-      token(/while/) {|m| m }
-      token(/for/) {|m| m }
-      token(/init/) {|m| m }
-      token(/run/) {|m| m }
-      token(/in/) {|m| m }
-      token(/prop/) {|m| m }
-      token(/event/) {|m| m }
-      token(/load/) {|m| m }
-      token(/new/) {|m| m }
+      token(/(?<!\w)false(?!\w)/) {|m|m}
+      token(/(?<!\w)true(?!\w)/) {|m| m }
+      token(/(?<!\w)or(?!\w)/) {|m| m }
+      token(/(?<!\w)and(?!\w)/) {|m| m }
+      token(/(?<!\w)not(?!\w)/) {|m| m }
+      token(/(?<!\w)def(?!\w)/) {|m| m }
+      token(/(?<!\w)write(?!\w)/) {|m| m }
+      token(/(?<!\w)read(?!\w)/) {|m| m }
+      token(/(?<!\w)wait(?!\w)/) {|m| m }
+      token(/(?<!\w)if(?!\w)/) {|m| m }
+      token(/(?<!\w)else(?!\w)/) {|m| m }
+      token(/(?<!\w)switch(?!\w)/) {|m| m }
+      token(/(?<!\w)case(?!\w)/) {|m| m }
+      token(/(?<!\w)while(?!\w)/) {|m| m }
+      token(/(?<!\w)for(?!\w)/) {|m| m }
+      token(/(?<!\w)init(?!\w)/) {|m| m }
+      token(/(?<!\w)run(?!\w)/) {|m| m }
+      token(/(?<!\w)in(?!\w)/) {|m| m }
+      token(/(?<!\w)prop(?!\w)/) {|m| m }
+      token(/(?<!\w)event(?!\w)/) {|m| m }
+      token(/(?<!\w)load(?!\w)/) {|m| m }
+      token(/(?<!\w)new(?!\w)/) {|m| m }
       token(/break/) { Break.new() }
       token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
         mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)

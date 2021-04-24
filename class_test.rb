@@ -10,7 +10,7 @@ class EventTest < Test::Unit::TestCase
             event Test { init { i = 2 } run { write(i) } }
             load(Test)'
 
-    assert_equal(nil, gp.parse_string(code))
+    assert_equal(true, gp.parse_string(code))
   end
 
   def test2()
@@ -31,13 +31,13 @@ class EventTest < Test::Unit::TestCase
               }
              }
             load(Test)'
-    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(true, gp.parse_string(code1))
 
 
     code2 = 'write("Expecting 5")
              load(Test)'
 
-    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(true, gp.parse_string(code2))
   end
 
   def test3()
@@ -62,13 +62,13 @@ class EventTest < Test::Unit::TestCase
               }
              }
             load(Test)'
-    assert_equal(nil, gp.parse_string(code1))
+    assert_equal(true, gp.parse_string(code1))
 
 
     code2 = 'write("Expecting 33")
              load(Test)'
 
-    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(true, gp.parse_string(code2))
   end
 end
 

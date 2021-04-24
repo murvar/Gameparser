@@ -7,7 +7,7 @@ prop Player
     attack = a
     defence = d
     health = h
-    slots = {"sword" = nil, "helmet" = nil, "chest" = nil}
+    
   }
 
 }
