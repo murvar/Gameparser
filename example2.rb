@@ -1,5 +1,5 @@
 # coding: utf-8
-type Character
+prop Character
 {
   init(att, agi, hp)
   {

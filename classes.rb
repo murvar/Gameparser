@@ -454,7 +454,7 @@ class Read
     if @string != nil
       puts @string.evaluate()
     end
-    input = gets().chomp()
+    input = STDIN.gets().chomp()
     input
   end
 end
@@ -496,7 +496,7 @@ class Switch
 
   def evaluate()
     for c in @cases
-      if c.value.evaluate() == @idn.evaluate()
+      if c.value.evaluate() == @idn.evaluate().to_i
         return c.evaluate()
       end
     end
