@@ -354,8 +354,13 @@ class Assignment
   end
 
   def evaluate()
-    $variables[$current_scope][@lhs.name] = Variable.new(@rhs.evaluate())
-    $variables[$current_scope][@lhs.name].value
+    if @lhs.class != GIdentifier
+      $variables[$current_scope][@lhs.name] = Variable.new(@rhs.evaluate())
+      $variables[$current_scope][@lhs.name].value
+    else
+      $g_variables[@lhs.name] = Variable.new(@rhs.evaluate())
+      $g_variables[@lhs.name].value
+    end
   end
 end
 
@@ -615,7 +620,11 @@ class InstanceReader
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name].value.vars[@attr.name].evaluate()
+    if @idn.class != GIdentifier
+      $variables[$current_scope][@idn.name].value.vars[@attr.name].evaluate()
+    else
+      $g_variables[@idn.name].value.vars[@attr.name].evaluate()
+    end
   end
 end
 
@@ -627,7 +636,11 @@ class InstanceWriter
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name].value.vars[@attr.name] = @exp.evaluate()
+    if @idn.class != GIdentifier
+      $variables[$current_scope][@idn.name].value.vars[@attr.name] = @exp.evaluate()
+    else
+      $g_variables[@idn.name].value.vars[@attr.name] = @exp.evaluate()
+    end
   end
 end
 
@@ -636,9 +649,6 @@ class Event
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
     @init = init
-    # for obj in @init
-    #   obj.evaluate()
-    # end
     @init.evaluate()
 
     @variables = $variables[$current_scope]
@@ -670,5 +680,22 @@ class Load
   def evaluate()
     $events[@event].evaluate()
     true
+  end
+end
+
+class GIdentifier
+  attr_accessor :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+class GIdentifierNode
+  def initialize(idn)
+    @idn = idn
+  end
+
+  def evaluate()
+    $g_variables[@idn.name].evaluate()
   end
 end

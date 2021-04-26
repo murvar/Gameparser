@@ -55,6 +55,7 @@ class GameLanguage
       token(/>=/){|m| CompOp.new(m) }
       token(/>/){|m| CompOp.new(m)  }
 
+      token(/^\$[a-zA-Z_0-9]*/) {|m| GIdentifier.new(m) }
       # returns variable/function names as an Identifier prop
       token(/^[a-zA-Z][a-zA-Z_0-9]*/) {|m| Identifier.new(m) }
 
@@ -115,7 +116,7 @@ class GameLanguage
       end
 
       rule :param do
-        match(Identifier) {|m| m}
+        match(:identifier) {|m| m}
       end
 
       rule :block do
@@ -132,6 +133,9 @@ class GameLanguage
         match("write", "(", :exp, ")") {|_, _, s, _| Write.new(s)}
         match("write", "(", Identifier, ")") do |_, _, idn, _|
           Write.new(IdentifierNode.new(idn))
+        end
+        match("write", "(", GIdentifier, ")") do |_, _, idn, _|
+          Write.new(GIdentifierNode.new(idn))
         end
         match("write", "(", ")") { Write.new("")}
         match("read", "(", LiteralString, ")") {|_, _, m, _| Read.new(m)}
@@ -159,14 +163,14 @@ class GameLanguage
       end
 
       rule :assignment do
-        match(Identifier, "=", :exp) do |idn, _, exp|
+        match(:identifier, "=", :exp) do |idn, _, exp|
 
           Assignment.new(idn, exp)
         end
-        match(Identifier, "[", Integer, "]", "=", :exp) do |idn, _, index, _, _, exp|
+        match(:identifier, "[", Integer, "]", "=", :exp) do |idn, _, index, _, _, exp|
           ElementWriter.new(idn, index, exp)
         end
-        match(Identifier, ".", Identifier, "=", :exp) do |idn, _, attr, _, exp|
+        match(:identifier, ".", Identifier, "=", :exp) do |idn, _, attr, _, exp|
           InstanceWriter.new(idn, attr, exp)
         end
       end
@@ -238,13 +242,13 @@ class GameLanguage
         match(:array)
         match(:instance)
         match(:instance_reader)
-        match(Identifier) {|m| IdentifierNode.new(m)}
+        match(:identifiernode)
         match(LiteralString)
         match(Range)
       end
 
       rule :array do
-        match(Identifier, "[", Integer, "]") do |idn, _, index, _|
+        match(:identifier, "[", Integer, "]") do |idn, _, index, _|
           ElementReader.new(idn, index)
         end
         match("[", :values, "]") {|_, v, _| List.new(v)}
@@ -258,12 +262,12 @@ class GameLanguage
       end
 
       rule :instance do
-        match(Identifier, ".", "new", "(", :values, ")") { |idn, _, _, _, args, _ |
+        match(:identifier, ".", "new", "(", :values, ")") { |idn, _, _, _, args, _ |
           Instance.new(idn, args)
         }
       end
       rule :instance_reader do
-        match(Identifier, ".", Identifier) { |idn, _, attr, _ |
+        match(:identifier, ".", :identifier) { |idn, _, attr, _ |
           InstanceReader.new(idn, attr)
         }
       end
@@ -298,6 +302,18 @@ class GameLanguage
         match("for", Identifier, "in", Identifier, :block) do |_, i1, _, i2, b|
           For.new(i1, IdentifierNode.new(i2), b)
         end
+        match("for", Identifier, "in", GIdentifier, :block) do |_, i1, _, i2, b|
+          For.new(i1, GIdentifierNode.new(i2), b)
+        end
+      end
+
+      rule :identifier do
+        match(Identifier)
+        match(GIdentifier)
+      end
+      rule :identifiernode do
+        match(Identifier) {|m| IdentifierNode.new(m)}
+        match(GIdentifier) {|m| GIdentifierNode.new(m)}
       end
     end
 

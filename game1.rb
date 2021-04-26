@@ -12,10 +12,10 @@ bossman = Character.new(3, 2, 13)
 minion = Character.new(1, 1, 4)
 $player = Character.new(2, 2, 4)
 
-
+#
 event Forest
 {
-  init(player)
+  init
   {
     chest_opened = false
     boss_defeated = false
@@ -47,7 +47,7 @@ event Forest
       case(4)
         {
           write("You got a rusty sword which gives you +5 attack!")
-          #player.slots[sword] += 5
+          $player.attack = $player.attack + 5
           chest_opened = true
           #load(Forest)
           #continue
@@ -59,7 +59,7 @@ event Forest
        load(Forest)
   }
 }
-# ========================================
-# Huvudprogram
-# ========================================
+# # ========================================
+# # Huvudprogram
+# # ========================================
 load(Forest)
