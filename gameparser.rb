@@ -5,6 +5,7 @@ require './classes'
 
 $current_scope = 0
 $variables = [Hash.new()]
+$g_variables = Hash.new()
 $functions = Hash.new()
 $props = Hash.new()
 $events = Hash.new()

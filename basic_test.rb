@@ -7,14 +7,14 @@ class SimpleTest < Test::Unit::TestCase
 
   def test1
     gp = GameLanguage.new
-  
+
     assert_equal(1, gp.parse_string("1"))
     assert_equal(123, gp.parse_string("123"))
     assert_equal(888, gp.parse_string("888"))
     assert_equal(10000, gp.parse_string("10000"))
     assert_equal(100000000, gp.parse_string("100000000"))
   end
-  
+
   def test2
     gp = GameLanguage.new
 
@@ -25,7 +25,7 @@ class SimpleTest < Test::Unit::TestCase
     assert_equal("Hey!", gp.parse_string('"Hey!"'))
     assert_equal("###Bye", gp.parse_string('"###Bye"'))
   end
-  
+
   def test3
     gp = GameLanguage.new
 
@@ -43,7 +43,7 @@ class SimpleTest < Test::Unit::TestCase
     assert_equal([true, true, false], gp.parse_string("[true,true,false]"))
     assert_equal([1, "a", true], gp.parse_string("[1,'a',true]"))
   end
-end 
+end
 
 class SimpleArithmetic < Test::Unit::TestCase
   def test_addition
@@ -75,7 +75,7 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-1, gp.parse_string("1 -2"))
     assert_equal(-4, gp.parse_string("1 -2-2 - 1"))
   end
-  
+
   def test_multiplication
     gp = GameLanguage.new
 
@@ -85,7 +85,7 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(-10, gp.parse_string("10 *-1"))
     assert_equal(3300, gp.parse_string("33* 100"))
   end
-   
+
   def test_division
     gp = GameLanguage.new
 
@@ -94,7 +94,7 @@ class SimpleArithmetic < Test::Unit::TestCase
     assert_equal(10, gp.parse_string("20 /2"))
     assert_equal(-10, gp.parse_string("10 /-1"))
     assert_equal(0, gp.parse_string("33/ 100")) # Integer division
-  end 
+  end
 end
 
 class ArithmeticPriority < Test::Unit::TestCase
@@ -292,10 +292,10 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal(false, gp.parse_string(" value = false or (not(true or false))"))
     assert_equal(false, gp.parse_string(" value"))
   end
-  
+
   def test_lista
     gp = GameLanguage.new
-    
+
     assert_equal([23, 11, 578], gp.parse_string("l = [23, 11, 578]"))
     assert_equal([23, 11, 578], gp.parse_string("l"))
     assert_equal(23, gp.parse_string("l[0]"))
@@ -308,7 +308,7 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal([1, 2, 578], gp.parse_string("l"))
     assert_equal(3, gp.parse_string("l[2] = 3"))
     assert_equal([1, 2, 3], gp.parse_string("l"))
-    
+
 
     assert_equal([true, false, true], gp.parse_string("l2 = [true, false, true]"))
     assert_equal([true, false, true], gp.parse_string("l2"))
@@ -323,20 +323,20 @@ class Variable_assignment < Test::Unit::TestCase
     assert_equal(true, gp.parse_string("l2[2] = true"))
     assert_equal([true, true, true], gp.parse_string("l2"))
 
-    
+
     assert_equal(["a", "b", "c"], gp.parse_string('l3 = ["a","b","c"]'))
     assert_equal(["a", "b", "c"], gp.parse_string("l3"))
     assert_equal("a", gp.parse_string("l3[0]"))
     assert_equal("b", gp.parse_string("l3[1]"))
     assert_equal("c", gp.parse_string("l3[2]"))
-    
+
     assert_equal("x", gp.parse_string('l3[0] = "x"'))
     assert_equal(["x", "b", "c"], gp.parse_string("l3"))
     assert_equal("y", gp.parse_string('l3[1] = "y"'))
     assert_equal(["x", "y", "c"], gp.parse_string("l3"))
     assert_equal("z", gp.parse_string('l3[2] = "z"'))
     assert_equal(["x", "y", "z"], gp.parse_string("l3"))
-    
+
   end
 end
 
@@ -420,33 +420,43 @@ class WriteTest < Test::Unit::TestCase
    end
 end
 
-# class SwitchTest < Test::Unit::TestCase
-#   def test1()
-#     gp = GameLanguage.new
-#     puts "Test "
+class SwitchTest < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new
+    puts "Test "
 
-#     code = ''
-    
-#     assert_equal(, gp.parse_string(code))
-#   end
+    code = 'i = 2
+            switch(i)
+            case(1)
+              {
+                write("i is one.")
+              }
+            case(1)
+              {
+                write("i is 2.")
+              }
+            write("Hello")'
 
-#   def test2()
-#     gp = GameLanguage.new
-#     puts "Test 2"
+    assert_equal(nil, gp.parse_string(code))
+  end
 
-#     code = ''
-    
-#     assert_equal(, gp.parse_string(code))
-#   end
+  # def test2()
+  #   gp = GameLanguage.new
+  #   puts "Test 2"
+  #
+  #   code = ''
+  #
+  #   assert_equal(, gp.parse_string(code))
+  # end
+end
 
-  
 
 class IfTest < Test::Unit::TestCase
   def test1()
     gp = GameLanguage.new
 
     code = "x = 1
-           if x <10 
+           if x <10
            {
                 'low'
            }
@@ -456,7 +466,7 @@ class IfTest < Test::Unit::TestCase
            }"
 
     assert_equal("low", gp.parse_string(code))
-    
+
     code = "x = 10
            if x <10
            {
@@ -479,11 +489,11 @@ class WhileTest < Test::Unit::TestCase
             {
               i = i + 1
             }"
-    
+
     assert_equal(nil , gp.parse_string(code))
     assert_equal(5, gp.parse_string("i"))
   end
-  
+
   def test2()
     gp = GameLanguage.new
 
@@ -492,10 +502,10 @@ class WhileTest < Test::Unit::TestCase
             {
               i = i + 1
             }"
-    
+
     assert_equal(nil, gp.parse_string(code))
     assert_equal(10, gp.parse_string("i"))
-    
+
   end
 
   def test3()
@@ -511,11 +521,11 @@ class WhileTest < Test::Unit::TestCase
                 bool = false
               }
             }"
-    
+
     assert_equal(nil, gp.parse_string(code))
     assert_equal(false, gp.parse_string("bool"))
     assert_equal(6, gp.parse_string("i"))
-    
+
   end
 
   def test3_break()
@@ -530,28 +540,28 @@ class WhileTest < Test::Unit::TestCase
                 break
               }
             }"
-    
+
     assert_equal(nil, gp.parse_string(code))
     assert_equal(11, gp.parse_string("i"))
-    
+
   end
 end
 
 class ForTest < Test::Unit::TestCase
   def test1_literal_list()
     gp = GameLanguage.new()
-  
+
     code1 = "sum = 0
-            for i in [1, 2, 3] 
+            for i in [1, 2, 3]
             {
                 sum = sum + i
             }
             "
-    
+
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(6, gp.parse_string("sum"))
 
-    code2 = "for i in [1, 2, 3] 
+    code2 = "for i in [1, 2, 3]
             {
                 sum = sum + i
             }
@@ -559,7 +569,7 @@ class ForTest < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code2))
     assert_equal(12, gp.parse_string("sum"))
   end
-  
+
   def test2_list()
     gp = GameLanguage.new()
 
@@ -570,7 +580,7 @@ class ForTest < Test::Unit::TestCase
                 sum = sum + i
             }
             "
-    
+
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(6, gp.parse_string("sum"))
 
@@ -592,7 +602,7 @@ class ForTest < Test::Unit::TestCase
                 sum = sum + i
             }
             "
-    
+
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(15, gp.parse_string("sum"))
 
@@ -623,7 +633,7 @@ class ForTest < Test::Unit::TestCase
                 sum = sum + i
             }
             "
-    
+
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(15, gp.parse_string("sum"))
 
@@ -635,7 +645,7 @@ class ForTest < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code2))
     assert_equal(30, gp.parse_string("sum"))
   end
-  
+
   def test5_range_descending()
     gp = GameLanguage.new()
 
@@ -646,9 +656,9 @@ class ForTest < Test::Unit::TestCase
                 write(i)
             }
             '
-    
+
     assert_equal(nil, gp.parse_string(code1))
-    
+
     code1 = 'write("Printing numbers in range(-2..2)")
             r = (-2..2)
             for i in r
@@ -656,9 +666,9 @@ class ForTest < Test::Unit::TestCase
                 write(i)
             }
             '
-    
+
     assert_equal(nil, gp.parse_string(code1))
-    
+
     code1 = 'write("Printing numbers in range(-4..-1)")
             r = (-4..-1)
             for i in r
@@ -666,7 +676,7 @@ class ForTest < Test::Unit::TestCase
                 write(i)
             }
             '
-    
+
     assert_equal(nil, gp.parse_string(code1))
 
     code1 = 'write("Printing numbers in range(4...0)")
@@ -676,10 +686,10 @@ class ForTest < Test::Unit::TestCase
                 write(i)
             }
             '
-    
+
     assert_equal(nil, gp.parse_string(code1))
   end
-  
+
   def test6_nested()
     gp = GameLanguage.new()
 
@@ -687,7 +697,7 @@ class ForTest < Test::Unit::TestCase
             for x in [1, 2, 3]
             {
                  for y in [1, 2, 3]
-                 {    
+                 {
                       result = result + (x * y)
                  }
             }
@@ -695,7 +705,7 @@ class ForTest < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(36, gp.parse_string("result"))
   end
-  
+
   def test7_break()
     gp = GameLanguage.new()
 
@@ -713,7 +723,7 @@ class ForTest < Test::Unit::TestCase
     assert_equal(2, gp.parse_string("result"))
   end
 
-  
+
 end
 
 # ============================================================
