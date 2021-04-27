@@ -90,12 +90,13 @@ class GameLanguage
 
       rule :prop do
         match("prop", Identifier, "{", :init, "}") {|_, idn, _, i, _|
-          $props[idn.name] = Prop.new(i[0], i[1])}
+          $props[idn.name] = Prop.new(idn, i[0], i[1])
+        }
       end
 
       rule :event do
         match("event", Identifier, "{", :init, "run", :block, "}") do |_, idn, _, i, _, b, _|
-          $events[idn.name]= Event.new(i, b)
+          $events[idn.name] = Event.new(i, b)
         end
       end
 
@@ -173,7 +174,7 @@ class GameLanguage
           ElementWriter.new(idn, index, exp)
         end
         match(:identifier, ".", Identifier, "=", :exp) do |idn, _, attr, _, exp|
-          InstanceWriter.new(idn, attr, exp)
+          AttributeWriter.new(idn, attr, exp)
         end
       end
 
@@ -240,14 +241,11 @@ class GameLanguage
         match("+", "(", :math_exp , ")") {|_, _, m, _| m }
         match("-", "(", :math_exp , ")") {|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :exp , ")") {|_, m, _| m }
-
         match(:function_call)
         match(:array)
-        match(:instance)
+        match(:instancering)
         match(:instance_reader)
-
         match(:identifiernode)
-
         match(LiteralString)
         match(Range)
       end
@@ -266,14 +264,14 @@ class GameLanguage
         match(:empty)  {|m| [] }
       end
 
-      rule :instance do
-        match(:identifier, ".", "new", "(", :values, ")") { |idn, _, _, _, args, _ |
-          Instance.new(idn, args)
-        }
+      rule :instancering do
+        match(:identifier, ".", "new", "(", :values, ")") do |idn, _, _, _, args, _ |
+          Instancering.new(idn, args)
+        end
       end
       rule :instance_reader do
         match(:identifier, ".", :identifier) { |idn, _, attr, _ |
-          InstanceReader.new(idn, attr)
+          AttributeReader.new(idn, attr)
         }
       end
 
@@ -367,7 +365,3 @@ if __FILE__ == $0
     gp.parse_string(file)
   end
 end
-
-# file = File.read(ARGV[0])
-# gp = GameLanguage.new()
-# gp.parse_string(file)

@@ -565,13 +565,13 @@ class Break
 end
 
 class Prop
-  attr_accessor :vars
-  def initialize(params, block)
+  def initialize(idn, params, block)
+    @idn = idn
     @params = params
     @block = block
     @vars = Hash.new()
   end
-
+  
   def evaluate(values)
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
@@ -594,11 +594,12 @@ class Prop
 
     $current_scope -= 1
     $variables.pop()
-    self
+
+    ObjectNode.new(@vars)
   end
 end
 
-class Instance
+class Instancering
   def initialize(idn, values)
     @idn = idn
     @values = values
@@ -613,7 +614,7 @@ class Instance
   end
 end
 
-class InstanceReader
+class AttributeReader
   def initialize(idn, attr)
     @idn = idn
     @attr = attr
@@ -628,7 +629,7 @@ class InstanceReader
   end
 end
 
-class InstanceWriter
+class AttributeWriter
   def initialize(idn, attr, exp)
     @idn = idn
     @attr = attr
@@ -641,6 +642,13 @@ class InstanceWriter
     else
       $g_variables[@idn.name].value.vars[@attr.name] = @exp.evaluate()
     end
+  end
+end
+
+class ObjectNode
+  attr_accessor :vars
+  def initialize(vars)
+    @vars = vars
   end
 end
 

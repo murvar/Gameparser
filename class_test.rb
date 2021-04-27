@@ -121,3 +121,41 @@ class EventTraverse < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code))    
   end
 end
+
+
+class PropTest < Test::Unit::TestCase
+  def test1()
+    gp = GameLanguage.new
+
+    code = 'prop character
+            {
+              init(hp, n)
+              {
+                health = hp
+                name = n
+              }
+            }'
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(true, gp.parse_string('player = character.new(100, "Hadi") true'))
+    assert_equal(true, gp.parse_string('enemy = character.new(30, "Minion") true'))
+
+    assert_equal(100, gp.parse_string('player.health'))
+    assert_equal("Hadi", gp.parse_string('player.name'))
+
+    assert_equal(30, gp.parse_string('enemy.health'))
+    assert_equal("Minion", gp.parse_string('enemy.name'))
+
+    assert_equal(250, gp.parse_string('player.health = 250'))
+    assert_equal(250, gp.parse_string('player.health'))
+    assert_equal("Vincent", gp.parse_string('player.name = "Vincent"'))
+    assert_equal("Vincent", gp.parse_string('player.name'))
+
+    assert_equal(50, gp.parse_string('enemy.health = 50'))
+    assert_equal(50, gp.parse_string('enemy.health'))
+    assert_equal("Big Boss", gp.parse_string('enemy.name = "Big Boss"'))
+    assert_equal("Big Boss", gp.parse_string('enemy.name'))
+
+    assert_equal(250, gp.parse_string('player.health'))
+    assert_equal("Vincent", gp.parse_string('player.name'))
+  end
+end

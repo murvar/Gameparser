@@ -9,9 +9,6 @@ prop Character
   }
 }
 
-# bossman = Character.new("Bossman",3, 2, 13)
-# ghost = Character.new("Ghost",3, 2, 13)
-# minion = Character.new("Minion",1, 1, 4)
 $player = Character.new("Vincent", 2, 2, 4)
 
 def battle (player, enemy) {
@@ -49,7 +46,6 @@ event room {
 
 }
 
-
 event yard {
   init {ghost = Character.new("Ghost",3, 2, 13)}
   run {
@@ -78,4 +74,5 @@ event yard {
   }
 
 }
+
 load(room)
