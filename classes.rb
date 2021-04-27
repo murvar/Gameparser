@@ -305,7 +305,7 @@ class Function
     $variables[$current_scope] = Hash.new()
     counter = 0
     @params.each do |p|
-      $variables[$current_scope][p.name] = Variable.new(values[counter].evaluate())
+      $variables[$current_scope][p.name] = Variable.new(values[counter])
       counter += 1
     end
     result = @block.evaluate()
@@ -605,6 +605,10 @@ class Instance
   end
 
   def evaluate()
+
+    for v in @values
+      puts v.evaluate
+    end
     values = []
     for value in @values
       values << value.evaluate()
