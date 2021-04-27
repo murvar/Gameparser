@@ -605,10 +605,6 @@ class Instance
   end
 
   def evaluate()
-
-    for v in @values
-      puts v.evaluate
-    end
     values = []
     for value in @values
       values << value.evaluate()

@@ -42,6 +42,7 @@ class GameLanguage
       token(/(?<!\w)event(?!\w)/) {|m| m }
       token(/(?<!\w)load(?!\w)/) {|m| m }
       token(/(?<!\w)new(?!\w)/) {|m| m }
+      #token(/(?<!\w)str\((?![a-zA-Z])/) {|m| m }
       token(/(?<!\w)str(?!\w)/) {|m| m }
       token(/break/) { Break.new() }
       token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
@@ -239,11 +240,14 @@ class GameLanguage
         match("+", "(", :math_exp , ")") {|_, _, m, _| m }
         match("-", "(", :math_exp , ")") {|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :exp , ")") {|_, m, _| m }
+
         match(:function_call)
         match(:array)
         match(:instance)
         match(:instance_reader)
+
         match(:identifiernode)
+
         match(LiteralString)
         match(Range)
       end

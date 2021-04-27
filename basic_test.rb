@@ -479,7 +479,7 @@ class SwitchTest < Test::Unit::TestCase
               {
                 write("i is one.")
                 k = 1
-                str = "Test string"
+                str2 = "Test string"
               }
             case(2)
               {

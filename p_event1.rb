@@ -1,24 +1,3 @@
-<<<<<<< HEAD
-def battle (player, enemy) {
-  # write("You enter a battle with a " + enemy.name)
-  # wait(2)
-  # while player.health and enemy.health > 0 {
-  #   write("1. Attack " + enemy.name)
-  #   choice = read("2. Run away")
-  #   switch(choice)
-  #   case (1) {
-  #     write("You deal " + (player.attack - enemy.defence) + "damage to " + enemy.name)
-  #     enemy.health = enemy.health - (player.attack - enemy.defence)
-  #     if enemy.health > 0 {
-  #       write(enemy.name + " attacks back dealing " + (enemy.attack - player.defence) + " damage to you")
-  #       player.health = player.health - (enemy.attack - player.defence)
-  #     }
-  #   }
-  #   case (2)  {
-  #     load(yard)
-  #   }
-  # }
-=======
 prop Character
 {
   init(n, att, d, hp)
@@ -43,10 +22,10 @@ def battle (player, enemy) {
     choice = read("2. Run away")
     switch(choice)
     case (1) {
-      write("You deal " + (player.attack - enemy.defence) + "damage to " + enemy.name)
+      write("You deal " + str(player.attack - enemy.defence) + "damage to " + enemy.name)
       enemy.health = enemy.health - (player.attack*2 - enemy.defence)
       if enemy.health > 0 {
-        write(enemy.name + " attacks back dealing " + (enemy.attack - player.defence) + " damage to you")
+        write(enemy.name + " attacks back dealing " + str(enemy.attack - player.defence) + " damage to you")
         player.health = player.health - (enemy.attack - player.defence)
       }
     }
@@ -54,7 +33,6 @@ def battle (player, enemy) {
       load(yard)
     }
   }
->>>>>>> 998fe64a5674f2e88e180684f77b47580cfc1468
 }
 
 event room {
@@ -83,22 +61,14 @@ event yard {
       load(room)
     }
     case (2) {
-<<<<<<< HEAD
-      write("The ghost waves for you to come closer")
-=======
       #wait(3)
       write("The ghost waves for you to come closer")
       #wait(2)
->>>>>>> 998fe64a5674f2e88e180684f77b47580cfc1468
       write("1. Go towards it")
       choice = read("2. Run back into the house")
       switch(choice)
       case (1)  {
-<<<<<<< HEAD
-        battle(player, ghost)
-=======
         battle($player, ghost)
->>>>>>> 998fe64a5674f2e88e180684f77b47580cfc1468
       }
       case (2) {
         load(room)
