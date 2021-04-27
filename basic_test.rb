@@ -340,6 +340,36 @@ class Variable_assignment < Test::Unit::TestCase
   end
 end
 
+class GlobalVars < Test::Unit::TestCase
+  def test1_assignment()
+    gp = GameLanguage.new
+    puts "Global variable assignment test:"
+
+    assert_equal(1 , gp.parse_string("$my_int = 1"))
+    assert_equal(1 , gp.parse_string("$my_int"))
+
+    assert_equal(true , gp.parse_string("$my_bool = true"))
+    assert_equal(true , gp.parse_string("$my_bool"))
+
+    assert_equal("Hello" , gp.parse_string('$my_str = "Hello"'))
+    assert_equal("Hello" , gp.parse_string('$my_str'))
+  end
+
+  def test2_access()
+    gp = GameLanguage.new
+    puts "Global variable access test:"
+    code = '$i = 22
+           def function1()
+           {
+                k = $i + 2
+                k
+           }'
+
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(24 , gp.parse_string("function1()"))
+  end
+end
+
 class MultipleLine < Test::Unit::TestCase
   def test_mini()
     gp = GameLanguage.new
@@ -423,7 +453,6 @@ end
 class SwitchTest < Test::Unit::TestCase
   def test1()
     gp = GameLanguage.new
-    puts "Test "
 
     code = 'i = 2
             switch(i)
@@ -431,7 +460,7 @@ class SwitchTest < Test::Unit::TestCase
               {
                 write("i is one.")
               }
-            case(1)
+            case(2)
               {
                 write("i is 2.")
               }
@@ -440,14 +469,29 @@ class SwitchTest < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code))
   end
 
-  # def test2()
-  #   gp = GameLanguage.new
-  #   puts "Test 2"
-  #
-  #   code = ''
-  #
-  #   assert_equal(, gp.parse_string(code))
-  # end
+  def test2()
+    gp = GameLanguage.new
+
+    code = 'i = 2
+            k = 0
+            switch(i)
+            case(1)
+              {
+                write("i is one.")
+                k = 1
+                str = "Test string"
+              }
+            case(2)
+              {
+                write("i is 2.")
+                k = 2
+                m = 100
+              }'
+
+     assert_equal(100, gp.parse_string(code))
+     assert_equal(2, gp.parse_string("k"))
+     assert_equal(100, gp.parse_string("m"))
+  end
 end
 
 

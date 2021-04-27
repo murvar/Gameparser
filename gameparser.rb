@@ -164,7 +164,6 @@ class GameLanguage
 
       rule :assignment do
         match(:identifier, "=", :exp) do |idn, _, exp|
-
           Assignment.new(idn, exp)
         end
         match(:identifier, "[", Integer, "]", "=", :exp) do |idn, _, index, _, _, exp|
@@ -183,7 +182,7 @@ class GameLanguage
       end
 
       rule :bool_exp do
-        match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs|
+        match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs| #finns det bättre lösning?
           case c.op
           when "<=" then
             LessEqual.new(lhs, rhs)
