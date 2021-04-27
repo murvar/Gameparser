@@ -42,8 +42,8 @@ class GameLanguage
       token(/(?<!\w)event(?!\w)/) {|m| m }
       token(/(?<!\w)load(?!\w)/) {|m| m }
       token(/(?<!\w)new(?!\w)/) {|m| m }
-      #token(/(?<!\w)str\((?![a-zA-Z])/) {|m| m }
       token(/(?<!\w)str(?!\w)/) {|m| m }
+      token(/(?<!\w)cls(?!\w)/) {|m| m }
       token(/break/) { Break.new() }
       token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
         mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)
@@ -146,6 +146,7 @@ class GameLanguage
         match("wait", "(", Integer, ")") {|_, _, s, _| Wait.new(s)}
         match("load", "(", Identifier, ")") {|_, _, idn, _| Load.new(idn.name)}
         match("str", "(", :exp, ")") {|_, _, exp, _| ToString.new(exp)}
+        match("cls", "(", ")") { Clear.new()}
       end
 
       rule :statements do

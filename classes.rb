@@ -717,3 +717,9 @@ class ToString
     @exp.evaluate().to_s
   end
 end
+
+class Clear
+  def evaluate()
+    system('clear')
+  end
+end
