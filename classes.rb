@@ -305,7 +305,7 @@ class Function
     $variables[$current_scope] = Hash.new()
     counter = 0
     @params.each do |p|
-      $variables[$current_scope][p.name] = Variable.new(values[counter].evaluate())
+      $variables[$current_scope][p.name] = Variable.new(values[counter])
       counter += 1
     end
     result = @block.evaluate()
@@ -697,5 +697,15 @@ class GIdentifierNode
 
   def evaluate()
     $g_variables[@idn.name].evaluate()
+  end
+end
+
+class ToString
+  def initialize(exp)
+    @exp = exp
+  end
+
+  def evaluate()
+    @exp.evaluate().to_s
   end
 end
