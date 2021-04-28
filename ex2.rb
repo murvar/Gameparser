@@ -1,3 +1,4 @@
+read("hello")
 prop Character
 {
   init(n, att, d, hp)
@@ -50,10 +51,10 @@ event yard
     write("You are in a dark yard. Behind a dead tree you can see a ghost peeking out.")
     write("1. Go back to the house")
     write("2. Wave to the ghost")
-    
+
     choice = read()
     cls()
-    
+
     switch(choice)
     case (1)
     {
@@ -66,10 +67,10 @@ event yard
       #wait(2)
       write("1. Go towards it")
       write("2. Run back into the house")
-      
+
       choice = read()
       cls()
-      
+
       switch(choice)
       case (1)
       {
@@ -94,7 +95,7 @@ def battle (enemy) {
     write("2. Run away")
     choice = read()
     cls()
-    
+
     switch(choice)
     case (1)
     {
@@ -109,10 +110,10 @@ def battle (enemy) {
       }
       else
       {
-        cls()  
+        cls()
         write("Excellent! You defeated the ghost and won the game...")
       }
-        
+
     }
     case (2)
     {

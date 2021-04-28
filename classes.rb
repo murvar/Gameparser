@@ -326,7 +326,11 @@ class FunctionCall
     for value in @values
       values << value.evaluate()
     end
-    $functions[@idn.name].evaluate(values)
+    if $functions[@idn.name] == nil
+      raise "#{@idn.name}() is not a defined function"
+    else
+      $functions[@idn.name].evaluate(values)
+    end
   end
 end
 
@@ -401,7 +405,11 @@ class IdentifierNode
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name].evaluate()
+    if $variables[$current_scope][@idn.name] == nil
+      raise "Unknown variable '#{@idn.name}'"
+    else
+      $variables[$current_scope][@idn.name].evaluate()
+    end
   end
 end
 
@@ -483,6 +491,9 @@ class If
   end
 
   def evaluate()
+    if @exp.evaluate() != true and @exp.evaluate() != false
+      raise "If statement needs a bool"
+    end
     if @exp.evaluate()
       @block.evaluate
     else
@@ -527,6 +538,9 @@ class While
   end
 
   def evaluate()
+    if @exp.evaluate().class != TrueClass and FalseClass
+      raise "While loop needs a bool"
+    end
     while @exp.evaluate
       temp = @block.evaluate
       if temp == Break
@@ -545,6 +559,9 @@ class For
   end
 
   def evaluate()
+    if @iterable.evaluate().length == 0
+      raise "For loop needs something to iterate over"
+    end
     for var in @iterable.evaluate()
       $variables[$current_scope][@identifier.name] = Variable.new(var)
       temp = @block.evaluate()
@@ -571,8 +588,14 @@ class Prop
     @block = block
     @vars = Hash.new()
   end
-  
+
   def evaluate(values)
+    if values.length() < @params.length()
+      raise "Instance of '#{@idn.name}' missing #{@params.length() - values.length()} arguments"
+    elsif values.length() > @params.length()
+      raise "Instance of '#{@idn.name}' has #{values.length() - @params.length()} arguments to many"
+    end
+
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
     counter = 0
@@ -664,12 +687,12 @@ class Event
     $current_scope += 1
     $variables[$current_scope] = Hash.new()
     $variables[$current_scope] = @variables
-    
+
     if not @initiated
       @init.evaluate()
       @initiated = true
     end
-    
+
     @block.evaluate()
 
     @variables = $variables[$current_scope]
@@ -687,8 +710,12 @@ class Load
   end
 
   def evaluate()
-    $events[@event].evaluate()
-    true
+    if $events[@event] == nil
+      raise "Can't load event '#{@event}'. Unknown event"
+    else
+      $events[@event].evaluate()
+      true
+    end
   end
 end
 
@@ -705,7 +732,11 @@ class GIdentifierNode
   end
 
   def evaluate()
-    $g_variables[@idn.name].evaluate()
+    if $g_variables[@idn.name] == nil
+      raise "Unknown global variable '#{@idn.name}'"
+    else
+      $g_variables[@idn.name].evaluate()
+    end
   end
 end
 

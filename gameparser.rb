@@ -97,7 +97,7 @@ class GameLanguage
       rule :event do
         match("event", Identifier, "{", :init, "run", :block, "}") do |_, idn, _, i, _, b, _|
           if i.class == Array
-            #throw...
+            raise "Event '#{idn.name}' should not have parameters"
           end
           $events[idn.name] = Event.new(i, b)
         end
@@ -134,19 +134,18 @@ class GameLanguage
         match(Identifier, "(", :values, ")") do |idn, _, args, _|
           FunctionCall.new(idn, args)
         end
-
-        match("write", "(", LiteralString, ")") {|_, _, s, _| Write.new(s)}
-        match("write", "(", :exp, ")") {|_, _, s, _| Write.new(s)}
         match("write", "(", Identifier, ")") do |_, _, idn, _|
           Write.new(IdentifierNode.new(idn))
         end
         match("write", "(", GIdentifier, ")") do |_, _, idn, _|
           Write.new(GIdentifierNode.new(idn))
         end
+        match("write", "(", :exp, ")") {|_, _, s, _| Write.new(s)}
         match("write", "(", ")") { Write.new("")}
-        match("read", "(", LiteralString, ")") {|_, _, m, _| Read.new(m)}
+        match("read", "(", :exp, ")") {|_, _, m, _| Read.new(m)}
         match("read", "(", ")") {|_, _, _| Read.new()}
         match("wait", "(", Integer, ")") {|_, _, s, _| Wait.new(s)}
+        match("wait") {raise "Wait takes a positive integer as argument"}
         match("load", "(", Identifier, ")") {|_, _, idn, _| Load.new(idn.name)}
         match("str", "(", :exp, ")") {|_, _, exp, _| ToString.new(exp)}
         match("cls", "(", ")") { Clear.new()}
@@ -291,6 +290,7 @@ class GameLanguage
 
       rule :switch do
         match("switch", "(", :exp, ")", :cases) {|_, _, val, _, cases| Switch.new(val, cases)}
+        match("switch", "(", :exp, ")") {raise "Switch needs at least one case"}
       end
 
       rule :cases do
