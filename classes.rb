@@ -654,21 +654,22 @@ end
 
 class Event
   def initialize(init, block)
-    $current_scope += 1
-    $variables[$current_scope] = Hash.new()
     @init = init
-    @init.evaluate()
-
-    @variables = $variables[$current_scope]
-    $current_scope -= 1
-    $variables.pop()
     @block = block
+    @variables = Hash.new()
+    @initiated = false
   end
 
   def evaluate()
     $current_scope += 1
+    $variables[$current_scope] = Hash.new()
     $variables[$current_scope] = @variables
-
+    
+    if not @initiated
+      @init.evaluate()
+      @initiated = true
+    end
+    
     @block.evaluate()
 
     @variables = $variables[$current_scope]

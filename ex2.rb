@@ -12,11 +12,19 @@ prop Character
 event room
   {
 
-  init {}
+    init {
+      write("Hello " + $player.name + ". Try to survive in this world!")
+      write("Your stats")
+      write("=" * 30)
+      write("Attack : " + str($player.attack))
+      write("Defence : " + str($player.defence))
+      write("health : " + str($player.health))
+      write()
+    }
 
   run
   {
-    write("You are in an empty room")
+    write("You are in an empty room.")
     choice = read("1. Go to the yard")
     cls()
 
