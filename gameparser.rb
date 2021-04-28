@@ -96,6 +96,9 @@ class GameLanguage
 
       rule :event do
         match("event", Identifier, "{", :init, "run", :block, "}") do |_, idn, _, i, _, b, _|
+          if i.class == Array
+            #throw...
+          end
           $events[idn.name] = Event.new(i, b)
         end
       end
