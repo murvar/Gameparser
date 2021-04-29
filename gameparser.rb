@@ -58,13 +58,13 @@ class GameLanguage
       token(/>/){|m| CompOp.new(m)  }
 
       token(/^\$[a-zA-Z_0-9]*/) {|m| GIdentifier.new(m) }
-      # returns variable/function names as an Identifier prop
+      # returns variable/function names as an Identifier object
       token(/^[a-zA-Z][a-zA-Z_0-9]*/) {|m| Identifier.new(m) }
 
       token(/((?<![\\])['"])((?:.(?!(?<![\\])\1))*.?)\1/) do |m|
         m = m[1...-1]
         LiteralString.new(m)
-      end # returns a LiteralString prop
+      end # returns a LiteralString object
 
       token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
@@ -185,8 +185,8 @@ class GameLanguage
       end
 
       rule :exp do
-        match(:bool_exp, "and", :exp) {|lhs, _, rhs| And.new(lhs, rhs) }
-        match(:bool_exp, "or", :exp) {|lhs, _, rhs| Or.new(lhs, rhs) }
+        match(:exp, "and", :bool_val) {|lhs, _, rhs| And.new(lhs, rhs) }
+        match(:exp, "or", :bool_val) {|lhs, _, rhs| Or.new(lhs, rhs) }
         match("not", :exp) {|_, m, _| Not.new(m) }
         match(:bool_exp) {|m| m}
       end

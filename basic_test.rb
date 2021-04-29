@@ -24,6 +24,11 @@ class SimpleTest < Test::Unit::TestCase
     assert_equal("Hello World", gp.parse_string('"Hello World"'))
     assert_equal("Hey!", gp.parse_string('"Hey!"'))
     assert_equal("###Bye", gp.parse_string('"###Bye"'))
+    assert_equal("Hallå där!", gp.parse_string('"Hallå där!"'))
+    assert_equal("ÄÖÅ äöå!", gp.parse_string('"ÄÖÅ äöå!"'))
+    assert_equal("2 + 2 / 0", gp.parse_string('"2 + 2 / 0"'))
+    assert_equal("false", gp.parse_string('"false"'))
+    assert_equal("def t()", gp.parse_string('"def t()"'))
   end
 
   def test3
@@ -147,6 +152,8 @@ class LogicalExpressionPriority < Test::Unit::TestCase
     assert_equal(true, gp.parse_string("(true and false) or true"))
     assert_equal(false, gp.parse_string("(true and false) and ( false and true)"))
     assert_equal(true, gp.parse_string("(true and false) or ( (false or true) and true)"))
+    assert_equal(true, gp.parse_string("false and true or true"))
+    assert_equal(false, gp.parse_string("false and true or true and false"))
   end
 end
 
