@@ -90,6 +90,9 @@ class GameLanguage
 
       rule :prop do
         match("prop", Identifier, "{", :init, "}") {|_, idn, _, i, _|
+          if i.class != Array
+            raise "Missed parentheses for init while defining prop '#{idn.name}'"
+          end
           $props[idn.name] = Prop.new(idn, i[0], i[1])
         }
       end
@@ -146,7 +149,7 @@ class GameLanguage
         match("read", "(", ")") {|_, _, _| Read.new()}
         match("wait", "(", Integer, ")") {|_, _, s, _| Wait.new(s)}
         match("wait") {raise "Wait takes a positive integer as argument"}
-        match("load", "(", Identifier, ")") {|_, _, idn, _| Load.new(idn.name)}
+        match("load", "(", Identifier, ")") { |_, _, idn, _| Load.new(idn.name) }
         match("str", "(", :exp, ")") {|_, _, exp, _| ToString.new(exp)}
         match("cls", "(", ")") { Clear.new()}
       end

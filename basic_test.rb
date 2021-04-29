@@ -217,7 +217,7 @@ class BoolLogic < Test::Unit::TestCase
 
     assert_equal(false, gp.parse_string("(12 > 100) and (100 < 2)" ))
     assert_equal(false, gp.parse_string("not ((12 > 10) or (100 < 2))"))
-    assert_equal(true , gp.parse_string("(2 == 2) and (100 >= 2)"))
+    assert_equal(true, gp.parse_string("(2 == 2) and (100 >= 2)"))
   end
 end
 
@@ -343,30 +343,80 @@ end
 class GlobalVars < Test::Unit::TestCase
   def test1_assignment()
     gp = GameLanguage.new
-    puts "Global variable assignment test:"
 
-    assert_equal(1 , gp.parse_string("$my_int = 1"))
-    assert_equal(1 , gp.parse_string("$my_int"))
+    assert_equal(1, gp.parse_string("$my_int = 1"))
+    assert_equal(1, gp.parse_string("$my_int"))
 
-    assert_equal(true , gp.parse_string("$my_bool = true"))
-    assert_equal(true , gp.parse_string("$my_bool"))
+    assert_equal(true, gp.parse_string("$my_bool = true"))
+    assert_equal(true, gp.parse_string("$my_bool"))
 
-    assert_equal("Hello" , gp.parse_string('$my_str = "Hello"'))
-    assert_equal("Hello" , gp.parse_string('$my_str'))
+    assert_equal("Hello", gp.parse_string('$my_str = "Hello"'))
+    assert_equal("Hello", gp.parse_string('$my_str'))
   end
 
   def test2_access()
     gp = GameLanguage.new
-    puts "Global variable access test:"
+      
     code = '$i = 22
-           def function1()
+           def function1(p)
            {
-                k = $i + 2
-                k
+                p = $i + p
+                p
            }'
 
     assert_equal(nil, gp.parse_string(code))
-    assert_equal(24 , gp.parse_string("function1()"))
+    assert_equal(24, gp.parse_string("function1(2)"))
+    assert_equal(145, gp.parse_string("function1(123)"))
+
+
+    code = '$i = 22
+           def function2()
+           {
+                $i = $i + 1 
+           }'
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(23, gp.parse_string("function2()"))
+    assert_equal(24, gp.parse_string("function2()"))
+    assert_equal(25, gp.parse_string("function2()"))
+    assert_equal(26, gp.parse_string("function2()"))
+  end
+  def test3_access()
+    gp = GameLanguage.new
+    
+    code = '$t = 40
+           event Desert
+           {
+             init{}
+             run
+             {
+                $t = $t + 10
+                
+             }
+           }'
+
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(true, gp.parse_string("load(Desert)"))
+    assert_equal(50, gp.parse_string("$t"))
+    
+  end
+  def test4_access()
+    gp = GameLanguage.new
+    puts "Global variable access test 3:"
+    
+    code = '$global_hp = 150
+           prop character
+           {
+             init(n, hp)
+             {
+                name = n
+                health = $global_hp
+                
+             }
+           }'
+
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(true, gp.parse_string('p1 = character.new("Hadi", 100) true'))
+    assert_equal(150, gp.parse_string("p1.health"))
   end
 end
 
@@ -382,7 +432,7 @@ class MultipleLine < Test::Unit::TestCase
 
     code = "bool = true and false or true
             bool"
-    assert_equal(true , gp.parse_string(code))
+    assert_equal(true, gp.parse_string(code))
 
     code = "bool = true and false or true
             bool = 32 + 21
@@ -417,24 +467,24 @@ class WriteTest < Test::Unit::TestCase
   def test1()
     gp = GameLanguage.new
 
-    assert_equal(nil , gp.parse_string('write()'))
-    assert_equal(nil , gp.parse_string('write("Testing \"write\":")'))
-    assert_equal(nil , gp.parse_string('write("Hello World!")'))
-    assert_equal(nil , gp.parse_string('write("write()")'))
-    assert_equal(nil , gp.parse_string('write("My name is Hadi")'))
+    assert_equal(nil, gp.parse_string('write()'))
+    assert_equal(nil, gp.parse_string('write("Testing \"write\":")'))
+    assert_equal(nil, gp.parse_string('write("Hello World!")'))
+    assert_equal(nil, gp.parse_string('write("write()")'))
+    assert_equal(nil, gp.parse_string('write("My name is Hadi")'))
   end
 
   def test2()
     gp = GameLanguage.new
 
-    assert_equal(nil , gp.parse_string("write()"))
+    assert_equal(nil, gp.parse_string("write()"))
 
     # Works in interactive mode
-    # assert_equal(nil , gp.parse_string("write('Testing \'write\':')"))
+    # assert_equal(nil, gp.parse_string("write('Testing \'write\':')"))
 
-    assert_equal(nil , gp.parse_string("write('Hello World!')"))
-    assert_equal(nil , gp.parse_string("write('write()')"))
-    assert_equal(nil , gp.parse_string("write('My name is Hadi')"))
+    assert_equal(nil, gp.parse_string("write('Hello World!')"))
+    assert_equal(nil, gp.parse_string("write('write()')"))
+    assert_equal(nil, gp.parse_string("write('My name is Hadi')"))
   end
    def test3()
     gp = GameLanguage.new
@@ -443,10 +493,10 @@ class WriteTest < Test::Unit::TestCase
             b = false
             c = "hi"'
 
-    assert_equal("hi" , gp.parse_string(code))
-    assert_equal(nil , gp.parse_string("write(a)"))
-    assert_equal(nil , gp.parse_string("write(b)"))
-    assert_equal(nil , gp.parse_string("write(c)"))
+    assert_equal("hi", gp.parse_string(code))
+    assert_equal(nil, gp.parse_string("write(a)"))
+    assert_equal(nil, gp.parse_string("write(b)"))
+    assert_equal(nil, gp.parse_string("write(c)"))
    end
 end
 
@@ -534,7 +584,7 @@ class WhileTest < Test::Unit::TestCase
               i = i + 1
             }"
 
-    assert_equal(nil , gp.parse_string(code))
+    assert_equal(nil, gp.parse_string(code))
     assert_equal(5, gp.parse_string("i"))
   end
 
@@ -777,8 +827,8 @@ end
 #   def "..."
 #     gp = GameLanguage.new
 #
-#     assert_equal( , gp.parse_string())
-#     assert_equal( , gp.parse_string())
-#     assert_equal( , gp.parse_string())
+#     assert_equal(, gp.parse_string())
+#     assert_equal(, gp.parse_string())
+#     assert_equal(, gp.parse_string())
 #   end
 # end

@@ -1,4 +1,3 @@
-read("hello")
 prop Character
 {
   init(n, att, d, hp)
@@ -125,6 +124,6 @@ def battle (enemy) {
 # ==================================================
 # Huvudprogram
 # ==================================================
-
-$player = Character.new("Vincent", 5, 2, 25)
+name = read("Please enter your name:")
+$player = Character.new(name, 5, 2, 25)
 load(room)
