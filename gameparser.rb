@@ -243,7 +243,7 @@ class GameLanguage
       rule :factor do
         match(Integer) {|m| LiteralInteger.new(m) }
         match(:signs, Integer) {|s, m|  Multiplication.new(s, m) }
-        match(:signs, "(", :math_exp , ")") {|_, _, m, _| Multiplication.new(m, -1) }
+        match(:signs, "(", :math_exp , ")") {|s, _, m, _| Multiplication.new(s, m) }
         match("(", :exp , ")") {|_, m, _| m }
         match(:function_call)
         match(:array)

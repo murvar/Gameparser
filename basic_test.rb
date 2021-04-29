@@ -13,6 +13,13 @@ class SimpleTest < Test::Unit::TestCase
     assert_equal(888, gp.parse_string("888"))
     assert_equal(10000, gp.parse_string("10000"))
     assert_equal(100000000, gp.parse_string("100000000"))
+
+    assert_equal(-1, gp.parse_string("-1"))
+    assert_equal(123, gp.parse_string("--123"))
+    assert_equal(-888, gp.parse_string("---888"))
+    assert_equal(-101, gp.parse_string("-+-+-101"))
+    assert_equal(100000000, gp.parse_string("+++++100000000"))
+
   end
 
   def test2
@@ -103,9 +110,9 @@ class SimpleArithmetic < Test::Unit::TestCase
 end
 
 class ArithmeticPriority < Test::Unit::TestCase
-  def test3
+  def test1
     gp = GameLanguage.new
-
+    
     assert_equal(22, gp.parse_string("2 + 2 * 10"))
     assert_equal(40, gp.parse_string("(2 + 2) * 10"))
     assert_equal(14, gp.parse_string("2 * 2 + 10"))
@@ -114,6 +121,15 @@ class ArithmeticPriority < Test::Unit::TestCase
     assert_equal(22, gp.parse_string("2 / 2 + 10 * 2 + 1"))
     assert_equal(16, gp.parse_string("(2 + 2) * (2 + 2)"))
     assert_equal(1, gp.parse_string("(22/2) + (2 * 5) - (+20)"))
+
+    assert_equal(3, gp.parse_string("--(++3)"))
+    assert_equal(1, gp.parse_string("2 +-1"))
+    assert_equal(0, gp.parse_string("2 +-1 * 2"))
+    assert_equal(100, gp.parse_string("2 +-1 * 2 ++100"))
+    assert_equal(-4, gp.parse_string("--(+-2) +-1 * 2"))
+    assert_equal(-4, gp.parse_string("--(+-2) +-1 * (-++-2)"))
+    assert_equal(-2, gp.parse_string("--(+-2) +-1 / (-++2)"))
+    
   end
 end
 
