@@ -242,10 +242,8 @@ class GameLanguage
 
       rule :factor do
         match(Integer) {|m| LiteralInteger.new(m) }
-        match("-", Integer) {|_, m| LiteralInteger.new(-m) }
-        match("+", Integer) {|_, m| LiteralInteger.new(m) }
-        match("+", "(", :math_exp , ")") {|_, _, m, _| m }
-        match("-", "(", :math_exp , ")") {|_, _, m, _| Multiplication.new(m, -1) }
+        match(:signs, Integer) {|s, m|  Multiplication.new(s, m) }
+        match(:signs, "(", :math_exp , ")") {|_, _, m, _| Multiplication.new(m, -1) }
         match("(", :exp , ")") {|_, m, _| m }
         match(:function_call)
         match(:array)
@@ -254,6 +252,16 @@ class GameLanguage
         match(:identifiernode)
         match(LiteralString)
         match(Range)
+      end
+      
+      rule :signs do
+        match(:signs, :sign) {|a, b| Multiplication.new(a, b) }
+        match(:sign)
+      end
+
+      rule :sign do
+        match("+") { LiteralInteger.new(1)  }
+        match("-") { LiteralInteger.new(-1) }
       end
 
       rule :array do
