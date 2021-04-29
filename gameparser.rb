@@ -185,8 +185,8 @@ class GameLanguage
       end
 
       rule :exp do
-        match(:exp, "and", :bool_val) {|lhs, _, rhs| And.new(lhs, rhs) }
-        match(:exp, "or", :bool_val) {|lhs, _, rhs| Or.new(lhs, rhs) }
+        match(:exp, "and", :bool_exp) {|lhs, _, rhs| And.new(lhs, rhs) }
+        match(:exp, "or", :bool_exp) {|lhs, _, rhs| Or.new(lhs, rhs) }
         match("not", :exp) {|_, m, _| Not.new(m) }
         match(:bool_exp) {|m| m}
       end

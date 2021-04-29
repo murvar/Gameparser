@@ -117,7 +117,7 @@ class ArithmeticPriority < Test::Unit::TestCase
   end
 end
 
-class SimpleLogicalExpression < Test::Unit::TestCase
+class LogicalExp < Test::Unit::TestCase
   def test_and
     gp = GameLanguage.new
 
@@ -125,6 +125,10 @@ class SimpleLogicalExpression < Test::Unit::TestCase
     assert_equal(false, gp.parse_string("true and false"))
     assert_equal(false, gp.parse_string("false and true"))
     assert_equal(false, gp.parse_string("false and false"))
+    
+    assert_equal(2, gp.parse_string("2 and 2"))
+    assert_equal(2, gp.parse_string("10 and 2"))
+    assert_equal(-12, gp.parse_string("10 and -12"))
   end
   def test_or
     gp = GameLanguage.new
@@ -133,16 +137,25 @@ class SimpleLogicalExpression < Test::Unit::TestCase
     assert_equal(true, gp.parse_string("true or false"))
     assert_equal(true, gp.parse_string("false or true"))
     assert_equal(false, gp.parse_string("false or false"))
+    
+    assert_equal(2, gp.parse_string("2 or 2"))
+    assert_equal(10, gp.parse_string("10 or 2"))
+    assert_equal(10, gp.parse_string("10 or -12"))
+    
   end
   def test_not
     gp = GameLanguage.new
 
     assert_equal(false, gp.parse_string("not true"))
     assert_equal(true, gp.parse_string("not false"))
+
+    assert_equal(false, gp.parse_string("not 2"))
+    assert_equal(false, gp.parse_string("not -12"))
+    assert_equal(false, gp.parse_string("not 0"))
   end
 end
 
-class LogicalExpressionPriority < Test::Unit::TestCase
+class LogicalExpPriority < Test::Unit::TestCase
   def test3
     gp = GameLanguage.new
 
@@ -157,7 +170,7 @@ class LogicalExpressionPriority < Test::Unit::TestCase
   end
 end
 
-class BooleanExpression < Test::Unit::TestCase
+class BooleanExp < Test::Unit::TestCase
   def test_less
     gp = GameLanguage.new
 
@@ -225,10 +238,12 @@ class BoolLogic < Test::Unit::TestCase
     assert_equal(false, gp.parse_string("(12 > 100) and (100 < 2)" ))
     assert_equal(false, gp.parse_string("not ((12 > 10) or (100 < 2))"))
     assert_equal(true, gp.parse_string("(2 == 2) and (100 >= 2)"))
+    assert_equal(true, gp.parse_string("2 == 2 and 100 >= 2"))
+    assert_equal(false, gp.parse_string("2 == 3 or 100 >= 200"))
   end
 end
 
-class Variable_assignment < Test::Unit::TestCase
+class VariableAssignment < Test::Unit::TestCase
 
   def test_int
     gp = GameLanguage.new
