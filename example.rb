@@ -1,57 +1,3 @@
-# #--- Forest1
-
-# puts "You enter a dark forest. The wind is howling."
-
-# puts "1. Walk to the right."
-# puts "2. Walk forward."
-# puts "3. Initiate battle with Bossman."
-# puts "4. Open the chest."
-
-# choice = gets.chomp.to_i
-
-# case choice
-# when 1 then
-#   puts ""
-# when 2 then
-#   puts "You won!"
-# when 3 then
-#   puts "You has been slain!"
-# when 4 then
-#   puts "The Bossman shouts at you: DIE"
-# end
-
-# #-- Forest2
-
-# puts "You enter a house."
-
-# puts "1. Walk to the left."
-# puts "3. Go to the previous location."
-# puts "4. Open the chest."
-
-# choice = gets.chomp.to_i
-
-# case choice
-# when 1 then
-#   go Forest2
-# when 2 then
-#   puts "You won!"
-# when 3 then
-#   puts "You has been slain!"
-# when 4 then
-#   puts "The Bossman shouts at you: DIE"
-# end
-
-
-# name = "Boss"
-# name = "Boss 2"
-# name = "Boss3"
-#
-# class Char (name, attack, agi){
-#   if name
-#   name = name
-#   stats = {"attack" = attack, "agi" = agi}
-# }
-
 type Kratos()
 {
     attack = -8
@@ -61,8 +7,6 @@ type Kratos()
     weapon = {"name": Sword}
     slots = {"sword" = RustySword, "helmet" = nil, "chest" = nil}
 }
-
-
 
 type Sword
   {
