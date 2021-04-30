@@ -6,7 +6,7 @@ class SimpleTest < Test::Unit::TestCase
 
   def test1
     gp = GameLanguage.new
-
+    
     assert_equal(1, gp.parse_string("1"))
     assert_equal(123, gp.parse_string("123"))
     assert_equal(888, gp.parse_string("888"))
