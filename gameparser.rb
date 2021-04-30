@@ -44,12 +44,16 @@ class GameLanguage
       token(/(?<!\w)new(?!\w)/) {|m| m }
       token(/(?<!\w)str(?!\w)/) {|m| m }
       token(/(?<!\w)cls(?!\w)/) {|m| m }
+      token(/(?<!\w)remove(?!\w)/) {|m| m }
+      token(/(?<!\w)append(?!\w)/) {|m| m }
+      token(/(?<!\w)insert(?!\w)/) {|m| m }
       token(/break/) { Break.new() }
       token(/\((-?\d+)(\.{2,3})(-?\d+)\)/) do |m|
         mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)
         Range.new(mymatch[1].to_i, mymatch[2], mymatch[3].to_i)
       end
-
+      
+      token(/<</) {|m| m }
       token(/<=/){|m| CompOp.new(m) }
       token(/==/){|m| CompOp.new(m) }
       token(/!=/){|m| CompOp.new(m) }
@@ -163,6 +167,7 @@ class GameLanguage
         match(:condition)
         match(:loop)
         match(:assignment)
+        match(:array_op)
         match(:exp)
         match(Break)
       end
@@ -245,7 +250,7 @@ class GameLanguage
         match(:signs, Integer) {|s, m|  Multiplication.new(s, m) }
         match(:signs, "(", :math_exp , ")") {|s, _, m, _| Multiplication.new(s, m) }
         match("(", :exp , ")") {|_, m, _| m }
-        match(:function_call)
+        match(:function_call) 
         match(:array)
         match(:instancering)
         match(:instance_reader)
@@ -265,11 +270,29 @@ class GameLanguage
       end
 
       rule :array do
-        match(:identifier, "[", Integer, "]") do |idn, _, index, _|
-          ElementReader.new(idn, index)
-        end
         match("[", :values, "]") {|_, v, _| List.new(v)}
         match("[", "]") { List.new([]) }
+      end
+
+      rule :array_op do
+        match(:identifier, "[", Integer, "]") do |idn, _, index, _| 
+          ElementReader.new(idn, index)
+        end
+        match(:identifier, ".", "remove", "(", :exp, ")") do |idn, _, _, _, index, _| 
+          ElementRemover.new(idn, index)
+        end
+        match(:identifier, ".", "remove", "(", ")") do |idn, _, _, _, _| 
+          ElementRemover.new(idn)
+        end
+        match(:identifier, ".", "append", "(", :exp, ")") do |idn, _, _, _, exp, _| 
+          ListAppend.new(idn, exp)
+        end
+        match(:identifier, "<<", :exp) do |idn, _, exp| 
+          ListAppend.new(idn, exp)
+        end
+        match(:identifier, ".", "insert", "(", Integer, ",", :exp, ")") do |idn, _, _, _, index, _, exp, _| 
+          ListInsert.new(idn, index, exp)
+        end
       end
 
       rule :values do

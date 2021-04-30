@@ -104,6 +104,41 @@ class ElementWriter
   end
 end
 
+class ElementRemover
+  def initialize(idn, index = -1)
+    @idn = idn
+    @index = index
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].value.delete_at(@index.evaluate())
+  end
+end
+
+class ListAppend
+  def initialize(idn, value)
+    @idn = idn
+    @value = value
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].value << @value.evaluate()
+  end
+end
+
+class ListInsert
+  def initialize(idn, index, value)
+    @idn = idn
+    @index = index
+    @value = value
+  end
+
+  def evaluate()
+    $variables[$current_scope][@idn.name].value.insert(@index, @value.evaluate())
+  end
+end
+
+
 class And
   def initialize(lhs, rhs)
     @lhs = lhs
@@ -606,11 +641,11 @@ class Prop
     @block.evaluate()
     @vars = $variables[$current_scope]
 
-    lista = []
-    @params.each {|e| lista << e.name}
+    list = []
+    @params.each {|e| list << e.name}
 
     for v in @vars.keys()
-      if lista.include?(v)
+      if list.include?(v)
         @vars.tap { |h| h.delete(v) }
       end
     end

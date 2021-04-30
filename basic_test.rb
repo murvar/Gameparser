@@ -2,7 +2,6 @@
 require './gameparser'
 require 'test/unit'
 
-
 class SimpleTest < Test::Unit::TestCase
 
   def test1
@@ -331,7 +330,7 @@ class VariableAssignment < Test::Unit::TestCase
     assert_equal(false, gp.parse_string(" value"))
   end
 
-  def test_lista
+  def test_list
     gp = GameLanguage.new
 
     assert_equal([23, 11, 578], gp.parse_string("l = [23, 11, 578]"))
@@ -374,6 +373,155 @@ class VariableAssignment < Test::Unit::TestCase
     assert_equal(["x", "y", "c"], gp.parse_string("l3"))
     assert_equal("z", gp.parse_string('l3[2] = "z"'))
     assert_equal(["x", "y", "z"], gp.parse_string("l3"))
+
+  end
+end
+
+class ListOperation < Test::Unit::TestCase
+  
+  def test1_remove() # removes by index. Whitout index pop the list.
+    gp = GameLanguage.new
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal(1, gp.parse_string("l.remove(0)"))
+    assert_equal([2, 3], gp.parse_string("l"))
+
+    assert_equal([1, -2, 3], gp.parse_string("l = [1, -2, 3]"))
+    assert_equal(-2, gp.parse_string("l.remove(1)"))
+    assert_equal([1, 3], gp.parse_string("l"))
+    
+    assert_equal([true, true, false], gp.parse_string("l = [true, true, false]"))
+    assert_equal(false, gp.parse_string("l.remove(2)"))
+    assert_equal([true, true], gp.parse_string("l"))
+
+    assert_equal(["a", "b", "c"], gp.parse_string('l = ["a", "b", "c"]'))
+    assert_equal("b", gp.parse_string("l.remove(1)"))
+    assert_equal(["a", "c"], gp.parse_string("l"))
+
+    assert_equal([[1, 2], [3, 4], [5, 6]], gp.parse_string("l = [[1, 2], [3, 4], [5, 6]]"))
+    assert_equal([1, 2], gp.parse_string("l.remove(0)"))
+    assert_equal([[3, 4], [5, 6]], gp.parse_string("l"))
+
+    assert_equal(1, gp.parse_string("index = 1"))
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal(2, gp.parse_string("l.remove(index)"))
+    assert_equal([1, 3], gp.parse_string("l"))
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal(3, gp.parse_string("l.remove()"))
+    assert_equal([1, 2], gp.parse_string("l"))
+
+
+    code1 = '
+           l = [100, 200, 300]
+           l.remove(0)
+           '
+
+    assert_equal(100, gp.parse_string(code1))
+
+    code2 = '
+           l = [100, 200, 300]
+           l.remove()
+           '
+    assert_equal(300, gp.parse_string(code2))
+    
+  end
+
+  def test2_append()
+    gp = GameLanguage.new
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l.append(4)"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l"))
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 2, 3, -5], gp.parse_string("l.append(-5)"))
+    assert_equal([1, 2, 3, -5], gp.parse_string("l"))
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l << 4"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l"))
+    
+    
+    assert_equal([true, true, false], gp.parse_string("l = [true, true, false]"))
+    assert_equal([true, true, false, false], gp.parse_string("l.append(false)"))
+    assert_equal([true, true, false, false], gp.parse_string("l"))
+
+    assert_equal(["a", "b", "c"], gp.parse_string('l = ["a", "b", "c"]'))
+    assert_equal(["a", "b", "c", "d"], gp.parse_string('l.append("d")'))
+    assert_equal(["a", "b", "c", "d"], gp.parse_string("l"))
+
+    assert_equal([[1, 2], [3, 4], [5, 6]], gp.parse_string("l = [[1, 2], [3, 4], [5, 6]]"))
+    assert_equal([[1, 2], [3, 4], [5, 6], [7, 8]], gp.parse_string("l.append([7, 8])"))
+    assert_equal([[1, 2], [3, 4], [5, 6], [7, 8]], gp.parse_string("l"))
+
+    assert_equal(4, gp.parse_string("value = 4"))
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l.append(value)"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l"))
+
+    assert_equal(-100, gp.parse_string("value = -100"))
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 2, 3, -100], gp.parse_string("l << value"))
+    assert_equal([1, 2, 3, -100], gp.parse_string("l"))
+    
+    code1 = '
+           l = [100, 200, 300]
+           l.append(400)
+           '
+
+    assert_equal([100, 200, 300, 400], gp.parse_string(code1))
+
+    code2 = '
+           l = [100, 200, 300]
+           l.append(400)
+           l
+           '
+    assert_equal([100, 200, 300, 400], gp.parse_string(code2))
+  end
+  def test3_insert() # insert(index, value)
+    gp = GameLanguage.new
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([0, 1, 2, 3], gp.parse_string("l.insert(0, 0)"))
+    assert_equal([0, 1, 2, 3], gp.parse_string("l"))
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([-1, 1, 2, 3], gp.parse_string("l.insert(0, -1)"))
+    assert_equal([-1, 1, 2, 3], gp.parse_string("l"))
+    
+    assert_equal([true, true, true], gp.parse_string("l = [true, true, true]"))
+    assert_equal([true, false, true, true], gp.parse_string("l.insert(1, false)"))
+    assert_equal([true, false, true, true], gp.parse_string("l"))
+
+    assert_equal(["a", "b", "c"], gp.parse_string('l = ["a", "b", "c"]'))
+    assert_equal(["a", "b", "c", "d"], gp.parse_string('l.insert(3, "d")'))
+    assert_equal(["a", "b", "c", "d"], gp.parse_string("l"))
+    assert_equal(["a", "b", "c", "x", "d"], gp.parse_string('l.insert(3, "x")'))
+    assert_equal(["a", "b", "c", "x", "d"], gp.parse_string("l"))
+
+    assert_equal([[1, 2], [3, 4], [5, 6]], gp.parse_string("l = [[1, 2], [3, 4], [5, 6]]"))
+    assert_equal([[1, 2], [3, 4], [7, 8], [5, 6]], gp.parse_string("l.insert(2, [7, 8])"))
+    assert_equal([[1, 2], [3, 4], [7, 8], [5, 6]], gp.parse_string("l"))
+
+    assert_equal(4, gp.parse_string("value = 4"))
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 4, 2, 3], gp.parse_string("l.insert(1, value)"))
+    assert_equal([1, 4, 2, 3], gp.parse_string("l"))
+    
+    code1 = '
+           l = [100, 200, 300]
+           l.insert(3, 400)
+           '
+
+    assert_equal([100, 200, 300, 400], gp.parse_string(code1))
+
+    code2 = '
+           l = [100, 200, 300]
+           l.insert(3, 400)
+           l
+           '
+    assert_equal([100, 200, 300, 400], gp.parse_string(code2))
 
   end
 end
