@@ -44,6 +44,7 @@ class GameLanguage
       token(/(?<!\w)new(?!\w)/) {|m| m }
       token(/(?<!\w)str(?!\w)/) {|m| m }
       token(/(?<!\w)cls(?!\w)/) {|m| m }
+      token(/(?<!\w)len(?!\w)/) {|m| m }      
       token(/(?<!\w)remove(?!\w)/) {|m| m }
       token(/(?<!\w)append(?!\w)/) {|m| m }
       token(/(?<!\w)insert(?!\w)/) {|m| m }
@@ -178,6 +179,9 @@ class GameLanguage
       end
 
       rule :assignment do
+        match(:identifier, "=", :array_op) do |idn, _, a|
+          Assignment.new(idn, a)
+        end
         match(:identifier, "=", :exp) do |idn, _, exp|
           Assignment.new(idn, exp)
         end
@@ -293,6 +297,7 @@ class GameLanguage
         match(:identifier, ".", "insert", "(", Integer, ",", :exp, ")") do |idn, _, _, _, index, _, exp, _| 
           ListInsert.new(idn, index, exp)
         end
+        match(:identifier, ".", "len") {|idn, _, _| ListLength.new(idn) }
       end
 
       rule :values do

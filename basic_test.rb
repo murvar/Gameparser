@@ -479,6 +479,7 @@ class ListOperation < Test::Unit::TestCase
            '
     assert_equal([100, 200, 300, 400], gp.parse_string(code2))
   end
+  
   def test3_insert() # insert(index, value)
     gp = GameLanguage.new
 
@@ -524,6 +525,44 @@ class ListOperation < Test::Unit::TestCase
     assert_equal([100, 200, 300, 400], gp.parse_string(code2))
 
   end
+  
+  def test4_len()
+    gp = GameLanguage.new
+
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal(3, gp.parse_string("l.len"))
+    
+    assert_equal([true, true, false], gp.parse_string("l = [true, true, false]"))
+    assert_equal(3, gp.parse_string("l.len"))
+
+    assert_equal(["a", "b", "c"], gp.parse_string('l = ["a", "b", "c"]'))
+    assert_equal(3, gp.parse_string("l.len"))
+    assert_equal(["a", "b", "c", "d"], gp.parse_string('l.append("d")'))
+    assert_equal(4, gp.parse_string("l.len"))
+
+    assert_equal([[1, 2], [3, 4], [5, 6]], gp.parse_string("l = [[1, 2], [3, 4], [5, 6]]"))
+    assert_equal(3, gp.parse_string("l.len"))
+
+    assert_equal(4, gp.parse_string("value = 4"))
+    assert_equal([1, 2, 3], gp.parse_string("l = [1, 2, 3]"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l.append(value)"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("l"))
+    assert_equal(4, gp.parse_string("l.len"))
+    
+    code1 = '
+           l = [100, 200, 300]
+           l.len
+           '
+
+    assert_equal(3, gp.parse_string(code1))
+
+    code2 = '
+           l = [100, 200, 300]
+           l.append(400)
+           l.len
+           '
+    assert_equal(4, gp.parse_string(code2))
+  end
 end
 
 class GlobalVars < Test::Unit::TestCase
@@ -548,7 +587,31 @@ class GlobalVars < Test::Unit::TestCase
     assert_equal([1, 2, 3, 4], gp.parse_string("$my_list"))
     assert_equal([1, -40, 2, 3, 4], gp.parse_string("$my_list.insert(1, -40)"))
     assert_equal([1, -40, 2, 3, 4], gp.parse_string("$my_list"))
-    
+    assert_equal(5, gp.parse_string("$my_list.len"))
+
+    code1 = '$my_list = [4, 5, 6]
+            $my_list.remove(0)
+            $my_list
+            '
+    assert_equal([5, 6], gp.parse_string(code1))
+
+    code2 = '$my_list = [4, 5, 6]
+            $my_list.append(88)
+            $my_list
+            '
+    assert_equal([4, 5, 6, 88], gp.parse_string(code2))
+
+    code3 = '$my_list = [4, 5, 6]
+            $my_list.insert(1, 88)
+            $my_list
+            '
+    assert_equal([4, 88, 5, 6], gp.parse_string(code3))
+
+    code4 = '$my_list = [4, 5, 6]
+            i = $my_list.len
+            i 
+            '
+    assert_equal(3, gp.parse_string(code4))
   end
 
   def test2_access()

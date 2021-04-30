@@ -150,6 +150,20 @@ class ListInsert
   end
 end
 
+class ListLength
+  def initialize(idn)
+    @idn = idn
+  end
+
+  def evaluate()
+    if @idn.class != GIdentifier
+      $variables[$current_scope][@idn.name].value.length
+    else
+      $g_variables[@idn.name].value.length
+    end
+  end
+end
+
 
 class And
   def initialize(lhs, rhs)
