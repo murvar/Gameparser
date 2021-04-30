@@ -538,6 +538,17 @@ class GlobalVars < Test::Unit::TestCase
 
     assert_equal("Hello", gp.parse_string('$my_str = "Hello"'))
     assert_equal("Hello", gp.parse_string('$my_str'))
+
+    assert_equal([1, 2, 3], gp.parse_string("$my_list = [1, 2, 3]"))
+    assert_equal([1, 2, 3], gp.parse_string("$my_list"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("$my_list.append(4)"))
+    assert_equal([1, 2, 3, 4, 4], gp.parse_string("$my_list.append(4)"))
+    assert_equal([1, 2, 3, 4, 4], gp.parse_string("$my_list"))
+    assert_equal(4, gp.parse_string("$my_list.remove()"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("$my_list"))
+    assert_equal([1, -40, 2, 3, 4], gp.parse_string("$my_list.insert(1, -40)"))
+    assert_equal([1, -40, 2, 3, 4], gp.parse_string("$my_list"))
+    
   end
 
   def test2_access()

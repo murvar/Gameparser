@@ -111,7 +111,11 @@ class ElementRemover
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name].value.delete_at(@index.evaluate())
+    if @idn.class != GIdentifier
+      $variables[$current_scope][@idn.name].value.delete_at(@index.evaluate())
+    else
+      $g_variables[@idn.name].value.delete_at(@index.evaluate())
+    end
   end
 end
 
@@ -122,7 +126,11 @@ class ListAppend
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name].value << @value.evaluate()
+    if @idn.class != GIdentifier
+      $variables[$current_scope][@idn.name].value << @value.evaluate()
+    else
+      $g_variables[@idn.name].value << @value.evaluate()
+    end
   end
 end
 
@@ -134,7 +142,11 @@ class ListInsert
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name].value.insert(@index, @value.evaluate())
+    if @idn.class != GIdentifier
+      $variables[$current_scope][@idn.name].value.insert(@index, @value.evaluate())
+    else
+      $g_variables[@idn.name].value.insert(@index, @value.evaluate())
+    end
   end
 end
 
