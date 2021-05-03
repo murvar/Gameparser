@@ -1084,6 +1084,18 @@ class ForTest < Test::Unit::TestCase
             "
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(36, gp.parse_string("result"))
+
+    code2 = "result = 0
+             for i in (1..5)
+             {
+                for j in (1..5)
+                {
+                    result = result + i + j
+                }
+             }
+            "
+    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(150, gp.parse_string("result"))
   end
 
   def test7_break()
@@ -1101,6 +1113,28 @@ class ForTest < Test::Unit::TestCase
             "
     assert_equal(nil, gp.parse_string(code1))
     assert_equal(2, gp.parse_string("result"))
+
+    code2 = "def f(b)
+             {
+              result = false
+              for i in (0..10)
+              {
+                if b < i 
+                { 
+                  result = true
+                  break
+                }
+              }
+              result
+             }
+            "
+    assert_equal(nil, gp.parse_string(code2))
+    assert_equal(false, gp.parse_string("f(12)"))
+    assert_equal(false, gp.parse_string("f(100)"))
+    assert_equal(true, gp.parse_string("f(0)"))
+    assert_equal(true, gp.parse_string("f(-1)"))
+    assert_equal(true, gp.parse_string("f(-10)"))
+
   end
 
 
