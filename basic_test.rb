@@ -575,6 +575,13 @@ class GlobalVars < Test::Unit::TestCase
     assert_equal(true, gp.parse_string("$my_bool = true"))
     assert_equal(true, gp.parse_string("$my_bool"))
 
+    assert_equal([1, 2, 3, 4, 5], gp.parse_string("$my_range = (1..5)"))
+    assert_equal([1, 2, 3, 4, 5], gp.parse_string("$my_range"))
+
+    assert_equal([1, 2, 3, 4], gp.parse_string("$my_range = (1...5)"))
+    assert_equal([1, 2, 3, 4], gp.parse_string("$my_range"))
+    
+
     assert_equal("Hello", gp.parse_string('$my_str = "Hello"'))
     assert_equal("Hello", gp.parse_string('$my_str'))
 
@@ -661,7 +668,6 @@ class GlobalVars < Test::Unit::TestCase
   end
   def test4_access()
     gp = GameLanguage.new
-    puts "Global variable access test 3:"
     
     code = '$global_hp = 150
            prop character
@@ -677,6 +683,26 @@ class GlobalVars < Test::Unit::TestCase
     assert_equal(nil, gp.parse_string(code))
     assert_equal(true, gp.parse_string('p1 = character.new("Hadi", 100) true'))
     assert_equal(150, gp.parse_string("p1.health"))
+  end
+
+
+  def test5_access()
+    gp = GameLanguage.new
+    
+    code = '$range = (1..5)
+            def f1()
+            {
+              sum = 0
+              for i in $range
+              {
+                sum = i + sum
+              }
+              sum
+            }'
+           
+
+    assert_equal(nil, gp.parse_string(code))
+    assert_equal(15, gp.parse_string('f1()'))
   end
 end
 
