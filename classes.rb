@@ -336,7 +336,9 @@ end
 
 class LiteralString
   def initialize(st)
-    @str = st.gsub(/\\/, "")
+    @str = st.gsub(/\\"/, '"')
+    @str.gsub!(/\\n/, "\n")
+    @str.gsub!(/\\t/, "\t")
   end
 
   def evaluate()
