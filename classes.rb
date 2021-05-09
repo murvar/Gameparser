@@ -686,7 +686,7 @@ class Prop
   end
 end
 
-class Instancering
+class Instancing
   def initialize(idn, values)
     @idn = idn
     @values = values

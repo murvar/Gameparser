@@ -44,7 +44,7 @@ class GameLanguage
       token(/(?<!\w)new(?!\w)/) {|m| m }
       token(/(?<!\w)str(?!\w)/) {|m| m }
       token(/(?<!\w)cls(?!\w)/) {|m| m }
-      token(/(?<!\w)len(?!\w)/) {|m| m }      
+      token(/(?<!\w)len(?!\w)/) {|m| m }
       token(/(?<!\w)remove(?!\w)/) {|m| m }
       token(/(?<!\w)append(?!\w)/) {|m| m }
       token(/(?<!\w)insert(?!\w)/) {|m| m }
@@ -53,7 +53,7 @@ class GameLanguage
         mymatch = m.match(/\((-?\d+)(\.{2,3})(-?\d+)\)/)
         Range.new(mymatch[1].to_i, mymatch[2], mymatch[3].to_i)
       end
-      
+
       token(/<</) {|m| m }
       token(/<=/){|m| CompOp.new(m) }
       token(/==/){|m| CompOp.new(m) }
@@ -254,15 +254,15 @@ class GameLanguage
         match(:signs, Integer) {|s, m|  Multiplication.new(s, m) }
         match(:signs, "(", :math_exp , ")") {|s, _, m, _| Multiplication.new(s, m) }
         match("(", :exp , ")") {|_, m, _| m }
-        match(:function_call) 
+        match(:function_call)
         match(:array)
-        match(:instancering)
+        match(:instancing)
         match(:instance_reader)
         match(:identifiernode)
         match(LiteralString)
         match(Range)
       end
-      
+
       rule :signs do
         match(:signs, :sign) {|a, b| Multiplication.new(a, b) }
         match(:sign)
@@ -279,22 +279,22 @@ class GameLanguage
       end
 
       rule :array_op do
-        match(:identifier, "[", Integer, "]") do |idn, _, index, _| 
+        match(:identifier, "[", Integer, "]") do |idn, _, index, _|
           ElementReader.new(idn, index)
         end
-        match(:identifier, ".", "remove", "(", :exp, ")") do |idn, _, _, _, index, _| 
+        match(:identifier, ".", "remove", "(", :exp, ")") do |idn, _, _, _, index, _|
           ElementRemover.new(idn, index)
         end
-        match(:identifier, ".", "remove", "(", ")") do |idn, _, _, _, _| 
+        match(:identifier, ".", "remove", "(", ")") do |idn, _, _, _, _|
           ElementRemover.new(idn)
         end
-        match(:identifier, ".", "append", "(", :exp, ")") do |idn, _, _, _, exp, _| 
+        match(:identifier, ".", "append", "(", :exp, ")") do |idn, _, _, _, exp, _|
           ListAppend.new(idn, exp)
         end
-        match(:identifier, "<<", :exp) do |idn, _, exp| 
+        match(:identifier, "<<", :exp) do |idn, _, exp|
           ListAppend.new(idn, exp)
         end
-        match(:identifier, ".", "insert", "(", Integer, ",", :exp, ")") do |idn, _, _, _, index, _, exp, _| 
+        match(:identifier, ".", "insert", "(", Integer, ",", :exp, ")") do |idn, _, _, _, index, _, exp, _|
           ListInsert.new(idn, index, exp)
         end
         match(:identifier, ".", "len") {|idn, _, _| ListLength.new(idn) }
@@ -306,9 +306,9 @@ class GameLanguage
         match(:empty)  {|m| [] }
       end
 
-      rule :instancering do
+      rule :instancing do
         match(:identifier, ".", "new", "(", :values, ")") do |idn, _, _, _, args, _ |
-          Instancering.new(idn, args)
+          Instancing.new(idn, args)
         end
       end
       rule :instance_reader do
