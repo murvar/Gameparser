@@ -405,8 +405,12 @@ class Block
     if !@statements
       return nil
     end
+
     for statement in @statements do
       result = statement.evaluate()
+      if result == Break
+        return result
+      end
     end
     result
   end
@@ -602,10 +606,10 @@ class While
     if @exp.evaluate().class != TrueClass and FalseClass
       raise "While loop needs a bool"
     end
-    while @exp.evaluate
-      temp = @block.evaluate
+    while @exp.evaluate()
+      temp = @block.evaluate()
       if temp == Break
-        return nil
+        break
       end
     end
     nil
@@ -627,8 +631,7 @@ class For
       $variables[$current_scope][@identifier.name] = Variable.new(var)
       temp = @block.evaluate()
       if temp == Break
-        $variables[$current_scope].tap { |h| h.delete(@identifier.name) }
-        return nil
+        break
       end
     end
     $variables[$current_scope].tap { |h| h.delete(@identifier.name) }

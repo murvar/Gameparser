@@ -377,7 +377,8 @@ class GameLanguage
     end
     def parse()
       log(false)
-      print "[gameParser] #{format('%03d', @line)}: "
+     # print "[gameParser] #{format('%03d', @line)}: "
+      print "[gameParser]: "
       #str = File.read(file)
       str = gets
       if done(str) then

@@ -187,7 +187,7 @@ end
 
 class BooleanExp < Test::Unit::TestCase
   def test_less
-    gp = GameLanguage.new
+    gp = GameLanguage.newb
 
     assert_equal(true, gp.parse_string("1 < 2"))
     assert_equal(true, gp.parse_string("-10 < 6"))
@@ -1109,7 +1109,6 @@ class ForTest < Test::Unit::TestCase
                         result = x
                         break
                  }
-                 result = x
             }
             "
     assert_equal(nil, gp.parse_string(code1))
@@ -1125,7 +1124,6 @@ class ForTest < Test::Unit::TestCase
                   result = true
                   break
                 }
-                result = false
               }
               result
              }
