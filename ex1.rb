@@ -11,7 +11,6 @@ prop Character
 bossman = Character.new(3, 2, 13)
 minion = Character.new(1, 1, 4)
 $player = Character.new(2, 2, 4)
-
 #
 event Forest
 {
@@ -22,6 +21,7 @@ event Forest
   }
   run
   {
+    show("pixel_forest.jpg")
     write("You enter a dark forest. The wind is howling.")
     write("1. Walk to the right.")
     write("2. Walk forward.")

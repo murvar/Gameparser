@@ -821,3 +821,14 @@ class Clear
     system('clear')
   end
 end
+
+class Image
+  def initialize(image)
+    @image = image.evaluate
+  end
+
+  def evaluate()
+    puts(@image)
+    system("fim -a images/#{@image}")
+  end
+end

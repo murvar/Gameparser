@@ -44,6 +44,7 @@ class GameLanguage
       token(/(?<!\w)new(?!\w)/) {|m| m }
       token(/(?<!\w)str(?!\w)/) {|m| m }
       token(/(?<!\w)cls(?!\w)/) {|m| m }
+      token(/(?<!\w)show(?!\w)/) {|m| m }
       token(/(?<!\w)len(?!\w)/) {|m| m }
       token(/(?<!\w)remove(?!\w)/) {|m| m }
       token(/(?<!\w)append(?!\w)/) {|m| m }
@@ -157,6 +158,7 @@ class GameLanguage
         match("load", "(", Identifier, ")") { |_, _, idn, _| Load.new(idn.name) }
         match("str", "(", :exp, ")") {|_, _, exp, _| ToString.new(exp)}
         match("cls", "(", ")") { Clear.new()}
+        match("show", "(", :exp, ")") {|_, _, m, _| Image.new(m)}
       end
 
       rule :statements do
