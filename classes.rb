@@ -771,17 +771,34 @@ class Event
 end
 
 class Load
-  def initialize(event)
+  def initialize(event, image = nil)
     @event = event
+    if image != nil
+      @image = image
+    end
   end
 
   def evaluate()
     if $events[@event] == nil
       raise "Can't load event '#{@event}'. Unknown event"
     else
+      @image.evaluate
       $events[@event].evaluate()
       true
     end
+  end
+end
+
+class Image
+  def initialize(image)
+    @image = image.evaluate
+    if @image[-4, 4] != ".jpg" and @image[-4, 4] != ".png"
+      raise "#{@image} is not an imagefile. Must be jpg or png"
+    end
+  end
+
+  def evaluate()
+    system("fim -a images/#{@image}")
   end
 end
 
@@ -819,16 +836,5 @@ end
 class Clear
   def evaluate()
     system('clear')
-  end
-end
-
-class Image
-  def initialize(image)
-    @image = image.evaluate
-  end
-
-  def evaluate()
-    puts(@image)
-    system("fim -a images/#{@image}")
   end
 end

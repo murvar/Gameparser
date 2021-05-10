@@ -155,10 +155,10 @@ class GameLanguage
         match("read", "(", ")") {|_, _, _| Read.new()}
         match("wait", "(", Integer, ")") {|_, _, s, _| Wait.new(s)}
         match("wait") {raise "Wait takes a positive integer as argument"}
+        match("load", "(", Identifier, ",", :exp,")") { |_, _, idn, _, i, _| Load.new(idn.name, Image.new(i)) }
         match("load", "(", Identifier, ")") { |_, _, idn, _| Load.new(idn.name) }
         match("str", "(", :exp, ")") {|_, _, exp, _| ToString.new(exp)}
         match("cls", "(", ")") { Clear.new()}
-        match("show", "(", :exp, ")") {|_, _, m, _| Image.new(m)}
       end
 
       rule :statements do
