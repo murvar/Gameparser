@@ -126,4 +126,5 @@ def battle (enemy) {
 # ==================================================
 name = read("Please enter your name:")
 $player = Character.new(name, 5, 2, 25)
+write("hello")
 load(room)

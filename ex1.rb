@@ -32,7 +32,7 @@ event Forest
       switch (choice)
       case(1)
         {
-          #load(Desert)
+          load(Desert)
         }
       case(2)
         {
@@ -40,7 +40,7 @@ event Forest
         }
       case(3)
         {
-          #load(Battle1)
+          load(Battle1)
         }
       case(4)
         {

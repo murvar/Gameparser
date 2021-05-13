@@ -175,11 +175,6 @@ class GameLanguage
         match(Break)
       end
 
-      # rule :assignments do
-      #   match(:assignments, :assignment) {|m, n| m + Array(n) }
-      #   match(:assignment) {|m| Array(m)}
-      # end
-
       rule :assignment do
         match(:identifier, "=", :array_op) do |idn, _, a|
           Assignment.new(idn, a)

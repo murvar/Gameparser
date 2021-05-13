@@ -782,7 +782,9 @@ class Load
     if $events[@event] == nil
       raise "Can't load event '#{@event}'. Unknown event"
     else
-      @image.evaluate
+      if @image
+        @image.evaluate
+      end
       $events[@event].evaluate()
       true
     end
