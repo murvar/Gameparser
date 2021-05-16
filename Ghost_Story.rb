@@ -52,8 +52,8 @@ def print_stats(attack, defence, health)
   write("* Defence : " + str(defence))
   write("* health  : " + str(health))
   write()
-}    
-  
+}
+
 def header(heading)
 {
   write("*"*90)
@@ -65,11 +65,12 @@ event room
   {
 
     init {
-     
+
     }
 
   run
   {
+    cls()
     print_stats($player.attack, $player.defence, $player.health)
     header("Dark room")
     write("You are in a dark room.\n\n")
@@ -79,7 +80,10 @@ event room
     switch(choice)
     case (1)
     {
-      load(yard)
+      cls()
+      header("Yard")
+      write("You are in a dark yard. Behind a dead tree you can see a ghost peeking out.\n\n")
+      load(yard, "yard.jpg")
     }
 
   }
@@ -95,6 +99,7 @@ event yard
 
   run
   {
+    cls()
     print_stats($player.attack, $player.defence, $player.health)
     header("Yard")
     write("You are in a dark yard. Behind a dead tree you can see a ghost peeking out.\n\n")
@@ -102,7 +107,7 @@ event yard
     write("2. Wave to the ghost")
 
     choice = read()
-    
+
     switch(choice)
     case (1)
     {
@@ -116,7 +121,7 @@ event yard
       write("2. Run back into the house")
 
       choice = read()
-      
+
       switch(choice)
       case (1)
       {
@@ -138,7 +143,7 @@ def battle (enemy)
   cls()
   header("Battle with the ghost!!!")
   write("You enter a battle with a " + enemy.name + ".\n\n")
-      
+
   while true
   {
     write("1. Attack the " + enemy.name)
@@ -147,7 +152,7 @@ def battle (enemy)
     choice = read()
     cls()
     header("Battle with the ghost!!!")
-    
+
     switch(choice)
     case (1)
     {
@@ -176,7 +181,10 @@ def battle (enemy)
     }
     case (2)
     {
-     load(yard)
+      cls()
+      header("Yard")
+      write("You are in a dark yard. Behind a dead tree you can see a ghost peeking out.\n\n")
+      load(yard, "yard.jpg")
     }
   }
 }
@@ -184,8 +192,10 @@ def battle (enemy)
 # ==================================================
 # Huvudprogram
 # ==================================================
-prompt("Welcome to the \"Ghost Story\"", 26, 5)    
+prompt("Welcome to the \"Ghost Story\"", 26, 5)
 name = read("Please enter your name:")
 cls()
 $player = initiate_player(name)
-load(room)
+header("Dark room")
+write("You are in a dark room.\n\n")
+load(room, "dark_room.jpg")
