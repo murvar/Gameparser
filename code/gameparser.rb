@@ -74,6 +74,10 @@ class GameLanguage
 
       token(/./) {|m| m } # returns rest like (, {, =, < etc as string
 
+    # ============================================================
+    # Parser start
+    # ============================================================
+      
       start :prog do
         match(:comps) {|m| Comps.new(m).evaluate() unless m.class == nil }
       end
@@ -112,7 +116,7 @@ class GameLanguage
         end
       end
 
-      rule :init do #Kan vi avgöra vilken init som skall tillåtas på det här djupet?
+      rule :init do
         match("init", "(", :params, ")", :block) {|_, _, p, _, b, _| [p,b] }
         match("init", :block) {|_, b| b }
       end
@@ -185,6 +189,7 @@ class GameLanguage
         match(:identifier, "[", Integer, "]", "=", :exp) do |idn, _, index, _, _, exp|
           ElementWriter.new(idn, index, exp)
         end
+
         match(:identifier, ".", Identifier, "=", :exp) do |idn, _, attr, _, exp|
           AttributeWriter.new(idn, attr, exp)
         end
@@ -198,7 +203,7 @@ class GameLanguage
       end
 
       rule :bool_exp do
-        match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs| #finns det bättre lösning?
+        match(:math_exp, CompOp, :math_exp) do |lhs, c, rhs|
           case c.op
           when "<=" then
             LessEqual.new(lhs, rhs)
@@ -276,27 +281,39 @@ class GameLanguage
       end
 
       rule :array_op do
-        match(:identifier, "[", Integer, "]") do |idn, _, index, _|
-          ElementReader.new(idn, index)
-        end
-        match(:identifier, ".", "remove", "(", :exp, ")") do |idn, _, _, _, index, _|
-          ElementRemover.new(idn, index)
-        end
-        match(:identifier, ".", "remove", "(", ")") do |idn, _, _, _, _|
-          ElementRemover.new(idn)
-        end
-        match(:identifier, ".", "append", "(", :exp, ")") do |idn, _, _, _, exp, _|
-          ListAppend.new(idn, exp)
-        end
-        match(:identifier, "<<", :exp) do |idn, _, exp|
-          ListAppend.new(idn, exp)
-        end
-        match(:identifier, ".", "insert", "(", Integer, ",", :exp, ")") do |idn, _, _, _, index, _, exp, _|
-          ListInsert.new(idn, index, exp)
-        end
-        match(:identifier, ".", "len") {|idn, _, _| ListLength.new(idn) }
+        match(:identifier, :ops) {|list, ops| ListOps.new(list, ops) }
+        match(:array, :ops) {|list, ops| ListOps.new(list, ops) }
+        match(:instance_reader, :ops) {|list, ops| ListOps.new(list, ops) }
+        match(:function_call, :ops) {|list, ops| ListOps.new(list, ops) }
       end
-
+      
+      rule :ops do
+        match(:ops, :op) {|ops, op| ops + Array(ops)}
+        match(:op) {|op| Array(op)}
+      end
+      
+      rule :op do
+        match("[", Integer, "]") do | _, index, _|
+          ElementReader.new(index)
+        end
+        match(".", "remove", "(", :exp, ")") do | _, _, _, index, _|
+          ElementRemover.new(index)
+        end
+        match(".", "remove", "(", ")") do | _, _, _, _|
+          ElementRemover.new()
+        end
+        match(".", "append", "(", :exp, ")") do | _, _, _, exp, _|
+          ListAppend.new(exp)
+        end
+        match("<<", :exp) do | _, exp|
+          ListAppend.new(exp)
+        end
+        match(".", "insert", "(", Integer, ",", :exp, ")") do | _, _, _, index, _, exp, _|
+          ListInsert.new(index, exp)
+        end
+        match(".", "len") {| _, _| ListLength.new() }
+      end
+      
       rule :values do
         match(:values, ",", :exp) {|m, _, n| m + Array(n)}
         match(:exp) {|m| Array(m)}
@@ -365,7 +382,6 @@ class GameLanguage
     # Parser end
     # ============================================================
 
-
     def done(str)
       ["quit","exit","bye",""].include?(str.chomp)
     end
@@ -377,7 +393,6 @@ class GameLanguage
       log(false)
      # print "[gameParser] #{format('%03d', @line)}: "
       print "[gameParser]: "
-      #str = File.read(file)
       str = gets
       if done(str) then
         puts "Bye."

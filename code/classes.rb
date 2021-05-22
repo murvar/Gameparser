@@ -81,14 +81,95 @@ class List
   end
 end
 
-class ElementReader
-  def initialize(idn, index)
-    @idn = idn
-    @index = index
+class ListOps
+  def initialize(list, ops)
+    @list = list
+    @ops = ops
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name][@index]
+    temp_list = @list 
+    for o in @ops
+      temp_list = o.evaluate(temp_list)
+    end
+    temp_list
+  end
+end
+  
+class ElementReader
+  def initialize(index)
+    @index = index
+  end
+
+  def evaluate(list)
+    if list.class == Identifier
+      $variables[$current_scope][list.name][@index]
+    elsif list.class == GIdentifier
+      $g_variables[list.name][@index]
+    else
+      list.evaluate()[@index]
+    end
+  end
+end
+
+class ElementRemover
+  def initialize(index = -1)
+    @index = index
+  end
+
+  def evaluate(list)
+    if list.class == Identifier
+      $variables[$current_scope][list.name].delete_at(@index.evaluate())
+    elsif list.class == GIdentifier
+      $g_variables[list.name].delete_at(@index.evaluate())
+    else
+      list.evaluate().delete_at(@index.evaluate())
+    end
+  end
+end
+
+class ListAppend
+  def initialize(value)
+    @value = value
+  end
+
+  def evaluate(list)
+    if list.class == Identifier
+      $variables[$current_scope][list.name] << @value.evaluate()
+    elsif list.class == GIdentifier
+      $g_variables[list.name] << @value.evaluate()
+    else
+      list.evaluate() << @value.evaluate()
+    end
+  end
+end
+
+class ListInsert
+  def initialize(index, value)
+    @index = index
+    @value = value
+  end
+
+  def evaluate(list)
+    if list.class == Identifier
+      $variables[$current_scope][list.name].insert(@index, @value.evaluate())
+    elsif list.class == GIdentifier
+      $g_variables[list.name].insert(@index, @value.evaluate())
+    else
+      list.evaluate().insert(@index, @value.evaluate())
+    end
+  end
+end
+
+class ListLength
+  def evaluate(list)
+    if list.class == Identifier
+      $variables[$current_scope][list.name].length
+    elsif list.class == GIdentifier
+      $g_variables[list.name].length
+    else
+      list.evaluate().length
+    end
   end
 end
 
@@ -100,66 +181,10 @@ class ElementWriter
   end
 
   def evaluate()
-    $variables[$current_scope][@idn.name][@index] = @value.evaluate()
-  end
-end
-
-class ElementRemover
-  def initialize(idn, index = -1)
-    @idn = idn
-    @index = index
-  end
-
-  def evaluate()
-    if @idn.class != GIdentifier
-      $variables[$current_scope][@idn.name].delete_at(@index.evaluate())
+    if @idn.class == Identifier
+      $variables[$current_scope][@idn.name][@index] = @value.evaluate()
     else
-      $g_variables[@idn.name].delete_at(@index.evaluate())
-    end
-  end
-end
-
-class ListAppend
-  def initialize(idn, value)
-    @idn = idn
-    @value = value
-  end
-
-  def evaluate()
-    if @idn.class != GIdentifier
-      $variables[$current_scope][@idn.name] << @value.evaluate()
-    else
-      $g_variables[@idn.name] << @value.evaluate()
-    end
-  end
-end
-
-class ListInsert
-  def initialize(idn, index, value)
-    @idn = idn
-    @index = index
-    @value = value
-  end
-
-  def evaluate()
-    if @idn.class != GIdentifier
-      $variables[$current_scope][@idn.name].insert(@index, @value.evaluate())
-    else
-      $g_variables[@idn.name].insert(@index, @value.evaluate())
-    end
-  end
-end
-
-class ListLength
-  def initialize(idn)
-    @idn = idn
-  end
-
-  def evaluate()
-    if @idn.class != GIdentifier
-      $variables[$current_scope][@idn.name].length
-    else
-      $g_variables[@idn.name].length
+      $g_variables[@idn.name][@index] = @value.evaluate()
     end
   end
 end
