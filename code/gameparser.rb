@@ -281,18 +281,18 @@ class GameLanguage
       end
 
       rule :array_op do
-        match(:identifier, :ops) {|list, ops| ListOps.new(list, ops) }
-        match(:array, :ops) {|list, ops| ListOps.new(list, ops) }
-        match(:instance_reader, :ops) {|list, ops| ListOps.new(list, ops) }
-        match(:function_call, :ops) {|list, ops| ListOps.new(list, ops) }
+        match(:identifier, :operations) {|list, ops| ListOps.new(list, ops) }
+        match(:array, :operations) {|list, ops| ListOps.new(list, ops) }
+        match(:instance_reader, :operations) {|list, ops| ListOps.new(list, ops) }
+        match(:function_call, :operations) {|list, ops| ListOps.new(list, ops) }
       end
       
-      rule :ops do
-        match(:ops, :op) {|ops, op| ops + Array(ops)}
-        match(:op) {|op| Array(op)}
+      rule :operations do
+        match(:operations, :operation) {|ops, op| ops + Array(ops)}
+        match(:operation) {|op| Array(op)}
       end
       
-      rule :op do
+      rule :operation do
         match("[", Integer, "]") do | _, index, _|
           ElementReader.new(index)
         end
