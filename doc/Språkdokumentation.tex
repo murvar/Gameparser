@@ -2,11 +2,11 @@
 \usepackage{xcolor}
 
 
-\newcommand{\version}{Version 1.0}
+\newcommand{\version}{Version 2.0}
 \author{Hadi Ansari, \url{hadan326@student.liu.se}\\
   Vincent Ahlström, \url{vinah331@student.liu.se}}
 \title{Språkdokumentation}
-\date{2021-05-25}
+\date{2021-05-26}
 \rhead{Hadi Ansari\\
 Vincent Ahlström}
 
@@ -17,7 +17,7 @@ Vincent Ahlström}
 \cleardoublepage
 \setcounter{page}{1}
 \section{Introduktion}
-I den här rapporten skriven som en del av kursen TDP019 Projekt: Datorspråk, kommer programmeringsspråket Gameparser dokumenteras. Projektet Datorspråk är det tredje projektet i programmet innovativ programmering och det handlar om att utveckla ett eget datorspråk. Projektet utvecklades av en grupp av två IP-studenter under andra perioden av vårterminen 2021.
+I den här rapporten skriven som en del av kursen TDP019 Projekt: Datorspråk, kommer programmeringsspråket \textbf{Gameparser} dokumenteras. Projektet Datorspråk är det tredje projektet i programmet innovativ programmering och det handlar om att utveckla ett eget datorspråk. Projektet utvecklades av en grupp av två IP-studenter under andra perioden av vårterminen 2021.
 
 Språket är designat för (men ej begränsat till) att skapa textbaserade spel. Det har sin grund i Ruby där det via rdparse.rb översätter skriven kod till Ruby för körning. Syntaxen är inspirerad av både Ruby och Python vilket gör språket användarvänligt. Gameparser ämnar att erbjuda användaren alla verktyg som krävs för att designa en interaktiv och levande spelvärld i ett textbaserat format.
 
@@ -75,7 +75,7 @@ Notera att en range kan båda inkludera och exkludera slutvärdet (se figur 3). 
   \caption{Exempel på hur en range kan båda inkludera och exkludera slutvärdet}
 \end{figure}
 
-I avsnittet “Variabler” kommer fler exempel på hur dessa datatyper kan användas för att kunna deklarera olika typer av variabler.
+I avsnittet “Variabel” kommer fler exempel på hur dessa datatyper kan användas för att kunna deklarera olika typer av variabler.
 
 \newpage
 \section{Språkstruktur}
@@ -463,9 +463,9 @@ Det finns ingen specificerad kodstandard utöver de krav som tidigare nämnts. B
   \> \>| \> <event> \\
   \> \>| \> <function\_def>\\\\
 
-  \><prop> \>::= \>\textbf{prop} \textcolor{Cyan}{Identifier} { <init> }\\\\
+  \><prop> \>::= \>\textbf{prop} \textcolor{Cyan}{Identifier} \textbf{\{} <init> \textbf{\}}\\\\
 
-  \><event> \>::= \>\textbf{event} \textcolor{Cyan}{Identifier} { <init> \textbf{run} <block> }\\\\
+  \><event> \>::= \>\textbf{event} \textcolor{Cyan}{Identifier} \textbf{\{} <init> \textbf{run} <block> \textbf{\}}\\\\
 
   \><init> \>::= \>\textbf{init} \textbf{(} <params> \textbf{)} <block>\\
   \> \>| \> \textbf{init} <block>\\\\
@@ -478,8 +478,8 @@ Det finns ingen specificerad kodstandard utöver de krav som tidigare nämnts. B
 
   \><param> \>::= \><identifier>\\\\
 
-  \><block> \>::= \>{ <statements> }\\
-  \> \>| \> { <empty> }\\\\
+  \><block> \>::= \>\textbf{\{} <statements> \textbf{\}}\\
+  \> \>| \> \textbf{\{} <empty> \textbf{\}}\\\\
 
   \><function\_call> \>::= \>\textcolor{Cyan}{Identifier} \textbf{(} <values> \textbf{)}\\
   \> \>| \> \textbf{write (} \textcolor{Cyan}{Identifier} \textbf{)}\\
@@ -518,8 +518,8 @@ Det finns ingen specificerad kodstandard utöver de krav som tidigare nämnts. B
   \> \>| \> \textbf{not} <exp>\\
   \> \>| \> <bool\_exp>\\\\
 
-  \><bool\_exp> \>::= \><math\_exp> CompOp <math\_exp>\\
-  \> \>| \> <bool\_val> CompOp <bool\_val>\\
+  \><bool\_exp> \>::= \><math\_exp> \textcolor{blue}{CompOp} <math\_exp>\\
+  \> \>| \> <bool\_val> \textcolor{blue}{CompOp} <bool\_val>\\
   \> \>| \> <bool\_val>\\\\
 
   \><bool\_val> \>::= \>\textbf{\textcolor{ForestGreen}{true}}\\
